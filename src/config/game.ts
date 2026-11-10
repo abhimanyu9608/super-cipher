@@ -121,6 +121,8 @@ export const FX = {
   bannerFrames: 170,
   confettiFrames: 150,
   skyBlend: 300,
+  /** Jumpscare freeze (frames); matches the 0.9 s CSS pop-up. */
+  scareFrames: 54,
 } as const;
 
 export const AUDIO_MIX = {

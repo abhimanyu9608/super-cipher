@@ -165,19 +165,165 @@ button {
     0 0 0 3px var(--line),
     0 0 40px #7c3aed66,
     0 20px 60px #0008;
-  container-type: inline-size;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 
-.stage:fullscreen {
+/* The 16:9 box that holds the canvas and every overlay; overlays size with cqw of this box. */
+.stage-box {
+  position: absolute;
+  inset: 0;
+  container-type: inline-size;
+}
+
+/* Full screen: real Fullscreen API, or a full-window fallback for browsers without it (iPhone Safari). */
+.stage:fullscreen,
+.stage:-webkit-full-screen,
+.stage.pseudo-full {
+  position: fixed;
+  inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
+  min-width: 0;
   max-width: none;
   aspect-ratio: auto;
   border-radius: 0;
+  box-shadow: none;
   background: #000;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+.stage:fullscreen .stage-box,
+.stage:-webkit-full-screen .stage-box,
+.stage.pseudo-full .stage-box {
+  position: relative;
+  inset: auto;
+  width: min(100%, calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 16 / 9));
+  aspect-ratio: 16 / 9;
+}
+
+body.pseudo-full-on {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* In-stage Pause / Exit buttons: shown only in full screen, where the page toolbar is hidden. */
+.stage-tools {
+  position: absolute;
+  top: 12.5cqw;
+  right: 1.5cqw;
+  z-index: 26;
+  display: none;
+  gap: 1cqw;
+}
+
+.stage.is-full .stage-tools {
+  display: flex;
+}
+
+.stool {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  background: rgba(14, 11, 31, 0.6);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ---------------- jumpscare flash (DOM layer above the canvas) */
+.scare {
+  position: absolute;
+  inset: 0;
+  z-index: 24;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, rgba(255, 30, 30, 0.15), rgba(80, 0, 0, 0.85));
+  animation: scare-bg 0.9s ease-out forwards;
+}
+
+.scare img {
+  width: 46cqw;
+  max-height: 90%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 2cqw #ff2d2d);
+  animation: scare-pop 0.9s cubic-bezier(0.2, 1.6, 0.4, 1) forwards;
+}
+
+.scare p {
+  position: absolute;
+  bottom: 8%;
+  margin: 0;
+  font-family: var(--pixel);
+  font-size: max(16px, 4cqw);
+  color: #fff;
+  text-shadow:
+    0.5cqw 0.5cqw 0 #c92a2a,
+    -0.3cqw -0.3cqw 0 var(--outline);
+  animation: scare-shake 0.12s linear 6;
+}
+
+@keyframes scare-bg {
+  0% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  20% {
+    background-color: transparent;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes scare-pop {
+  0% {
+    transform: scale(0.2) rotate(-8deg);
+  }
+  25% {
+    transform: scale(1.25) rotate(4deg);
+  }
+  40% {
+    transform: scale(1) rotate(-3deg);
+  }
+  100% {
+    transform: scale(1.1) rotate(0deg);
+  }
+}
+
+@keyframes scare-shake {
+  25% {
+    transform: translate(-1cqw, 0.5cqw);
+  }
+  75% {
+    transform: translate(1cqw, -0.5cqw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scare,
+  .scare img,
+  .scare p {
+    animation-duration: 0.01s;
+  }
+
+  .scare {
+    background: rgba(80, 0, 0, 0.6);
+  }
 }
 
 #game,

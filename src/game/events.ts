@@ -20,6 +20,8 @@ export interface GameEvents {
   ready: undefined;
   /** Level scene finished building. */
   levelReady: { level: LevelId };
+  /** Full-screen jumpscare: a face image (data URL) and a caption. */
+  jumpscare: { image: string; text: string };
 }
 
 type Handler<T> = (payload: T) => void;

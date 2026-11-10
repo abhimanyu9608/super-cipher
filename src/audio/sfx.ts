@@ -44,7 +44,8 @@ export type SfxEvent =
   | 'ring'
   | 'unlock'
   | 'heart'
-  | 'late';
+  | 'late'
+  | 'jumpscare';
 
 type Channel = 'sfx' | 'voice';
 
@@ -83,6 +84,7 @@ const MAP: Record<SfxEvent, { ch: Channel; gen: string[] }> = {
   unlock: { ch: 'sfx', gen: ['unlock'] },
   heart: { ch: 'sfx', gen: ['heart'] },
   late: { ch: 'sfx', gen: ['late'] },
+  jumpscare: { ch: 'sfx', gen: ['jumpscare'] },
 };
 
 class AudioManager {

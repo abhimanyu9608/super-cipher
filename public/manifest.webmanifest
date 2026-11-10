@@ -1,0 +1,12 @@
+{
+  "name": "Super Cipher: Office Run",
+  "short_name": "Super Cipher",
+  "description": "A free retro platformer about Indian office life, by @cipherboy.dev",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0E0B1F",
+  "theme_color": "#0E0B1F",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

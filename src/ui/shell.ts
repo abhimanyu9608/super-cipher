@@ -8,6 +8,7 @@ import { unlockCode, isPlayerId } from '../social/unlock';
 import { press } from './input';
 import { copyText } from './clipboard';
 import type { Flow } from './screens';
+import { initFullscreen, toggleFullscreen } from './fullscreen';
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 
@@ -101,27 +102,10 @@ export function initShell(flow: Flow): void {
     audio.setEnabled(!audio.enabled);
     applyStatic();
   });
-  $('#btn-full').addEventListener('click', () => {
-    const stage = $('#stage');
-    const doc = document as Document & {
-      webkitFullscreenElement?: Element;
-      webkitExitFullscreen?: () => void;
-    };
-    const el = stage as HTMLElement & { webkitRequestFullscreen?: () => void };
-    if (document.fullscreenElement || doc.webkitFullscreenElement) {
-      void (document.exitFullscreen?.() ?? doc.webkitExitFullscreen?.());
-    } else {
-      try {
-        const p = el.requestFullscreen?.() ?? el.webkitRequestFullscreen?.();
-        void (p as Promise<void> | undefined)?.then(() => {
-          const o = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> };
-          return o?.lock?.('landscape').catch(() => undefined);
-        });
-      } catch {
-        /* fullscreen not allowed */
-      }
-    }
-  });
+  initFullscreen($('#stage'));
+  $('#btn-full').addEventListener('click', () => void toggleFullscreen());
+  $('#btn-full-exit').addEventListener('click', () => void toggleFullscreen());
+  $('#btn-pause-in').addEventListener('click', () => flow.togglePause());
   onLangChange(applyStatic);
   applyStatic();
   updateHead();

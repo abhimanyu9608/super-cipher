@@ -21,6 +21,11 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Super Cipher" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -59,19 +64,29 @@
     <main>
       <section class="stage-wrap">
         <div id="stage" class="stage">
-          <div id="game"></div>
-          <div id="overlay-root" class="overlay-root"></div>
-          <div id="touch" class="touch" aria-hidden="true">
-            <button type="button" class="tbtn tbtn-left" data-act="left" data-i18n-label="left">◀</button>
-            <button type="button" class="tbtn tbtn-right" data-act="right" data-i18n-label="right">▶</button>
-            <button type="button" class="tbtn tbtn-dash" data-act="dash" data-i18n="dash">DASH</button>
-            <button type="button" class="tbtn tbtn-jump" data-act="jump" data-i18n="jump">JUMP</button>
-          </div>
-          <p id="rotate-chip" class="rotate-chip" data-i18n="rotate"></p>
-          <div id="loading" class="loading">
-            <p class="loading-title">SUPER CIPHER</p>
-            <div class="load-track"><div id="load-bar" class="load-bar"></div></div>
-            <p class="loading-text" data-i18n="loading">Chai garam ho rahi hai...</p>
+          <div class="stage-box">
+            <div id="game"></div>
+            <div id="overlay-root" class="overlay-root"></div>
+            <div id="touch" class="touch" aria-hidden="true">
+              <button type="button" class="tbtn tbtn-left" data-act="left" data-i18n-label="left">◀</button>
+              <button type="button" class="tbtn tbtn-right" data-act="right" data-i18n-label="right">
+                ▶
+              </button>
+              <button type="button" class="tbtn tbtn-dash" data-act="dash" data-i18n="dash">DASH</button>
+              <button type="button" class="tbtn tbtn-jump" data-act="jump" data-i18n="jump">JUMP</button>
+            </div>
+            <div class="stage-tools">
+              <button type="button" id="btn-pause-in" class="stool" data-i18n-label="pause">⏸</button>
+              <button type="button" id="btn-full-exit" class="stool" data-i18n-label="exitFullscreen">
+                ✕
+              </button>
+            </div>
+            <p id="rotate-chip" class="rotate-chip" data-i18n="rotate"></p>
+            <div id="loading" class="loading">
+              <p class="loading-title">SUPER CIPHER</p>
+              <div class="load-track"><div id="load-bar" class="load-bar"></div></div>
+              <p class="loading-text" data-i18n="loading">Chai garam ho rahi hai...</p>
+            </div>
           </div>
         </div>
       </section>

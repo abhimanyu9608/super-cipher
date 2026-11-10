@@ -347,6 +347,10 @@ export const STRINGS = {
   quarterDeadline: { hi: 'Q4 DEADLINE!!!', en: 'Q4 DEADLINE!!!' },
   quickCallScreen: { hi: 'EK QUICK CALL?', en: 'QUICK CALL?' },
   companyName: { hi: 'CIPHER TECH PVT. LTD.', en: 'CIPHER TECH PVT. LTD.' },
+  exitFullscreen: { hi: 'Fullscreen band karo', en: 'Exit fullscreen' },
+  scareMonkey: { hi: 'OOK OOK! ID MERA HAI!', en: 'OOK OOK! THE ID IS MINE!' },
+  scareBug: { hi: 'BUG IN PRODUCTION!!!', en: 'BUG IN PRODUCTION!!!' },
+  scareManager: { hi: 'EK QUICK CALL?!', en: 'GOT A MINUTE?!' },
 } as const satisfies Record<string, Record<Lang, string>>;
 
 export type StringKey = keyof typeof STRINGS;

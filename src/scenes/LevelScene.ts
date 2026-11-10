@@ -146,6 +146,7 @@ export class LevelScene extends Phaser.Scene {
   private microwaves: { o: MapObject; t: number }[] = [];
   private onceFlags = new Set<string>();
   private scanFrames = 0;
+  private scareFrames = 0;
 
   constructor() {
     super('Level');
@@ -195,6 +196,7 @@ export class LevelScene extends Phaser.Scene {
     this.onceFlags = new Set();
     this.finishTimer = 0;
     this.scanFrames = 0;
+    this.scareFrames = 0;
     this.lastChair = null;
     this.coinBlocks = 0;
     this.cowNear = false;
@@ -818,9 +820,28 @@ export class LevelScene extends Phaser.Scene {
     this.render();
   }
 
+  /** Loud sting + giant face. Gameplay freezes for its duration so a scare never costs a heart. */
+  private jumpscare(tex: string, frame: number, caption: StringKey): void {
+    this.scareFrames = FX.scareFrames;
+    sfx('jumpscare');
+    this.fx.addShake(FX.shakeHit * 1.5);
+    let image = '';
+    try {
+      image = this.textures.getBase64(tex, frame);
+    } catch {
+      /* texture missing: caption only */
+    }
+    events.emit('jumpscare', { image, text: t(caption) });
+  }
+
   private step(): void {
     this.frame++;
     if (this.mode === 'attract') return this.stepAttract();
+    if (this.scareFrames > 0) {
+      this.scareFrames--;
+      this.fx.step();
+      return;
+    }
     const r = this.run;
     if (this.state === 'play') r.frames++;
     for (const k of Object.keys(r.power) as PowerUpId[]) if (r.power[k] > 0) r.power[k]--;
@@ -1158,11 +1179,13 @@ export class LevelScene extends Phaser.Scene {
       if (this.monkey && !this.monkey.active && p.cx > arena.x) {
         this.monkey.active = true;
         this.events.emit('bossBanner', 'bossMonkey');
-        sfx('ook');
+        if (this.once('scareMonkey')) this.jumpscare('monkey', 0, 'scareMonkey');
+        else sfx('ook');
       }
       if (this.manager && !this.manager.active && p.cx > arena.x) {
         this.manager.active = true;
         this.events.emit('bossBanner', 'bossManager');
+        if (this.once('scareManager')) this.jumpscare('manager', 1, 'scareManager');
         this.fx.popup(this.manager.cx, this.manager.y - 20, t('quickCall'), '#FFFFFF', 12);
         sfx('manager');
       }
@@ -1197,6 +1220,11 @@ export class LevelScene extends Phaser.Scene {
       this.doors.l.x = this.doors.x - 52 * open;
       this.doors.r.x = this.doors.x + 60 + 52 * open;
     }
+
+    // ---------------- Jumpscare deep inside the dark server room
+    const dark = (z.dark ?? [])[0];
+    if (dark && this.state === 'play' && p.cx > dark.x + 360 && this.once('scareBug'))
+      this.jumpscare('bug', 0, 'scareBug');
 
     // ---------------- Level 2: office clock
     if (LEVELS[r.level].officeClock && this.state === 'play') {

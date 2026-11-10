@@ -416,6 +416,38 @@ export const SOUNDS: Record<string, SoundSpec> = {
       },
     ],
   },
+  /** Jumpscare sting: white-noise blast + detuned dissonant stab + sub boom + rising shriek. */
+  jumpscare: {
+    voices: [
+      { wave: 'noise', notes: [{ f: 9000, f1: 700, d: 0.55 }], gain: 0.7, attack: 0.001, release: 0.25 },
+      {
+        wave: 'saw',
+        notes: [{ f: 220, f1: 205, d: 0.75 }],
+        gain: 0.32,
+        attack: 0.001,
+        vib: [0.03, 23],
+        release: 0.3,
+      },
+      {
+        wave: 'saw',
+        notes: [{ f: 233, f1: 218, d: 0.75 }],
+        gain: 0.32,
+        attack: 0.001,
+        vib: [0.03, 19],
+        release: 0.3,
+      },
+      { wave: 'square', notes: [{ f: 311, f1: 290, d: 0.7 }], gain: 0.22, attack: 0.001, release: 0.3 },
+      { wave: 'sine', notes: [{ f: 95, f1: 30, d: 0.7 }], gain: 1, attack: 0.001, release: 0.2 },
+      {
+        wave: 'square',
+        duty: 0.25,
+        notes: [{ f: 900, f1: 2600, d: 0.5 }],
+        gain: 0.2,
+        vib: [0.06, 13],
+        at: 0.06,
+      },
+    ],
+  },
 };
 
 // ---------------------------------------------------------------- music
