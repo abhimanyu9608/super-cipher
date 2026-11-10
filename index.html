@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="hi-Latn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0E0B1F" />
+    <title>Super Cipher: Office Run</title>
+    <meta
+      name="description"
+      content="A free retro platformer about Indian office life. Race from your 1RK flat to the metro before your 9:30 meeting. By @cipherboy.dev"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Super Cipher: Office Run" />
+    <meta
+      property="og:description"
+      content="9:30 ki meeting hai. Kutton se bacho, bugs fix karo, chai pi ke double jump maaro! A free retro platformer by @cipherboy.dev"
+    />
+    <meta property="og:image" content="og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <img id="brand-head" class="brand-head" alt="" width="44" height="44" />
+        <div>
+          <p class="logo">SUPER CIPHER</p>
+          <a
+            class="brand-sub"
+            href="https://www.instagram.com/cipherboy.dev/"
+            target="_blank"
+            rel="noopener"
+            data-i18n="brandSub"
+            >Office Run · by @cipherboy.dev</a
+          >
+        </div>
+      </div>
+      <nav class="toolbar" aria-label="Game controls">
+        <div class="lang-switch" role="group" data-i18n-label="langLabel">
+          <button type="button" data-lang="hi" data-i18n="langHi">Hinglish</button>
+          <button type="button" data-lang="en" data-i18n="langEn">English</button>
+        </div>
+        <button type="button" id="btn-pause" class="tool" data-i18n-label="pause">⏸</button>
+        <button type="button" id="btn-sound" class="tool">🔊</button>
+        <button type="button" id="btn-full" class="tool" data-i18n-label="fullscreen">⛶</button>
+        <button type="button" id="btn-restart" class="tool" data-i18n-label="restart">↻</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="stage-wrap">
+        <div id="stage" class="stage">
+          <div id="game"></div>
+          <div id="overlay-root" class="overlay-root"></div>
+          <div id="touch" class="touch" aria-hidden="true">
+            <button type="button" class="tbtn tbtn-left" data-act="left" data-i18n-label="left">◀</button>
+            <button type="button" class="tbtn tbtn-right" data-act="right" data-i18n-label="right">▶</button>
+            <button type="button" class="tbtn tbtn-dash" data-act="dash" data-i18n="dash">DASH</button>
+            <button type="button" class="tbtn tbtn-jump" data-act="jump" data-i18n="jump">JUMP</button>
+          </div>
+          <p id="rotate-chip" class="rotate-chip" data-i18n="rotate"></p>
+          <div id="loading" class="loading">
+            <p class="loading-title">SUPER CIPHER</p>
+            <div class="load-track"><div id="load-bar" class="load-bar"></div></div>
+            <p class="loading-text" data-i18n="loading">Chai garam ho rahi hai...</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panels">
+        <article class="panel">
+          <h2 id="map-title" data-i18n="mapTitle1"></h2>
+          <p id="map-goal" class="goal"></p>
+          <ol id="zone-list" class="zone-list"></ol>
+        </article>
+        <article class="panel">
+          <h2 data-i18n="howTitle"></h2>
+          <ul class="how-list">
+            <li><span class="ico" aria-hidden="true">⬅️</span><span data-i18n="howMove"></span></li>
+            <li><span class="ico" aria-hidden="true">⬆️</span><span data-i18n="howJump"></span></li>
+            <li><span class="ico" aria-hidden="true">🐞</span><span data-i18n="howStomp"></span></li>
+            <li><span class="ico" aria-hidden="true">🪙</span><span data-i18n="howCoins"></span></li>
+            <li><span class="ico" aria-hidden="true">☕</span><span data-i18n="howChai"></span></li>
+            <li><span class="ico" aria-hidden="true">🎧</span><span data-i18n="howPhones"></span></li>
+            <li><span class="ico" aria-hidden="true">🚌</span><span data-i18n="howHazard"></span></li>
+            <li><span class="ico" aria-hidden="true">⏸️</span><span data-i18n="howPause"></span></li>
+          </ul>
+        </article>
+      </section>
+
+      <p class="credits" data-i18n="credits"></p>
+
+      <section id="admin" class="panel admin" hidden>
+        <h2 data-i18n="adminTitle"></h2>
+        <div class="admin-row">
+          <label for="admin-pid" data-i18n="adminPid"></label>
+          <input
+            id="admin-pid"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="CB-XXXXXX"
+            maxlength="12"
+          />
+          <label for="admin-level" data-i18n="adminLevel"></label>
+          <select id="admin-level"></select>
+          <button type="button" id="admin-gen" class="btn btn-gold" data-i18n="adminGenerate"></button>
+        </div>
+        <p id="admin-code" class="admin-code" aria-live="polite"></p>
+        <button type="button" id="admin-copy" class="btn" data-i18n="adminCopy" hidden></button>
+        <p id="admin-msg" class="admin-msg" aria-live="polite"></p>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

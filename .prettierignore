@@ -1,0 +1,6 @@
+dist
+node_modules
+reference
+public/assets/maps
+package-lock.json
+PRD.md

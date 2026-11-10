@@ -1,0 +1,62 @@
+<!doctype html>
+<!-- Renders the 1200x630 Open Graph preview. Run the dev server, then screenshot this page:
+     msedge --headless --window-size=1200,630 --screenshot=public/og-image.png http://localhost:5173/super-cipher/scripts/og.html -->
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #0e0b1f;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c" width="1200" height="630"></canvas>
+    <script type="module">
+      import { drawCharacter } from '/super-cipher/src/gfx/characters.ts';
+      import { text, rr, fillStroke, seeded } from '/super-cipher/src/gfx/draw.ts';
+      await document.fonts.load('40px "Press Start 2P"');
+      await document.fonts.load('800 30px "Baloo 2"');
+      const c = document.getElementById('c').getContext('2d');
+      const g = c.createLinearGradient(0, 0, 1200, 630);
+      g.addColorStop(0, '#2A1F5C');
+      g.addColorStop(0.6, '#7C3AED');
+      g.addColorStop(1, '#F06595');
+      c.fillStyle = g;
+      c.fillRect(0, 0, 1200, 630);
+      const r = seeded(3);
+      const cols = ['#FFD43B', '#22D3EE', '#40C057', '#FF5C5C', '#FFFFFF'];
+      for (let i = 0; i < 70; i++) {
+        c.fillStyle = cols[i % cols.length];
+        c.fillRect(r() * 1200, r() * 630, 14, 7);
+      }
+      text(c, 'SUPER CIPHER', 420, 170, 58, '#FFD43B', { stroke: 14 });
+      text(c, 'OFFICE RUN', 420, 260, 40, '#FFFFFF', { stroke: 11 });
+      text(c, '9:30 ki meeting hai. Metro pakdo!', 420, 360, 34, '#FFFFFF', { font: '"Baloo 2"', stroke: 8 });
+      rr(c, 170, 420, 500, 80, 40);
+      fillStroke(c, '#FFD43B', 6);
+      text(c, '▶ PLAY FREE', 420, 462, 30, '#14121F');
+      text(c, '@cipherboy.dev', 420, 560, 26, '#FFFFFF', { stroke: 7 });
+      c.save();
+      c.translate(800, 200);
+      c.scale(1.75, 1.75);
+      drawCharacter(c, 'boy', 'jump');
+      c.restore();
+      c.save();
+      c.translate(990, 260);
+      c.scale(1.4, 1.4);
+      drawCharacter(c, 'girl', 'run1');
+      c.restore();
+      document.title = 'ready';
+    </script>
+  </body>
+</html>
