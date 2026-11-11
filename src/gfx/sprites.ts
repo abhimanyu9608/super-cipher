@@ -1451,6 +1451,86 @@ def('promoLetter', 64, 94, (c) => {
   text(c, '★', 32, 35, 6, '#FFD43B');
 });
 
+// ------------------------------------------------------------------ Level 8: the finale
+def(
+  'ceo',
+  124,
+  134,
+  (c, f) => {
+    // Silver hair, black suit, gold tie, smug smile, a crown pin.
+    limb(c, 46, 102, 44, 130, 15, '#14121F', 4);
+    limb(c, 78, 102, 80, 130, 15, '#14121F', 4);
+    rr(c, 24, 54, 76, 64, 22);
+    fillStroke(c, '#212529', 4);
+    poly(c, [54, 56, 70, 56, 66, 96, 58, 96], '#FFFFFF', 3);
+    poly(c, [59, 58, 65, 58, 67, 88, 62, 96, 57, 88], '#FFD43B', 2.5);
+    star(c, 38, 70, 6, '#FFD43B', 2);
+    limb(c, 28, 66, 16, 100, 13, '#212529', 4);
+    circle(c, 16, 100, 4, '#FFD43B', 2);
+    if (f === 0) {
+      // Arms spread: "We're a family here!"
+      limb(c, 96, 66, 118, 76, 13, '#212529', 4);
+      circle(c, 118, 76, 7, '#C98B5B', 3);
+    } else {
+      limb(c, 96, 66, 104, 30, 13, '#212529', 4);
+      circle(c, 104, 28, 7, '#C98B5B', 3);
+    }
+    circle(c, 62, 32, 26, '#C98B5B', 4);
+    c.fillStyle = '#CED4DA';
+    c.beginPath();
+    c.arc(62, 24, 26, Math.PI * 1.05, Math.PI * 1.95);
+    c.fill();
+    c.strokeStyle = OUTLINE;
+    c.lineWidth = 3;
+    c.stroke();
+    c.fillStyle = OUTLINE;
+    c.fillRect(51, 30, 4, 4);
+    c.fillRect(69, 30, 4, 4);
+    c.beginPath();
+    c.moveTo(48, 24);
+    c.lineTo(57, 26);
+    c.moveTo(76, 24);
+    c.lineTo(67, 26);
+    c.stroke();
+    // Smug half-smile.
+    c.beginPath();
+    c.moveTo(54, 44);
+    c.quadraticCurveTo(64, 50, 72, 40);
+    c.stroke();
+  },
+  2,
+);
+def('visionDeck', 64, 44, (c) => {
+  const g = c.createRadialGradient(32, 22, 4, 32, 22, 32);
+  g.addColorStop(0, 'rgba(255,212,59,0.75)');
+  g.addColorStop(1, 'rgba(255,212,59,0)');
+  c.fillStyle = g;
+  c.fillRect(0, 0, 64, 44);
+  box(c, 10, 8, 44, 30, '#FFD43B', 3, 3);
+  c.fillStyle = '#B07A00';
+  c.fillRect(14, 12, 36, 6);
+  text(c, '2030', 32, 28, 7, '#14121F');
+});
+def('ctoChair', 70, 110, (c) => {
+  // A golden executive throne.
+  box(c, 14, 6, 42, 60, '#FFD43B', 4, 10);
+  box(c, 20, 12, 30, 48, '#C92A2A', 3, 8);
+  star(c, 35, 2, 7, '#FFD43B', 2.5);
+  box(c, 6, 60, 58, 16, '#B07A00', 4, 6);
+  limb(c, 35, 76, 35, 96, 6, '#495057', 2);
+  limb(c, 12, 100, 58, 100, 5, '#495057', 2);
+  circle(c, 12, 104, 4, '#212529', 2);
+  circle(c, 58, 104, 4, '#212529', 2);
+  text(c, 'CTO', 35, 36, 8, '#FFFFFF', { stroke: 3 });
+});
+def('resignDoor', 70, 116, (c) => {
+  box(c, 4, 4, 62, 110, '#868E96', 4, 4);
+  box(c, 12, 14, 46, 92, '#495057', 3, 3);
+  circle(c, 50, 62, 4, '#FFD43B', 2);
+  box(c, 10, -2, 50, 20, '#C92A2A', 3, 4);
+  text(c, 'RESIGN', 35, 8, 6, '#FFFFFF');
+});
+
 // ------------------------------------------------------------------ ambient life
 def(
   'bird',

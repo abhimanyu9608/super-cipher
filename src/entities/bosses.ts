@@ -171,6 +171,10 @@ export interface DeskBossStyle {
   nameKey: StringKey;
   greetKey: StringKey;
   scareKey: StringKey;
+  /** Optional pools of [texture, hurt key]; when set, each attack picks the next entry. */
+  arcPool?: [string, StringKey][];
+  wavePool?: [string, StringKey][];
+  rainPool?: [string, StringKey][];
 }
 
 export const MANAGER_STYLE: DeskBossStyle = {
@@ -273,8 +277,54 @@ export const COMMITTEE_STYLE: DeskBossStyle = {
   scareKey: 'scareCommittee',
 };
 
+/** The final boss: throws every old boss's attacks. */
+export const CEO_STYLE: DeskBossStyle = {
+  body: 'ceo',
+  weak: 'visionDeck',
+  arcTex: 'banana',
+  arcHurt: 'bananaHit',
+  arcLine: 'ceoArc',
+  waveTex: 'ring',
+  waveHurt: 'ringHit',
+  rainTex: 'deadline',
+  rainHurt: 'deadlineHit',
+  hitLine: 'ceoHit',
+  phaseLines: ['ceoLine2', 'ceoLine3'],
+  byeLine: 'ceoBye',
+  phases: ['ceoP1', 'ceoP2', 'ceoP3'],
+  bannerKey: 'bossCeo',
+  nameKey: 'ceoName',
+  greetKey: 'ceoHi',
+  scareKey: 'scareCeo',
+  arcPool: [
+    ['banana', 'bananaHit'],
+    ['calendar', 'inviteHit'],
+    ['roti', 'rotiHit'],
+    ['errorCode', 'errorHit'],
+    ['changeReq', 'crHit'],
+    ['iceCard', 'iceHit'],
+    ['ratingStar', 'ratingHit'],
+  ],
+  wavePool: [
+    ['ring', 'ringHit'],
+    ['sambar', 'sambarHit'],
+    ['scopeWave', 'scopeHit'],
+    ['songWave', 'songHit'],
+    ['bellCurve', 'curveHit'],
+  ],
+  rainPool: [
+    ['deadline', 'deadlineHit'],
+    ['chilli', 'chilliHit'],
+    ['stackTrace', 'stackHit'],
+    ['revision', 'revisionHit'],
+    ['feedbackForm', 'formHit'],
+    ['kpiSheet', 'kpiHit'],
+  ],
+};
+
 /** Map object type → desk boss style. */
 export const DESK_BOSSES: Record<string, DeskBossStyle> = {
+  ceo: CEO_STYLE,
   committee: COMMITTEE_STYLE,
   manager: MANAGER_STYLE,
   aunty: AUNTY_STYLE,
@@ -296,6 +346,18 @@ export class Manager extends Enemy {
   private walkFrom = 0;
   private walkTo = 0;
   private inviteIn = 60;
+  private arcN = 0;
+  private waveN = 0;
+  private rainN = 0;
+
+  private pick(
+    pool: [string, StringKey][] | undefined,
+    n: number,
+    tex: string,
+    hurt: StringKey,
+  ): [string, StringKey] {
+    return pool && pool.length ? pool[n % pool.length] : [tex, hurt];
+  }
   private ringIn = 120;
   private paperIn = 40;
   private leaving = 0;
@@ -363,6 +425,7 @@ export class Manager extends Enemy {
     this.inviteIn -= this.speedUp;
     if (this.inviteIn <= 0) {
       this.inviteIn = MANAGER.inviteEvery;
+      const arc = this.pick(this.style.arcPool, this.arcN++, this.style.arcTex, this.style.arcHurt);
       const tx = L.player.cx;
       const T = 60;
       const sx = this.cx;
@@ -372,7 +435,7 @@ export class Manager extends Enemy {
       L.addHazard(
         new Projectile(
           L,
-          this.style.arcTex,
+          arc[0],
           sx - 12,
           sy,
           24,
@@ -380,7 +443,7 @@ export class Manager extends Enemy {
           vx * this.speedUp,
           vy,
           MANAGER.inviteGravity * this.speedUp * this.speedUp,
-          this.style.arcHurt,
+          arc[1],
           { spin: 0.1 },
         ),
       );
@@ -391,6 +454,7 @@ export class Manager extends Enemy {
       this.ringIn -= this.speedUp;
       if (this.ringIn <= 0) {
         this.ringIn = MANAGER.ringEvery;
+        const wave = this.pick(this.style.wavePool, this.waveN++, this.style.waveTex, this.style.waveHurt);
         const gy = L.map.groundY;
         L.addHazard(
           new RingWave(
@@ -400,8 +464,8 @@ export class Manager extends Enemy {
             -MANAGER.ringSpeed * this.speedUp,
             this.arenaX0,
             this.arenaX1,
-            this.style.waveTex,
-            this.style.waveHurt,
+            wave[0],
+            wave[1],
           ),
         );
         L.addHazard(
@@ -412,8 +476,8 @@ export class Manager extends Enemy {
             MANAGER.ringSpeed * this.speedUp,
             this.arenaX0,
             this.arenaX1,
-            this.style.waveTex,
-            this.style.waveHurt,
+            wave[0],
+            wave[1],
           ),
         );
         sfx('ring', { volume: 0.7 });
@@ -424,23 +488,12 @@ export class Manager extends Enemy {
       this.paperIn--;
       if (this.paperIn <= 0) {
         this.paperIn = MANAGER.paperEvery;
+        const rain = this.pick(this.style.rainPool, this.rainN++, this.style.rainTex, this.style.rainHurt);
         const px = Phaser.Math.Between(this.arenaX0 + 20, this.arenaX1 - 40);
         L.addHazard(
-          new Projectile(
-            L,
-            this.style.rainTex,
-            px,
-            -30,
-            18,
-            22,
-            0,
-            2.2,
-            0.06 * this.speedUp,
-            this.style.rainHurt,
-            {
-              wobble: 6,
-            },
-          ),
+          new Projectile(L, rain[0], px, -30, 18, 22, 0, 2.2, 0.06 * this.speedUp, rain[1], {
+            wobble: 6,
+          }),
         );
       }
     }

@@ -163,3 +163,30 @@ describe('Level 7 map: Appraisal Season', () => {
     expect(objectsOf(m, 'laser').every((l) => l.props.style === 'pip')).toBe(true);
   });
 });
+
+describe('Level 8 map: Resign ya CTO? (finale)', () => {
+  const m = load(8);
+  it('has 7 translated sections, the CEO, a RESIGN door and the CTO chair', () => {
+    const secs = objectsOf(m, 'section');
+    expect(secs).toHaveLength(7);
+    for (const s of secs) expect(STRINGS).toHaveProperty(String(s.props.key));
+    expect(objectsOf(m, 'ceo')).toHaveLength(1);
+    expect(objectsOf(m, 'resignDoor')).toHaveLength(1);
+    expect(objectsOf(m, 'finish')).toHaveLength(1);
+  });
+  it('remixes earlier mechanics and brings back every old boss as a cameo', () => {
+    for (const type of ['conveyor', 'brickRain', 'printer', 'wet', 'dark', 'slide', 'laser', 'trampoline'])
+      expect(objectsOf(m, type).length, type).toBeGreaterThan(0);
+    const cameos = objectsOf(m, 'cameo');
+    expect(cameos.map((c) => c.props.tex)).toEqual([
+      'monkey',
+      'manager',
+      'aunty',
+      'prodBug',
+      'client',
+      'hr',
+      'committee',
+    ]);
+    for (const c of cameos) expect(STRINGS).toHaveProperty(String(c.props.line));
+  });
+});

@@ -24,7 +24,8 @@ describe('level definitions', () => {
     expect(nextLevel(4)).toBe(5);
     expect(nextLevel(5)).toBe(6);
     expect(nextLevel(6)).toBe(7);
-    expect(nextLevel(7)).toBeNull();
+    expect(nextLevel(7)).toBe(8);
+    expect(nextLevel(8)).toBeNull();
     expect(isUnlocked(3, 2)).toBe(false);
     expect(isUnlocked(3, 3)).toBe(true);
   });

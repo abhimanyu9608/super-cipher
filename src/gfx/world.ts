@@ -837,6 +837,100 @@ const PAINTERS: Record<string, Painter> = {
     box(c, 7020, 160, 120, 40, '#14121F', 3, 4);
   },
 
+  // ---------------- Level 8: the finale (each zone remixes an earlier level)
+  z8_1(c, inp) {
+    poly(c, [inp.x0, 70, inp.x0 + inp.w, 70, inp.x0 + inp.w, 110, inp.x0, 110], '#7048E8', 4);
+    for (let x = inp.x0 + 60; x < inp.x0 + inp.w; x += 220) box(c, x, 110, 30, 350, '#DEE2E6', 3, 2);
+    box(c, inp.x0 + 380, 130, 230, 60, '#FFFFFF', 4, 10);
+    circle(c, inp.x0 + 412, 160, 20, '#E64980', 3);
+    text(c, 'M', inp.x0 + 412, 162, 14, '#FFFFFF', {});
+    text(c, 'METRO', inp.x0 + 520, 160, 16, '#5F3DC4', {});
+    text(c, '#throwback', inp.x0 + 900, 200, 12, '#FFFFFF', { stroke: 4 });
+  },
+  z8_2(c, inp) {
+    c.fillStyle = '#2B3035';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#343A40';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 50) c.fillRect(x, 0, 25, 460);
+    for (let i = 0; i < 4; i++)
+      text(c, `${30 + i * 10}`, inp.x0 + 60, 420 - i * 100, 12, '#FFD43B', { stroke: 3 });
+    box(c, inp.x0 + 820, 180, 300, 70, '#14121F', 4, 8);
+    text(c, 'CIPHER TECH', inp.x0 + 970, 215, 14, '#FFFFFF', {});
+  },
+  z8_cp(c, inp) {
+    const x = inp.x0 + 30;
+    const y = 300;
+    const w = 230;
+    box(c, x + 10, y + 50, w - 20, 110, '#8B5A2B', 4, 3);
+    for (let i = 0; i < 10; i++) {
+      c.fillStyle = i % 2 === 0 ? '#FF5C5C' : '#FFFFFF';
+      c.fillRect(x + (i * w) / 10, y + 20, w / 10, 32);
+    }
+    box(c, x + 20, y - 14, w - 40, 30, '#FFD43B', 3, 4);
+    text(c, 'SHARMA JI CHAI', x + w / 2, y + 2, 10, '#14121F', {});
+    text(c, '(since day 1 ☕)', x + w / 2, y + 120, 10, '#FFFFFF', { font: 'sans-serif', stroke: 3 });
+    limb(c, inp.x0 + 300, 300, inp.x0 + 300, 460, 5, '#DEE2E6', 2.5);
+    circle(c, inp.x0 + 300, 298, 5, '#FFD43B', 2);
+  },
+  z8_3(c, inp) {
+    // Left: sunny cafeteria. Right: the office at night.
+    const mid = inp.x0 + 500;
+    for (let y = 0; y < 460; y += 40)
+      for (let x = inp.x0; x < mid; x += 40) {
+        c.fillStyle = ((x - inp.x0) / 40 + y / 40) % 2 === 0 ? '#FFEC99' : '#FFF9DB';
+        c.fillRect(x, y, 40, 40);
+      }
+    nightWall(c, { ...inp, x0: mid, w: inp.x0 + inp.w - mid }, '#15182B', '#1C2038');
+    nightWindows(c, { ...inp, x0: mid, w: inp.x0 + inp.w - mid }, 120, 200);
+  },
+  z8_4(c, inp) {
+    c.fillStyle = '#3B2F2F';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.strokeStyle = 'rgba(255,255,255,0.08)';
+    c.lineWidth = 2;
+    for (let y = 40; y < 460; y += 40) {
+      c.beginPath();
+      c.moveTo(inp.x0, y);
+      c.lineTo(inp.x0 + inp.w, y);
+      c.stroke();
+    }
+    box(c, inp.x0 + 500, 70, 360, 70, '#FF2D55', 4, 6);
+    text(c, 'SLIDES + GRAPHS + PIP 😵', inp.x0 + 680, 105, 12, '#FFFFFF', { font: 'sans-serif' });
+  },
+  z8_boss(c, inp) {
+    c.fillStyle = '#0B0B12';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#16161F';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 70) c.fillRect(x, 0, 35, 460);
+    // Panoramic window with the night city.
+    box(c, inp.x0 + 140, 50, 760, 240, '#0B1026', 6, 6);
+    const r = seeded(808);
+    for (let i = 0; i < 18; i++) {
+      const bh = 50 + r() * 160;
+      const bx = inp.x0 + 150 + i * 42;
+      c.fillStyle = '#1E2547';
+      c.fillRect(bx, 288 - bh, 36, bh);
+      c.fillStyle = '#FFE8A3';
+      for (let y = 296 - bh; y < 280; y += 14) if (r() > 0.5) c.fillRect(bx + 8, y, 6, 6);
+    }
+    box(c, inp.x0 + 420, 20, 200, 40, '#FFD43B', 4, 6);
+    text(c, '👑 CEO', inp.x0 + 520, 40, 14, '#14121F', { font: 'sans-serif' });
+  },
+  z8_fin(c, inp) {
+    c.fillStyle = '#0E0B1F';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    // Two spotlights: one on the door, one on the chair.
+    for (const x of [inp.x0 + 130, inp.x0 + 480]) {
+      const g = c.createRadialGradient(x, 360, 10, x, 360, 200);
+      g.addColorStop(0, 'rgba(255,236,170,0.45)');
+      g.addColorStop(1, 'rgba(255,236,170,0)');
+      c.fillStyle = g;
+      c.fillRect(x - 220, 120, 440, 340);
+    }
+    text(c, 'RESIGN?', inp.x0 + 130, 150, 16, '#FF8787', { stroke: 5 });
+    text(c, 'CTO? 👑', inp.x0 + 480, 150, 16, '#FFD43B', { stroke: 5, font: '"Press Start 2P", sans-serif' });
+  },
+
   // ---------------- Level 7: appraisal season
   z7_1(c, inp) {
     c.fillStyle = '#F3F0FF';

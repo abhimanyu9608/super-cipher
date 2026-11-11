@@ -1,7 +1,7 @@
 import type { SkinId } from './extras';
 import type { StringKey } from '../i18n/strings';
 
-export type LevelId = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type LevelId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 /** In-game clock (minutes since midnight). Reaching `late` costs a heart and resets to `reset`. */
 export interface LevelClock {
@@ -26,14 +26,37 @@ export interface LevelDef {
   /** World map file in public/assets/maps. */
   map: string;
   nameKey:
-    'level1Name' | 'level2Name' | 'level3Name' | 'level4Name' | 'level5Name' | 'level6Name' | 'level7Name';
+    | 'level1Name'
+    | 'level2Name'
+    | 'level3Name'
+    | 'level4Name'
+    | 'level5Name'
+    | 'level6Name'
+    | 'level7Name'
+    | 'level8Name';
   /** i18n key of the eyebrow on the title screen and level card. */
-  worldKey: 'world1' | 'world2' | 'world3' | 'world4' | 'world5' | 'world6' | 'world7';
+  worldKey: 'world1' | 'world2' | 'world3' | 'world4' | 'world5' | 'world6' | 'world7' | 'world8';
   mapTitleKey:
-    'mapTitle1' | 'mapTitle2' | 'mapTitle3' | 'mapTitle4' | 'mapTitle5' | 'mapTitle6' | 'mapTitle7';
-  mapGoalKey: 'mapGoal1' | 'mapGoal2' | 'mapGoal3' | 'mapGoal4' | 'mapGoal5' | 'mapGoal6' | 'mapGoal7';
+    | 'mapTitle1'
+    | 'mapTitle2'
+    | 'mapTitle3'
+    | 'mapTitle4'
+    | 'mapTitle5'
+    | 'mapTitle6'
+    | 'mapTitle7'
+    | 'mapTitle8';
+  mapGoalKey:
+    'mapGoal1' | 'mapGoal2' | 'mapGoal3' | 'mapGoal4' | 'mapGoal5' | 'mapGoal6' | 'mapGoal7' | 'mapGoal8';
   /** Big headline on Level Clear. */
-  clearKey: 'clearBig' | 'clearBig2' | 'clearBig3' | 'clearBig4' | 'clearBig5' | 'clearBig6' | 'clearBig7';
+  clearKey:
+    | 'clearBig'
+    | 'clearBig2'
+    | 'clearBig3'
+    | 'clearBig4'
+    | 'clearBig5'
+    | 'clearBig6'
+    | 'clearBig7'
+    | 'clearBig8';
   indoor: boolean;
   /** Levels with a clock show it instead of the elapsed time (Level 2: office clock, Level 3: lunch). */
   clock?: LevelClock;
@@ -199,9 +222,28 @@ export const LEVELS: Record<LevelId, LevelDef> = {
     promoSkin: 'lanyard',
     music: 'office',
   },
+  8: {
+    id: 8,
+    map: 'level8.tmj',
+    nameKey: 'level8Name',
+    worldKey: 'world8',
+    mapTitleKey: 'mapTitle8',
+    mapGoalKey: 'mapGoal8',
+    clearKey: 'clearBig8',
+    indoor: true,
+    // The board meeting is at 7 PM.
+    clock: { start: hm(18, 40), red: hm(18, 57), late: hm(19, 0), reset: hm(18, 58), lateKey: 'boardLate' },
+    finish: 'punch',
+    punch: { tex: 'ctoChair', scanKey: 'claiming', doneKey: 'becameCto', lockedKey: 'ceoLocked' },
+    intro: false,
+    thirdStar: 'time',
+    promotion: { from: 'Director', to: 'CTO' },
+    promoSkin: 'goldPhones',
+    music: 'commute',
+  },
 };
 
-export const LEVEL_IDS: LevelId[] = [1, 2, 3, 4, 5, 6, 7];
+export const LEVEL_IDS: LevelId[] = [1, 2, 3, 4, 5, 6, 7, 8];
 /** Total levels planned (PRD section 15); levels beyond the built ones show as "coming soon". */
 export const PLANNED_LEVELS = 8;
 

@@ -170,6 +170,7 @@ export class LevelScene extends Phaser.Scene {
   private irisT = -1;
   private pitCount = 0;
   private hits = 0;
+  private resignAt = -999;
 
   constructor() {
     super('Level');
@@ -416,6 +417,21 @@ export class LevelScene extends Phaser.Scene {
           .setTint(0xffd8a8);
       }
     }
+    // Cameos: old bosses watching from the background (finale).
+    for (const d of decor.filter((o) => o.type === 'cameo')) {
+      this.add
+        .image(d.x, this.map.groundY, str(d, 'tex', 'manager'), num(d, 'frame', 0))
+        .setOrigin(0.5, 1)
+        .setScale(num(d, 'scale', 0.7))
+        .setDepth(-30)
+        .setAlpha(0.95);
+    }
+    // The RESIGN door (finale): a joke exit that bounces you back.
+    for (const o of this.zones.resignDoor ?? [])
+      this.add
+        .image(o.x + o.w / 2, o.y + o.h, 'resignDoor')
+        .setOrigin(0.5, 1)
+        .setDepth(3);
     for (const d of decor.filter((o) => o.type === 'guard'))
       this.add
         .image(d.x + d.w / 2, d.y + d.h, 'guard')
@@ -1572,6 +1588,24 @@ export class LevelScene extends Phaser.Scene {
         );
         sfx('pop');
       }
+    }
+
+    // ---------------- Finale: cameo lines + the RESIGN door
+    for (const d of m.layers.decor ?? []) {
+      if (d.type !== 'cameo' || Math.abs(p.cx - d.x) > 170 || !this.once(`cameo-${d.id}`)) continue;
+      this.fx.popup(d.x, this.map.groundY - 130, t(str(d, 'line', 'quickCall') as StringKey), '#FFFFFF', 10);
+      sfx('manager', { rate: 1.2 });
+    }
+    for (const o of z.resignDoor ?? []) {
+      if (this.state !== 'play' || !overlaps(b, o) || this.frame - this.resignAt < 90) continue;
+      this.resignAt = this.frame;
+      this.fx.popup(o.x + o.w / 2, o.y - 30, t('resignJoke'), '#FFD43B', 10);
+      this.fx.addShake(4);
+      b.vx = -6;
+      b.vy = -7;
+      b.onGround = false;
+      b.ground = null;
+      sfx('bump');
     }
 
     // ---------------- Finish

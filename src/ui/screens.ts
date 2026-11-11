@@ -3,7 +3,7 @@
  * Title → (Level select) → Level → Pause / Game Over / Level Clear → Unlock.
  */
 import type Phaser from 'phaser';
-import { LEVELS, LEVEL_IDS, isUnlocked, nextLevel, type LevelId } from '../config/levels';
+import { LEVELS, LEVEL_IDS, PLANNED_LEVELS, isUnlocked, nextLevel, type LevelId } from '../config/levels';
 import type { CharacterId } from '../config/physics';
 import { t, getLang, onLangChange, type StringKey } from '../i18n/strings';
 import { profile, session } from '../game/session';
@@ -321,7 +321,9 @@ export class Flow {
     const nextOpen = next !== null && isUnlocked(next, profile.unlocked);
     const nextBtn =
       next === null
-        ? `<a class="btn btn-pink" href="${IG_PROFILE}" target="_blank" rel="noopener">${t('comingSoon', { n: r.level + 1 })} · ${t('follow')}</a>`
+        ? r.level >= PLANNED_LEVELS
+          ? `<p class="title-badge">${t('gameComplete')}</p><a class="btn btn-pink" href="${IG_PROFILE}" target="_blank" rel="noopener">${t('thanksPlaying')}</a>`
+          : `<a class="btn btn-pink" href="${IG_PROFILE}" target="_blank" rel="noopener">${t('comingSoon', { n: r.level + 1 })} · ${t('follow')}</a>`
         : `<button class="btn btn-gold btn-big" data-act="${nextOpen ? 'next' : 'unlock'}" data-main>${nextOpen ? t('nextLevel', { n: next }) : t('unlockNext', { n: next })}</button>`;
     const stats = [
       [t('statScore'), padScore(r.score)],
