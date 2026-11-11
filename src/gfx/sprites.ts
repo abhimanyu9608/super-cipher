@@ -1052,6 +1052,117 @@ def('deployButton', 64, 94, (c) => {
   text(c, 'DEPLOY', 32, 66, 7, '#FFD43B', { stroke: 2 });
 });
 
+// ------------------------------------------------------------------ Level 5: client visit
+def(
+  'client',
+  124,
+  134,
+  (c, f) => {
+    // Sharp suit, slicked hair, sunglasses pushed up, pointing finger.
+    limb(c, 46, 100, 44, 130, 15, '#212529', 4);
+    limb(c, 78, 100, 80, 130, 15, '#212529', 4);
+    rr(c, 26, 56, 72, 60, 20);
+    fillStroke(c, '#5C7CFA', 4);
+    poly(c, [54, 58, 70, 58, 66, 94, 58, 94], '#FFFFFF', 3);
+    poly(c, [59, 60, 65, 60, 66, 86, 62, 92, 58, 86], '#FAB005', 2.5);
+    // Lapels.
+    poly(c, [44, 58, 56, 58, 58, 84], '#4263EB', 2.5);
+    poly(c, [80, 58, 68, 58, 66, 84], '#4263EB', 2.5);
+    limb(c, 30, 66, 18, 100, 12, '#5C7CFA', 4);
+    if (f === 0) {
+      // Pointing at you.
+      limb(c, 94, 66, 116, 58, 12, '#5C7CFA', 4);
+      limb(c, 116, 58, 124, 56, 5, '#E0AC69', 2);
+    } else {
+      // Phone to ear: "one more thing...".
+      limb(c, 94, 66, 100, 34, 12, '#5C7CFA', 4);
+      box(c, 92, 16, 12, 22, '#212529', 3, 3);
+    }
+    circle(c, 62, 32, 25, '#E0AC69', 4);
+    // Slick hair + sunglasses on the head.
+    c.fillStyle = '#2B2235';
+    c.beginPath();
+    c.ellipse(62, 14, 26, 12, 0, Math.PI, 0);
+    c.fill();
+    box(c, 44, 12, 15, 8, '#14121F', 2, 3);
+    box(c, 64, 12, 15, 8, '#14121F', 2, 3);
+    // Eyes + big salesy grin.
+    c.fillStyle = OUTLINE;
+    c.fillRect(51, 30, 4, 4);
+    c.fillRect(69, 30, 4, 4);
+    c.strokeStyle = OUTLINE;
+    c.lineWidth = 3;
+    c.beginPath();
+    c.arc(62, 38, 10, 0.15 * Math.PI, 0.85 * Math.PI);
+    c.stroke();
+    c.fillStyle = '#FFFFFF';
+    c.fillRect(56, 44, 12, 3);
+  },
+  2,
+);
+def('scopeDoc', 64, 40, (c) => {
+  const g = c.createRadialGradient(32, 20, 4, 32, 20, 32);
+  g.addColorStop(0, 'rgba(255,212,59,0.65)');
+  g.addColorStop(1, 'rgba(255,212,59,0)');
+  c.fillStyle = g;
+  c.fillRect(0, 0, 64, 40);
+  box(c, 14, 6, 36, 30, '#FFFFFF', 3, 2);
+  c.fillStyle = '#4263EB';
+  c.fillRect(18, 10, 28, 5);
+  c.fillStyle = '#ADB5BD';
+  for (const y of [19, 24, 29]) c.fillRect(18, y, 24, 2);
+  text(c, 'SCOPE', 32, 13, 4, '#FFFFFF');
+});
+def('changeReq', 30, 28, (c) => {
+  box(c, 3, 3, 24, 22, '#FFF3BF', 2.5, 2);
+  text(c, 'CR', 15, 13, 8, '#E8590C');
+  c.fillStyle = '#E8590C';
+  c.fillRect(7, 19, 16, 2);
+});
+def('scopeWave', 30, 20, (c) => {
+  c.beginPath();
+  c.moveTo(0, 20);
+  c.quadraticCurveTo(8, 0, 15, 10);
+  c.quadraticCurveTo(22, 0, 30, 20);
+  c.closePath();
+  fillStroke(c, '#40C057', 2.5);
+  text(c, '+', 15, 14, 7, '#FFFFFF');
+});
+def('revision', 22, 28, (c) => {
+  box(c, 2, 2, 18, 24, '#E7F5FF', 2.5, 1);
+  text(c, 'v27', 11, 10, 5, '#4263EB');
+  c.fillStyle = '#FF5C5C';
+  c.fillRect(5, 16, 12, 2);
+  c.fillRect(5, 20, 9, 2);
+});
+def('slide', 120, 34, (c) => {
+  // A projected slide: bright screen with a title bar.
+  box(c, 2, 2, 116, 30, '#E7F5FF', 3, 3);
+  c.fillStyle = '#4263EB';
+  c.fillRect(5, 5, 110, 6);
+  c.fillStyle = '#ADB5BD';
+  c.fillRect(8, 24, 50, 3);
+  c.fillStyle = '#40C057';
+  c.fillRect(70, 18, 6, 10);
+  c.fillRect(80, 14, 6, 14);
+  c.fillRect(90, 20, 6, 8);
+});
+def('contract', 64, 94, (c) => {
+  box(c, 26, 46, 12, 46, '#868E96', 3, 2);
+  box(c, 8, 86, 48, 8, '#495057', 3, 2);
+  poly(c, [6, 10, 58, 10, 54, 50, 10, 50], '#FFFFFF', 3);
+  c.fillStyle = '#ADB5BD';
+  for (const y of [18, 24, 30]) c.fillRect(14, y, 34, 2);
+  c.strokeStyle = '#4263EB';
+  c.lineWidth = 2;
+  c.beginPath();
+  c.moveTo(16, 42);
+  c.bezierCurveTo(22, 34, 26, 46, 32, 38);
+  c.bezierCurveTo(36, 34, 40, 44, 46, 40);
+  c.stroke();
+  limb(c, 46, 30, 58, 6, 3, '#FAB005', 1.5);
+});
+
 // ------------------------------------------------------------------ ambient life
 def(
   'bird',

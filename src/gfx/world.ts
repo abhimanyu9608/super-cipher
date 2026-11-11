@@ -814,6 +814,97 @@ const PAINTERS: Record<string, Painter> = {
     box(c, 7020, 160, 120, 40, '#14121F', 3, 4);
   },
 
+  // ---------------- Level 5: client visit
+  z5_1(c, inp) {
+    c.fillStyle = '#F1F3F5';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    // Tall glass panels.
+    for (let x = inp.x0 + 20; x < inp.x0 + inp.w; x += 180) {
+      box(c, x, 40, 160, 330, 'rgba(165,216,255,0.45)', 3, 2);
+      c.fillStyle = 'rgba(255,255,255,0.6)';
+      c.fillRect(x + 20, 50, 10, 300);
+    }
+    box(c, inp.x0 + 300, 70, 380, 70, '#14121F', 4, 8);
+    text(c, 'WELCOME, CLIENT! 🤝', inp.x0 + 490, 106, 16, '#FFD43B', { font: 'sans-serif' });
+    plant(c, inp.x0 + 120, 460, 1.2);
+    plant(c, inp.x0 + inp.w - 120, 460, 1.2);
+    // Red carpet strip on the wall base.
+    c.fillStyle = '#C92A2A';
+    c.fillRect(inp.x0, 430, inp.w, 30);
+  },
+  z5_2(c, inp) {
+    c.fillStyle = '#E9ECEF';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#DEE2E6';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 90) c.fillRect(x, 0, 45, 460);
+    // Framed "vision" posters.
+    const words = ['SYNERGY', 'DISRUPT', 'AGILE', 'PIVOT', 'SCALE'];
+    words.forEach((w, i) => {
+      const x = inp.x0 + 80 + i * 250;
+      box(c, x, 120, 160, 110, '#FFFFFF', 4, 3);
+      text(c, w, x + 80, 175, 12, ['#4263EB', '#E8590C', '#2F9E44', '#C2255C', '#7048E8'][i], {});
+    });
+  },
+  z5_cp(c, inp) {
+    c.fillStyle = '#FFF4E6';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    box(c, inp.x0 + 40, 330, 200, 130, '#8B5A2B', 4, 6);
+    box(c, inp.x0 + 30, 316, 220, 18, '#F8F9FA', 3, 4);
+    for (let i = 0; i < 4; i++) circle(c, inp.x0 + 70 + i * 40, 306, 10, '#C2622D', 2.5);
+    box(c, inp.x0 + 190, 270, 36, 46, '#495057', 3, 4);
+    text(c, 'COOKIES 🍪', inp.x0 + 140, 240, 11, '#8B5A2B', { font: 'sans-serif' });
+    limb(c, inp.x0 + 300, 300, inp.x0 + 300, 460, 5, '#DEE2E6', 2.5);
+    circle(c, inp.x0 + 300, 298, 5, '#FFD43B', 2);
+  },
+  z5_3(c, inp) {
+    c.fillStyle = '#1B1F3B';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    // Big projection screen + seats silhouettes.
+    box(c, inp.x0 + 300, 50, 640, 300, '#F8F9FA', 6, 6);
+    c.fillStyle = '#4263EB';
+    c.fillRect(inp.x0 + 312, 62, 616, 40);
+    text(c, 'Q3 ROADMAP: 47 SLIDES', inp.x0 + 620, 82, 13, '#FFFFFF', {});
+    c.fillStyle = '#40C057';
+    for (let i = 0; i < 6; i++) c.fillRect(inp.x0 + 380 + i * 80, 300 - i * 28, 50, 40 + i * 28);
+    c.fillStyle = '#14121F';
+    for (let x = inp.x0 + 20; x < inp.x0 + inp.w; x += 70) {
+      c.beginPath();
+      c.arc(x + 30, 420, 26, Math.PI, 0);
+      c.fill();
+    }
+  },
+  z5_4(c, inp) {
+    c.fillStyle = '#3B2F2F';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#4A3B3B';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 60) c.fillRect(x, 0, 30, 460);
+    for (let x = inp.x0 + 60; x < inp.x0 + inp.w; x += 320) {
+      box(c, x, 110, 200, 130, '#FFFFFF', 3, 4);
+      text(c, 'REQUIREMENTS', x + 100, 135, 9, '#C92A2A', {});
+      c.fillStyle = '#ADB5BD';
+      for (let y = 155; y < 230; y += 12) c.fillRect(x + 16, y, 168 - ((y * 7) % 60), 3);
+    }
+  },
+  z5_boss(c, inp) {
+    c.fillStyle = '#16213E';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#1C2A4D';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 70) c.fillRect(x, 0, 35, 460);
+    box(c, inp.x0 + 300, 70, 420, 200, '#14121F', 6, 8);
+    c.fillStyle = '#0B1A33';
+    c.fillRect(inp.x0 + 314, 84, 392, 172);
+    text(c, 'Q & A', inp.x0 + 510, 140, 26, '#FFD43B', {});
+    text(c, 'any small changes? 🙂', inp.x0 + 510, 200, 14, '#FFFFFF', { font: 'sans-serif' });
+  },
+  z5_fin(c, inp) {
+    c.fillStyle = '#FFF9DB';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#C92A2A';
+    c.fillRect(inp.x0, 430, inp.w, 30);
+    box(c, inp.x0 + 60, 110, 240, 80, '#14121F', 4, 6);
+    text(c, '✍️ SIGN HERE', inp.x0 + 180, 150, 14, '#FFD43B', { font: 'sans-serif' });
+  },
+
   // ---------------- Level 4: deadline night
   z4_1(c, inp) {
     nightWall(c, inp, '#1B1F3B', '#232850');

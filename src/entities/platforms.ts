@@ -149,6 +149,49 @@ export class Chair {
   }
 }
 
+/**
+ * A projected slide you can stand on (Level 5). It is solid for `on` frames out of every `period`,
+ * blinks for the last 40 frames, then vanishes. The offset lets a row of slides take turns.
+ */
+export class SlidePlatform {
+  solid: Solid;
+  private sprite: Phaser.GameObjects.Image;
+  private label: Phaser.GameObjects.Text;
+
+  constructor(
+    private L: LevelScene,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    private period: number,
+    private on: number,
+    private offset: number,
+    n: number,
+  ) {
+    this.solid = makeSolid({ x, y, w, h }, 'oneway', { safe: false, tag: 'slide' });
+    this.sprite = L.add.image(x, y, 'slide').setOrigin(0, 0).setDepth(6).setDisplaySize(w, 34);
+    this.label = L.add
+      .text(x + w / 2, y + 12, `SLIDE ${n}`, {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '7px',
+        color: '#14121F',
+      })
+      .setOrigin(0.5)
+      .setDepth(7);
+  }
+
+  step(): void {
+    const c = (this.L.frame + this.offset) % this.period;
+    const active = c < this.on;
+    const blinking = active && c > this.on - 40 && Math.floor(c / 4) % 2 === 0;
+    this.solid.active = active;
+    const a = !active ? 0.12 : blinking ? 0.35 : 1;
+    this.sprite.setAlpha(a);
+    this.label.setAlpha(a);
+  }
+}
+
 export class Conveyor {
   solid: Solid;
   private sprite: Phaser.GameObjects.TileSprite;

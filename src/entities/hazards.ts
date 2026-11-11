@@ -233,9 +233,12 @@ export class Laser implements Hazard {
     private on: number,
     private off: number,
     private warn: number,
+    private color = 0xff2d55,
+    hurtKey: StringKey = 'laserHit',
   ) {
+    this.hurtKey = hurtKey;
     this.beam = L.add
-      .rectangle(x + w / 2, y, w + 10, h, 0xff2d55, 0.35)
+      .rectangle(x + w / 2, y, w + 10, h, color, 0.35)
       .setOrigin(0.5, 0)
       .setDepth(56);
     this.core = L.add
@@ -260,7 +263,7 @@ export class Laser implements Hazard {
     this.beam.setVisible(isOn || flick).setAlpha(isOn ? 0.45 + Math.sin(this.L.frame * 0.6) * 0.15 : 0.15);
     this.beam.width = isOn ? this.w + 10 : 4;
     this.core.setVisible(isOn);
-    this.emitter.setFillStyle(isOn ? 0xff2d55 : warning ? 0xffd43b : 0x495057);
+    this.emitter.setFillStyle(isOn ? this.color : warning ? 0xffd43b : 0x495057);
   }
 
   destroy(): void {

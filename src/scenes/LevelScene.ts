@@ -42,7 +42,7 @@ import { clearBonus, starsFor, heartsAfterCoin, formatClock } from '../systems/s
 import { Fx, FONT } from '../systems/fx';
 import { Player } from '../entities/Player';
 import { Enemy, Bug, Dog, Invite, Coworker } from '../entities/enemies';
-import { Monkey, Manager, GiantBug, AUNTY_STYLE } from '../entities/bosses';
+import { Monkey, Manager, GiantBug, DESK_BOSSES } from '../entities/bosses';
 import { Bus, FallingBrick, Laser, Projectile, type Hazard } from '../entities/hazards';
 import {
   Coin,
@@ -54,7 +54,7 @@ import {
   type Collectible,
   type ItemKind,
 } from '../entities/items';
-import { Mover, Chair, Conveyor, type MoverStyle } from '../entities/platforms';
+import { Mover, Chair, Conveyor, SlidePlatform, type MoverStyle } from '../entities/platforms';
 import { paintBackdrop, paintGround } from '../gfx/world';
 import { hexToInt, mix } from '../gfx/draw';
 import { t, onLangChange, type StringKey } from '../i18n/strings';
@@ -106,6 +106,7 @@ export class LevelScene extends Phaser.Scene {
   private movers: Mover[] = [];
   private chairs: Chair[] = [];
   private conveyors: Conveyor[] = [];
+  private slides: SlidePlatform[] = [];
   private lasers: Laser[] = [];
   private zones: Record<string, MapObject[]> = {};
   private sky!: Phaser.GameObjects.Graphics;
@@ -198,6 +199,7 @@ export class LevelScene extends Phaser.Scene {
       'movers',
       'chairs',
       'conveyors',
+      'slides',
       'lasers',
       'parallax',
       'checkpoints',
@@ -551,6 +553,22 @@ export class LevelScene extends Phaser.Scene {
           this.addSolid(c.solid);
           break;
         }
+        case 'slide': {
+          const sl = new SlidePlatform(
+            this,
+            o.x,
+            o.y,
+            o.w,
+            o.h,
+            num(o, 'period', 240),
+            num(o, 'on', 150),
+            num(o, 'offset', 0),
+            num(o, 'n', this.slides.length + 1),
+          );
+          this.slides.push(sl);
+          this.addSolid(sl.solid);
+          break;
+        }
         case 'chair': {
           const ch = new Chair(this, o.x, o.y, o.w, o.h, num(o, 'min', o.x - 100), num(o, 'max', o.x + 200));
           this.chairs.push(ch);
@@ -666,6 +684,7 @@ export class LevelScene extends Phaser.Scene {
           this.enemies.push(this.monkey);
           break;
         case 'aunty':
+        case 'client':
         case 'manager': {
           const table = (this.map.layers.platforms ?? []).find((p) => p.type === 'table');
           const arena = (this.zones.bossArena ?? [])[0];
@@ -680,7 +699,7 @@ export class LevelScene extends Phaser.Scene {
             table?.y ?? 380,
             arena?.x ?? 6000,
             arena ? arena.x + arena.w : 7000,
-            o.type === 'aunty' ? AUNTY_STYLE : undefined,
+            DESK_BOSSES[o.type],
           );
           this.enemies.push(this.manager);
           break;
@@ -750,6 +769,8 @@ export class LevelScene extends Phaser.Scene {
         OFFICE.laserOn,
         OFFICE.laserOff,
         OFFICE.laserWarn,
+        str(o, 'style') === 'projector' ? 0x74c0fc : 0xff2d55,
+        str(o, 'style') === 'projector' ? 'projectorHit' : 'laserHit',
       );
       this.lasers.push(l);
       this.hazards.push(l);
@@ -987,6 +1008,7 @@ export class LevelScene extends Phaser.Scene {
 
     for (const m of this.movers) m.step();
     for (const c of this.chairs) c.step();
+    for (const sl of this.slides) sl.step();
     for (const c of this.conveyors) c.step();
     for (const b of this.blocks) b.step();
 
@@ -1153,7 +1175,7 @@ export class LevelScene extends Phaser.Scene {
       r.boss = { name: 'monkeyName', hp: this.monkey.statusHp, max: 3 };
     else if (this.manager && this.manager.active && !this.manager.defeated)
       r.boss = {
-        name: this.manager.style === AUNTY_STYLE ? 'auntyName' : 'managerName',
+        name: this.manager.style.nameKey,
         hp: this.manager.hp,
         max: 3,
         phase: this.manager.phaseKey,
@@ -1360,18 +1382,11 @@ export class LevelScene extends Phaser.Scene {
       }
       if (this.manager && !this.manager.active && p.cx > arena.x) {
         this.manager.active = true;
-        const aunty = this.manager.style === AUNTY_STYLE;
-        this.events.emit('bossBanner', aunty ? 'bossAunty' : 'bossManager');
+        const style = this.manager.style;
+        this.events.emit('bossBanner', style.bannerKey);
         events.emit('bossStart', { level: r.level });
-        if (this.once('scareManager'))
-          this.jumpscare(aunty ? 'aunty' : 'manager', 1, aunty ? 'scareAunty' : 'scareManager');
-        this.fx.popup(
-          this.manager.cx,
-          this.manager.y - 20,
-          t(aunty ? 'auntyHi' : 'quickCall'),
-          '#FFFFFF',
-          12,
-        );
+        if (this.once('scareManager')) this.jumpscare(style.body, 1, style.scareKey);
+        this.fx.popup(this.manager.cx, this.manager.y - 20, t(style.greetKey), '#FFFFFF', 12);
         sfx('manager');
       }
     }

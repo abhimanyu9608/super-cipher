@@ -1,7 +1,7 @@
 import type { SkinId } from './extras';
 import type { StringKey } from '../i18n/strings';
 
-export type LevelId = 1 | 2 | 3 | 4;
+export type LevelId = 1 | 2 | 3 | 4 | 5;
 
 /** In-game clock (minutes since midnight). Reaching `late` costs a heart and resets to `reset`. */
 export interface LevelClock {
@@ -25,13 +25,13 @@ export interface LevelDef {
   id: LevelId;
   /** World map file in public/assets/maps. */
   map: string;
-  nameKey: 'level1Name' | 'level2Name' | 'level3Name' | 'level4Name';
+  nameKey: 'level1Name' | 'level2Name' | 'level3Name' | 'level4Name' | 'level5Name';
   /** i18n key of the eyebrow on the title screen and level card. */
-  worldKey: 'world1' | 'world2' | 'world3' | 'world4';
-  mapTitleKey: 'mapTitle1' | 'mapTitle2' | 'mapTitle3' | 'mapTitle4';
-  mapGoalKey: 'mapGoal1' | 'mapGoal2' | 'mapGoal3' | 'mapGoal4';
+  worldKey: 'world1' | 'world2' | 'world3' | 'world4' | 'world5';
+  mapTitleKey: 'mapTitle1' | 'mapTitle2' | 'mapTitle3' | 'mapTitle4' | 'mapTitle5';
+  mapGoalKey: 'mapGoal1' | 'mapGoal2' | 'mapGoal3' | 'mapGoal4' | 'mapGoal5';
   /** Big headline on Level Clear. */
-  clearKey: 'clearBig' | 'clearBig2' | 'clearBig3' | 'clearBig4';
+  clearKey: 'clearBig' | 'clearBig2' | 'clearBig3' | 'clearBig4' | 'clearBig5';
   indoor: boolean;
   /** Levels with a clock show it instead of the elapsed time (Level 2: office clock, Level 3: lunch). */
   clock?: LevelClock;
@@ -134,9 +134,28 @@ export const LEVELS: Record<LevelId, LevelDef> = {
     promoSkin: 'cap',
     music: 'office',
   },
+  5: {
+    id: 5,
+    map: 'level5.tmj',
+    nameKey: 'level5Name',
+    worldKey: 'world5',
+    mapTitleKey: 'mapTitle5',
+    mapGoalKey: 'mapGoal5',
+    clearKey: 'clearBig5',
+    indoor: true,
+    // The client demo is at 5 PM.
+    clock: { start: hm(16, 42), red: hm(16, 57), late: hm(17, 0), reset: hm(16, 58), lateKey: 'demoLate' },
+    finish: 'punch',
+    punch: { tex: 'contract', scanKey: 'signing', doneKey: 'signed', lockedKey: 'clientLocked' },
+    intro: false,
+    thirdStar: 'time',
+    promotion: { from: 'Team Lead', to: 'Tech Lead' },
+    promoSkin: 'goldPhones',
+    music: 'office',
+  },
 };
 
-export const LEVEL_IDS: LevelId[] = [1, 2, 3, 4];
+export const LEVEL_IDS: LevelId[] = [1, 2, 3, 4, 5];
 /** Total levels planned (PRD section 15); levels beyond the built ones show as "coming soon". */
 export const PLANNED_LEVELS = 8;
 

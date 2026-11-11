@@ -104,3 +104,22 @@ describe('Level 4 map: Deadline Night', () => {
     expect(objectsOf(m, 'updraft')).toHaveLength(1);
   });
 });
+
+describe('Level 5 map: Client Visit', () => {
+  const m = load(5);
+  it('has 7 translated sections, the Client boss and a contract finish', () => {
+    const secs = objectsOf(m, 'section');
+    expect(secs).toHaveLength(7);
+    for (const s of secs) expect(STRINGS).toHaveProperty(String(s.props.key));
+    expect(objectsOf(m, 'client')).toHaveLength(1);
+    expect(objectsOf(m, 'table')).toHaveLength(1);
+    expect(objectsOf(m, 'finish')).toHaveLength(1);
+  });
+  it('has slide platforms that take turns and projector beams', () => {
+    const slides = objectsOf(m, 'slide');
+    expect(slides.length).toBeGreaterThanOrEqual(5);
+    for (const s of slides) expect(num(s, 'on')).toBeLessThan(num(s, 'period'));
+    expect(new Set(slides.slice(0, 3).map((s) => num(s, 'offset'))).size).toBe(3);
+    expect(objectsOf(m, 'laser').every((l) => l.props.style === 'projector')).toBe(true);
+  });
+});

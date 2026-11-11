@@ -166,6 +166,11 @@ export interface DeskBossStyle {
   phaseLines: [StringKey, StringKey];
   byeLine: StringKey;
   phases: [StringKey, StringKey, StringKey];
+  /** Boss intro banner, HUD name, first line and jumpscare caption. */
+  bannerKey: StringKey;
+  nameKey: StringKey;
+  greetKey: StringKey;
+  scareKey: StringKey;
 }
 
 export const MANAGER_STYLE: DeskBossStyle = {
@@ -182,6 +187,10 @@ export const MANAGER_STYLE: DeskBossStyle = {
   phaseLines: ['cameraOn', 'deadline'],
   byeLine: 'managerBye',
   phases: ['phase1', 'phase2', 'phase3'],
+  bannerKey: 'bossManager',
+  nameKey: 'managerName',
+  greetKey: 'quickCall',
+  scareKey: 'scareManager',
 };
 
 export const AUNTY_STYLE: DeskBossStyle = {
@@ -198,6 +207,37 @@ export const AUNTY_STYLE: DeskBossStyle = {
   phaseLines: ['auntyLine2', 'auntyLine3'],
   byeLine: 'auntyBye',
   phases: ['auntyP1', 'auntyP2', 'auntyP3'],
+  bannerKey: 'bossAunty',
+  nameKey: 'auntyName',
+  greetKey: 'auntyHi',
+  scareKey: 'scareAunty',
+};
+
+export const CLIENT_STYLE: DeskBossStyle = {
+  body: 'client',
+  weak: 'scopeDoc',
+  arcTex: 'changeReq',
+  arcHurt: 'crHit',
+  arcLine: 'clientSmall',
+  waveTex: 'scopeWave',
+  waveHurt: 'scopeHit',
+  rainTex: 'revision',
+  rainHurt: 'revisionHit',
+  hitLine: 'scopeLocked',
+  phaseLines: ['clientLine2', 'clientLine3'],
+  byeLine: 'clientBye',
+  phases: ['clientP1', 'clientP2', 'clientP3'],
+  bannerKey: 'bossClient',
+  nameKey: 'clientName',
+  greetKey: 'clientHi',
+  scareKey: 'scareClient',
+};
+
+/** Map object type → desk boss style. */
+export const DESK_BOSSES: Record<string, DeskBossStyle> = {
+  manager: MANAGER_STYLE,
+  aunty: AUNTY_STYLE,
+  client: CLIENT_STYLE,
 };
 
 /** Desk boss: stomp the glowing weak spot (laptop / pressure cooker) on the table. */
