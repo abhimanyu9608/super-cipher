@@ -151,7 +151,56 @@ export class Monkey extends Enemy {
   }
 }
 
-/** Manager boss: stomp the glowing laptop on the meeting table. */
+/** Art, attacks and lines for a desk boss (Manager in Level 2, Canteen Aunty in Level 3). */
+export interface DeskBossStyle {
+  body: string;
+  weak: string;
+  arcTex: string;
+  arcHurt: StringKey;
+  arcLine: StringKey;
+  waveTex: string;
+  waveHurt: StringKey;
+  rainTex: string;
+  rainHurt: StringKey;
+  hitLine: StringKey;
+  phaseLines: [StringKey, StringKey];
+  byeLine: StringKey;
+  phases: [StringKey, StringKey, StringKey];
+}
+
+export const MANAGER_STYLE: DeskBossStyle = {
+  body: 'manager',
+  weak: 'laptop',
+  arcTex: 'calendar',
+  arcHurt: 'inviteHit',
+  arcLine: 'syncUp',
+  waveTex: 'ring',
+  waveHurt: 'ringHit',
+  rainTex: 'deadline',
+  rainHurt: 'deadlineHit',
+  hitLine: 'muted',
+  phaseLines: ['cameraOn', 'deadline'],
+  byeLine: 'managerBye',
+  phases: ['phase1', 'phase2', 'phase3'],
+};
+
+export const AUNTY_STYLE: DeskBossStyle = {
+  body: 'aunty',
+  weak: 'cooker',
+  arcTex: 'roti',
+  arcHurt: 'rotiHit',
+  arcLine: 'rotiThrow',
+  waveTex: 'sambar',
+  waveHurt: 'sambarHit',
+  rainTex: 'chilli',
+  rainHurt: 'chilliHit',
+  hitLine: 'cookerHit',
+  phaseLines: ['auntyLine2', 'auntyLine3'],
+  byeLine: 'auntyBye',
+  phases: ['auntyP1', 'auntyP2', 'auntyP3'],
+};
+
+/** Desk boss: stomp the glowing weak spot (laptop / pressure cooker) on the table. */
 export class Manager extends Enemy {
   hurtKey: StringKey = 'inviteHit';
   boss = true;
@@ -179,11 +228,13 @@ export class Manager extends Enemy {
     tableY: number,
     private arenaX0: number,
     private arenaX1: number,
+    public style: DeskBossStyle = MANAGER_STYLE,
   ) {
-    super(L, x, y, MANAGER.w, MANAGER.h, 'manager');
+    super(L, x, y, MANAGER.w, MANAGER.h, style.body);
     this.sprite.setDepth(4);
     this.tableY = tableY;
-    this.laptop = L.add.image(0, 0, 'laptop').setOrigin(0.5, 1).setDepth(9);
+    this.hurtKey = style.arcHurt;
+    this.laptop = L.add.image(0, 0, style.weak).setOrigin(0.5, 1).setDepth(9);
   }
 
   activeNear(): boolean {
@@ -209,7 +260,7 @@ export class Manager extends Enemy {
   }
 
   get phaseKey(): StringKey {
-    return this.hp >= 3 ? 'phase1' : this.hp === 2 ? 'phase2' : 'phase3';
+    return this.style.phases[this.hp >= 3 ? 0 : this.hp === 2 ? 1 : 2];
   }
 
   step(): void {
@@ -239,7 +290,7 @@ export class Manager extends Enemy {
       L.addHazard(
         new Projectile(
           L,
-          'calendar',
+          this.style.arcTex,
           sx - 12,
           sy,
           24,
@@ -247,11 +298,11 @@ export class Manager extends Enemy {
           vx * this.speedUp,
           vy,
           MANAGER.inviteGravity * this.speedUp * this.speedUp,
-          'inviteHit',
+          this.style.arcHurt,
           { spin: 0.1 },
         ),
       );
-      if (this.t % 3 === 0) L.fx.popup(this.cx, this.y - 16, t('syncUp'), '#FFFFFF', 9);
+      if (this.t % 3 === 0) L.fx.popup(this.cx, this.y - 16, t(this.style.arcLine), '#FFFFFF', 9);
     }
     // Phase 2+: phone-ring shockwave both ways along the floor.
     if (this.hp <= 2) {
@@ -260,10 +311,28 @@ export class Manager extends Enemy {
         this.ringIn = MANAGER.ringEvery;
         const gy = L.map.groundY;
         L.addHazard(
-          new RingWave(L, this.cx - 13, gy, -MANAGER.ringSpeed * this.speedUp, this.arenaX0, this.arenaX1),
+          new RingWave(
+            L,
+            this.cx - 13,
+            gy,
+            -MANAGER.ringSpeed * this.speedUp,
+            this.arenaX0,
+            this.arenaX1,
+            this.style.waveTex,
+            this.style.waveHurt,
+          ),
         );
         L.addHazard(
-          new RingWave(L, this.cx - 13, gy, MANAGER.ringSpeed * this.speedUp, this.arenaX0, this.arenaX1),
+          new RingWave(
+            L,
+            this.cx - 13,
+            gy,
+            MANAGER.ringSpeed * this.speedUp,
+            this.arenaX0,
+            this.arenaX1,
+            this.style.waveTex,
+            this.style.waveHurt,
+          ),
         );
         sfx('ring', { volume: 0.7 });
       }
@@ -275,9 +344,21 @@ export class Manager extends Enemy {
         this.paperIn = MANAGER.paperEvery;
         const px = Phaser.Math.Between(this.arenaX0 + 20, this.arenaX1 - 40);
         L.addHazard(
-          new Projectile(L, 'deadline', px, -30, 18, 22, 0, 2.2, 0.06 * this.speedUp, 'deadlineHit', {
-            wobble: 6,
-          }),
+          new Projectile(
+            L,
+            this.style.rainTex,
+            px,
+            -30,
+            18,
+            22,
+            0,
+            2.2,
+            0.06 * this.speedUp,
+            this.style.rainHurt,
+            {
+              wobble: 6,
+            },
+          ),
         );
       }
     }
@@ -288,7 +369,7 @@ export class Manager extends Enemy {
     if (!this.vulnerable) return;
     this.hp--;
     L.addScore(SCORE.bossHit);
-    L.fx.popup(this.cx, this.tableY - 50, t('muted'), '#FFD43B', 12);
+    L.fx.popup(this.cx, this.tableY - 50, t(this.style.hitLine), '#FFD43B', 12);
     L.fx.burst(this.cx, this.tableY - 15, 0xffd43b, 18);
     L.fx.addShake(FX.shakeBoss);
     sfx('bossHit');
@@ -297,7 +378,7 @@ export class Manager extends Enemy {
       this.passive = true;
       this.leaving = 160;
       L.addScore(SCORE.managerDefeat);
-      L.fx.popup(this.cx, this.y - 20, t('managerBye'), '#FFFFFF', 11);
+      L.fx.popup(this.cx, this.y - 20, t(this.style.byeLine), '#FFFFFF', 11);
       sfx('manager');
       L.onManagerDefeated();
       this.laptop.destroy();
@@ -308,7 +389,7 @@ export class Manager extends Enemy {
     this.walkFrom = this.x;
     const mid = (this.tableX0 + this.tableX1) / 2;
     this.walkTo = this.cx < mid ? this.tableX1 - this.w - 10 : this.tableX0 + 10;
-    const line: StringKey = this.hp === 2 ? 'cameraOn' : 'deadline';
+    const line: StringKey = this.style.phaseLines[this.hp === 2 ? 0 : 1];
     L.fx.popup(this.cx, this.y - 20, t(line), '#FF8787', 11);
     sfx('manager');
   }

@@ -32,6 +32,7 @@ export const STRINGS = {
   // ---- info panels ----
   mapTitle1: { hi: 'Level 1-1 ka map', en: 'Level 1-1 map' },
   mapTitle2: { hi: 'Level 2 ka map', en: 'Level 2 map' },
+  mapTitle3: { hi: 'Level 3 ka map', en: 'Level 3 map' },
   mapGoal1: {
     hi: 'Goal: 9:30 se pehle 1RK se metro tak pahuncho. Bandar se Office ID wapas lo!',
     en: 'Goal: get from your 1RK flat to the metro before 9:30. Win your office ID back from the monkey!',
@@ -39,6 +40,10 @@ export const STRINGS = {
   mapGoal2: {
     hi: 'Goal: lobby se biometric tak pahuncho, Manager ko harao, aur 9:30 se pehle punch karo!',
     en: 'Goal: get from the lobby to the biometric machine, beat the Manager and punch in before 9:30!',
+  },
+  mapGoal3: {
+    hi: 'Goal: lunch ke rush se bacho, Canteen Aunty ko harao, aur 1:30 se pehle desk pe wapas!',
+    en: 'Goal: survive the lunch rush, beat the Canteen Aunty and get back to your desk before 1:30!',
   },
   howTitle: { hi: 'Kaise khelein', en: 'How to play' },
   howMove: { hi: '← → ya A D: chalo / bhaago', en: '← → or A D: move' },
@@ -130,11 +135,39 @@ export const STRINGS = {
   z2_bossDesc: { hi: 'Manager boss, 3 phase', en: 'Manager boss, 3 phases' },
   z2_finDesc: { hi: 'Punch in, promotion!', en: 'Punch in, get promoted!' },
 
+  // ---- zones: Level 3 ----
+  z3_1: { hi: 'Cafeteria', en: 'Cafeteria' },
+  z3_2: { hi: 'Food Counters', en: 'Food Counters' },
+  z3_cp: { hi: 'Chai Counter', en: 'Chai Counter' },
+  z3_3: { hi: 'Dal Spill Zone', en: 'Dal Spill Zone' },
+  z3_4: { hi: 'Plate Stack', en: 'Plate Stack' },
+  z3_boss: { hi: 'Kitchen', en: 'Kitchen' },
+  z3_fin: { hi: 'Wapas Desk', en: 'Back to Desk' },
+  z3_1Tip: { hi: 'Line mein lago... ya upar se kood jao!', en: 'Join the queue... or jump right over it!' },
+  z3_2Tip: { hi: 'Tray pe sawaari, tawa ke tel se bacho!', en: 'Ride the trays, dodge the hot tawa oil!' },
+  z3_cpTip: { hi: 'Cutting chai pi lo: double jump!', en: 'Grab a cutting chai: double jump!' },
+  z3_3Tip: {
+    hi: 'Dal gir gayi! Farsh phisal raha hai',
+    en: 'Someone spilled the dal! The floor is slippery',
+  },
+  z3_4Tip: { hi: 'Upar dekho, plates gir rahi hain!', en: 'Look up: plates are falling!' },
+  z3_bossTip: { hi: 'Canteen Aunty: "Aur roti loge?"', en: 'Canteen Aunty: "One more roti?"' },
+  z3_finTip: { hi: '1:30 se pehle desk pe wapas!', en: 'Back at your desk before 1:30!' },
+  z3_1Desc: { hi: 'Lambi queue, bhookhe coworkers', en: 'Long queues, hungry coworkers' },
+  z3_2Desc: { hi: 'Tray conveyor, garam tawa', en: 'Tray conveyor, hot tawa' },
+  z3_cpDesc: { hi: 'Checkpoint + cutting chai', en: 'Checkpoint + cutting chai' },
+  z3_3Desc: { hi: 'Phisalti dal, bugs, lunch invites', en: 'Slippery dal, bugs, lunch invites' },
+  z3_4Desc: { hi: 'Plate towers, girti plates', en: 'Plate towers, falling plates' },
+  z3_bossDesc: { hi: 'Canteen Aunty boss, 3 phase', en: 'Canteen Aunty boss, 3 phases' },
+  z3_finDesc: { hi: 'Punch back, promotion!', en: 'Punch back in, get promoted!' },
+
   // ---- title / select ----
   world1: { hi: 'WORLD 1-1 · GHAR SE METRO', en: 'WORLD 1-1 · HOME TO METRO' },
   world2: { hi: 'WORLD 1-2 · OFFICE FLOOR', en: 'WORLD 1-2 · OFFICE FLOOR' },
+  world3: { hi: 'WORLD 1-3 · LUNCH BREAK', en: 'WORLD 1-3 · LUNCH BREAK' },
   level1Name: { hi: 'Ghar se Metro', en: 'Home to Metro' },
   level2Name: { hi: 'Office Floor', en: 'Office Floor' },
+  level3Name: { hi: 'Lunch Break', en: 'Lunch Break' },
   logoTop: { hi: 'SUPER CIPHER', en: 'SUPER CIPHER' },
   logoBottom: { hi: 'OFFICE RUN', en: 'OFFICE RUN' },
   sub: {
@@ -158,7 +191,7 @@ export const STRINGS = {
   locked: { hi: 'LOCKED', en: 'LOCKED' },
   unlockToPlay: { hi: 'Unlock karo ▶', en: 'Unlock ▶' },
   play: { hi: '▶ KHELO', en: '▶ PLAY' },
-  comingSoon: { hi: 'Level 3 jaldi aa raha hai', en: 'Level 3 coming soon' },
+  comingSoon: { hi: 'Level {n} jaldi aa raha hai', en: 'Level {n} coming soon' },
   followForNews: { hi: 'Naye level ki khabar ke liye follow karo', en: 'Follow for new level drops' },
 
   // ---- pause / game over ----
@@ -183,6 +216,7 @@ export const STRINGS = {
   // ---- level clear ----
   clearBig: { hi: 'METRO PAKAD LI!', en: 'YOU CAUGHT THE METRO!' },
   clearBig2: { hi: 'PRESENT! TIME PE PAHUNCH GAYE!', en: 'PRESENT! YOU MADE IT ON TIME!' },
+  clearBig3: { hi: 'PET BHARA, KAAM SHURU!', en: 'LUNCH DONE, BACK TO WORK!' },
   title1: { hi: 'Jugaadu Intern', en: 'Hustling Intern' },
   title2: { hi: 'Chai-Sutta Engineer', en: 'Chai-Powered Engineer' },
   title3: { hi: 'Tech Lead Material', en: 'Tech Lead Material' },
@@ -193,8 +227,8 @@ export const STRINGS = {
   statBest: { hi: 'Best', en: 'Best' },
   statAppraisal: { hi: 'Appraisal', en: 'Appraisal' },
   newBest: { hi: 'NAYA BEST!', en: 'NEW BEST!' },
-  unlockNext: { hi: 'LEVEL 2 UNLOCK KARO ▶', en: 'UNLOCK LEVEL 2 ▶' },
-  nextLevel: { hi: 'LEVEL 2 ▶', en: 'LEVEL 2 ▶' },
+  unlockNext: { hi: 'LEVEL {n} UNLOCK KARO ▶', en: 'UNLOCK LEVEL {n} ▶' },
+  nextLevel: { hi: 'LEVEL {n} ▶', en: 'LEVEL {n} ▶' },
   playAgain: { hi: '▶ PHIR SE', en: '▶ PLAY AGAIN' },
   copyChallenge: { hi: 'Challenge copy karo', en: 'Copy challenge' },
   copied: { hi: 'Copy ho gaya!', en: 'Copied!' },
@@ -212,10 +246,10 @@ export const STRINGS = {
   starsHint3b: { hi: '⭐ Saare 5 Appraisal Points', en: '⭐ All 5 Appraisal Points' },
 
   // ---- unlock flow ----
-  unlockTitle: { hi: 'LEVEL 2 UNLOCK', en: 'UNLOCK LEVEL 2' },
+  unlockTitle: { hi: 'LEVEL {n} UNLOCK', en: 'UNLOCK LEVEL {n}' },
   unlockIntro: {
-    hi: 'Level 2 ka code DM mein milega. 4 simple steps:',
-    en: "You'll get the Level 2 code by DM. 4 simple steps:",
+    hi: 'Level {n} ka code DM mein milega. 4 simple steps:',
+    en: "You'll get the Level {n} code by DM. 4 simple steps:",
   },
   step1: { hi: '1. Story lagao', en: '1. Post a story' },
   step1Text: {
@@ -231,8 +265,8 @@ export const STRINGS = {
   copyDm: { hi: 'DM message copy karo', en: 'Copy DM message' },
   openDm: { hi: 'DM kholo', en: 'Open DM' },
   dmMessage: {
-    hi: 'Hi! Maine Super Cipher Level 1-1 clear kiya aur story lagayi 🎉 Mera Player ID: {pid}. Level {n} ka code bhej do please!',
-    en: 'Hi! I cleared Super Cipher Level 1-1 and posted a story 🎉 My Player ID: {pid}. Please send me the Level {n} code!',
+    hi: 'Hi! Maine Super Cipher Level 1-{done} clear kiya aur story lagayi 🎉 Mera Player ID: {pid}. Level {n} ka code bhej do please!',
+    en: 'Hi! I cleared Super Cipher Level 1-{done} and posted a story 🎉 My Player ID: {pid}. Please send me the Level {n} code!',
   },
   step4: { hi: '4. Code daalo', en: '4. Enter the code' },
   codePlaceholder: { hi: '6-akshar ka code', en: '6-character code' },
@@ -241,8 +275,8 @@ export const STRINGS = {
     hi: 'Ye code sahi nahi hai. DM mein mila code dobara check karo.',
     en: "That code isn't right. Check the code from your DM again.",
   },
-  unlocked: { hi: 'LEVEL 2 UNLOCKED!', en: 'LEVEL 2 UNLOCKED!' },
-  playLevel2: { hi: '▶ LEVEL 2 KHELO', en: '▶ PLAY LEVEL 2' },
+  unlocked: { hi: 'LEVEL {n} UNLOCKED!', en: 'LEVEL {n} UNLOCKED!' },
+  playLevel2: { hi: '▶ LEVEL {n} KHELO', en: '▶ PLAY LEVEL {n}' },
   close: { hi: 'Band karo', en: 'Close' },
 
   // ---- story card ----
@@ -347,6 +381,30 @@ export const STRINGS = {
   quarterDeadline: { hi: 'Q4 DEADLINE!!!', en: 'Q4 DEADLINE!!!' },
   quickCallScreen: { hi: 'EK QUICK CALL?', en: 'QUICK CALL?' },
   companyName: { hi: 'CIPHER TECH PVT. LTD.', en: 'CIPHER TECH PVT. LTD.' },
+  // ---- Level 3 ----
+  bossAunty: { hi: 'BOSS · CANTEEN AUNTY', en: 'BOSS · CANTEEN AUNTY' },
+  auntyName: { hi: 'CANTEEN AUNTY', en: 'CANTEEN AUNTY' },
+  auntyHi: { hi: 'Aur roti loge?', en: 'One more roti?' },
+  auntyP1: { hi: 'Phase 1: Roti ki barsaat', en: 'Phase 1: Roti rain' },
+  auntyP2: { hi: 'Phase 2: Garam sambar!', en: 'Phase 2: Hot sambar!' },
+  auntyP3: { hi: 'Phase 3: Mirchi toofan!', en: 'Phase 3: Chilli storm!' },
+  auntyLine2: { hi: 'Khana waste mat karo!', en: "Don't waste food!" },
+  auntyLine3: { hi: 'Ab mirchi wala tadka!', en: 'Now the spicy tadka!' },
+  auntyBye: { hi: 'Theek hai beta, kal jaldi aana', en: 'Fine, beta. Come early tomorrow' },
+  cookerHit: { hi: 'SEETI BAJ GAYI! +300', en: 'WHISTLE BLOWN! +300' },
+  rotiThrow: { hi: 'Garam roti!', en: 'Hot roti!' },
+  rotiHit: { hi: 'ROTI LAGI!', en: 'ROTI TO THE FACE!' },
+  sambarHit: { hi: 'GARAM SAMBAR!', en: 'HOT SAMBAR!' },
+  chilliHit: { hi: 'MIRCHI LAGI! 🌶️', en: 'TOO SPICY! 🌶️' },
+  oilHit: { hi: 'TEL KE CHHEENTE!', en: 'OIL SPLASH!' },
+  plateHit: { hi: 'PLATE TOOTI!', en: 'PLATE CRASH!' },
+  sizzle: { hi: 'CHHSSS!', en: 'SIZZLE!' },
+  hotTawa: { hi: 'GARAM TAWA', en: 'HOT TAWA' },
+  queueShout: { hi: 'Line mein lago bhai!', en: 'Hey, get in line!' },
+  menuBoard: { hi: 'AAJ KA MENU', en: "TODAY'S MENU" },
+  dalSpill: { hi: 'DAL GIRI HAI', en: 'DAL SPILL' },
+  lunchOver: { hi: 'LUNCH LATE!', en: 'LUNCH OVERTIME!' },
+  scareAunty: { hi: 'AUR ROTI LOGE?!', en: 'ONE MORE ROTI?!' },
   exitFullscreen: { hi: 'Fullscreen band karo', en: 'Exit fullscreen' },
   // Daily Manager mood
   moodTitle: { hi: 'AAJ KA MANAGER MOOD', en: "TODAY'S MANAGER MOOD" },

@@ -72,10 +72,6 @@ export const MONKEY = {
 export const METRO = { doorFrames: 25 * 60, pulseUnder: 8 * 60, tickUnder: 5 * 60 } as const;
 
 export const OFFICE = {
-  clockStartMin: 9 * 60 + 12,
-  clockLateMin: 9 * 60 + 30,
-  clockRedMin: 9 * 60 + 27,
-  clockResetMin: 9 * 60 + 28,
   framesPerMinute: 600,
   liftSpeed: 1.2,
   liftPause: 45,

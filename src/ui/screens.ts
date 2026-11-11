@@ -3,7 +3,7 @@
  * Title → (Level select) → Level → Pause / Game Over / Level Clear → Unlock.
  */
 import type Phaser from 'phaser';
-import { LEVELS, LEVEL_IDS, isUnlocked, type LevelId } from '../config/levels';
+import { LEVELS, LEVEL_IDS, isUnlocked, nextLevel, type LevelId } from '../config/levels';
 import type { CharacterId } from '../config/physics';
 import { t, getLang, onLangChange, type StringKey } from '../i18n/strings';
 import { profile, session } from '../game/session';
@@ -38,6 +38,8 @@ const letters = (word: string, offset: number): string =>
 export class Flow {
   screen: Screen = 'loading';
   level: LevelId = 1;
+  /** The level the unlock screen is unlocking (always the next one after the highest unlocked). */
+  private unlockTarget: LevelId = 2;
   private lastClear: ClearResult | null = null;
   private newBest = false;
   private cardUrl = '';
@@ -88,6 +90,8 @@ export class Flow {
   startLevel(level: LevelId): void {
     if (!isUnlocked(level, profile.unlocked)) {
       this.level = level;
+      this.unlockTarget = Math.min(level, profile.unlocked + 1) as LevelId;
+      this.cardUrl = '';
       this.show('unlock');
       return;
     }
@@ -269,7 +273,9 @@ export class Flow {
   private selectHtml(): string {
     const unlocked = profile.unlocked;
     const icons = ['🏠', '🚇', '🏢', '🍛', '🌙', '🤝', '🏝️', '📈', '👑'];
-    const soonKeys: StringKey[] = ['lv3', 'lv4', 'lv5', 'lv6', 'lv7', 'lv8'];
+    const soonKeys: StringKey[] = (['lv3', 'lv4', 'lv5', 'lv6', 'lv7', 'lv8'] as StringKey[]).slice(
+      LEVEL_IDS.length - 2,
+    );
     const here = Math.max(...LEVEL_IDS.filter((id) => isUnlocked(id, unlocked)));
     const nodes = [
       `<div class="node done"><span class="node-ico">${icons[0]}</span><span class="node-name">${t('mapHome')}</span></div>`,
@@ -288,7 +294,7 @@ export class Flow {
       }),
       ...soonKeys.map(
         (k, i) =>
-          `<div class="node soon"><span class="node-ico">${icons[i + 3]}</span><span class="node-name">${t(k)}</span><span class="node-meta">${t('soonShort')}</span></div>`,
+          `<div class="node soon"><span class="node-ico">${icons[i + LEVEL_IDS.length + 1]}</span><span class="node-name">${t(k)}</span><span class="node-meta">${t('soonShort')}</span></div>`,
       ),
     ];
     return `<div class="overlay dim" role="dialog" aria-modal="true" aria-labelledby="ov-h">
@@ -311,28 +317,28 @@ export class Flow {
           `<span class="s ${i < r.stars ? 'on' : 'off'}" style="animation-delay:${0.25 + i * 0.35}s">⭐</span>`,
       )
       .join('');
-    const next: LevelId | null = r.level === 1 ? 2 : null;
+    const next = nextLevel(r.level);
     const nextOpen = next !== null && isUnlocked(next, profile.unlocked);
     const nextBtn =
       next === null
-        ? `<a class="btn btn-pink" href="${IG_PROFILE}" target="_blank" rel="noopener">${t('comingSoon')} · ${t('follow')}</a>`
-        : `<button class="btn btn-gold btn-big" data-act="${nextOpen ? 'next' : 'unlock'}" data-main>${nextOpen ? t('nextLevel') : t('unlockNext')}</button>`;
+        ? `<a class="btn btn-pink" href="${IG_PROFILE}" target="_blank" rel="noopener">${t('comingSoon', { n: r.level + 1 })} · ${t('follow')}</a>`
+        : `<button class="btn btn-gold btn-big" data-act="${nextOpen ? 'next' : 'unlock'}" data-main>${nextOpen ? t('nextLevel', { n: next }) : t('unlockNext', { n: next })}</button>`;
     const stats = [
       [t('statScore'), padScore(r.score)],
       [t('statCoins'), `${r.coins}/${r.totalCoins}`],
       [t('statTime'), formatTime(r.frames)],
       [t('statBest'), padScore(profile.best(r.level))],
-      ...(r.level === 2 ? [[t('statAppraisal'), `${r.appraisal}/5`]] : []),
+      ...(def.thirdStar === 'appraisal' ? [[t('statAppraisal'), `${r.appraisal}/5`]] : []),
     ]
       .map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`)
       .join('');
     return `<div class="overlay dim" role="dialog" aria-modal="true" aria-labelledby="ov-h">
       <div class="stars" aria-label="${r.stars}/3">${starHtml}</div>
-      <h2 id="ov-h" class="h-big">${r.level === 1 ? t('clearBig') : t('clearBig2')}</h2>
+      <h2 id="ov-h" class="h-big">${t(def.clearKey)}</h2>
       <div class="promo">
         <img src="${portraitDataUrl(profile.character, 'idle0', 'none')}" alt="" />
         <span class="promo-arrow">➜</span>
-        <img class="promo-new" src="${portraitDataUrl(profile.character, 'win1', r.level === 1 ? 'lanyard' : 'goldPhones')}" alt="" />
+        <img class="promo-new" src="${portraitDataUrl(profile.character, 'win1', def.promoSkin)}" alt="" />
         <p class="title-badge"><b>${t('promoted')}</b> ${t(titleKey(r.stars))}<br />${t('promotion', { from: def.promotion.from, to: def.promotion.to })}</p>
       </div>
       ${this.newBest ? `<p class="new-best">${t('newBest')}</p>` : ''}
@@ -349,13 +355,13 @@ export class Flow {
 
   private storyCardUrl(): string {
     if (this.cardUrl) return this.cardUrl;
-    const r = this.lastClear;
-    const level = r?.level ?? 1;
+    const level = Math.max(1, this.unlockTarget - 1) as LevelId;
+    const r = this.lastClear?.level === level ? this.lastClear : null;
     const canvas = renderStoryCard({
       character: profile.character,
       level,
-      stars: r?.stars ?? Math.max(1, profile.stars(1)),
-      score: r?.score ?? profile.best(1),
+      stars: r?.stars ?? Math.max(1, profile.stars(level)),
+      score: r?.score ?? profile.best(level),
       coins: r?.coins ?? 0,
       totalCoins: r?.totalCoins ?? 0,
       lang: getLang(),
@@ -365,20 +371,20 @@ export class Flow {
   }
 
   private unlockHtml(): string {
-    const target = this.level === 1 ? 2 : this.level;
+    const target = this.unlockTarget;
     if (isUnlocked(target, profile.unlocked)) {
       return `<div class="overlay dim" role="dialog" aria-modal="true" aria-labelledby="ov-h">
-        <h2 id="ov-h" class="h-big">${t('unlocked')}</h2>
+        <h2 id="ov-h" class="h-big">${t('unlocked', { n: target })}</h2>
         <div class="row">
-          <button class="btn btn-gold btn-big" data-act="play2" data-main>${t('playLevel2')}</button>
+          <button class="btn btn-gold btn-big" data-act="play2" data-main>${t('playLevel2', { n: target })}</button>
           <button class="btn btn-ghost" data-act="title">${t('menu')}</button>
         </div></div>`;
     }
     const pid = profile.playerId;
     const url = this.storyCardUrl();
     return `<div class="overlay dim" role="dialog" aria-modal="true" aria-labelledby="ov-h">
-      <h2 id="ov-h" class="h-big">${t('unlockTitle')}</h2>
-      <p class="hint">${t('unlockIntro')}</p>
+      <h2 id="ov-h" class="h-big">${t('unlockTitle', { n: target })}</h2>
+      <p class="hint">${t('unlockIntro', { n: target })}</p>
       <div class="unlock">
         <img class="card-preview" src="${url}" alt="${esc(t('cardAlt'))}" />
         <div class="steps">
@@ -456,11 +462,12 @@ export class Flow {
           case 'continue':
             return this.continueRun();
           case 'next':
-            return this.startLevel(2);
+            return this.startLevel(nextLevel(this.level) ?? this.level);
           case 'play2':
-            return this.startLevel(2);
+            return this.startLevel(this.unlockTarget);
           case 'unlock':
-            this.level = 1;
+            this.unlockTarget = nextLevel(this.level) ?? this.level;
+            this.cardUrl = '';
             return this.show('unlock');
           case 'challenge': {
             const r = this.lastClear;
@@ -469,7 +476,11 @@ export class Flow {
             return;
           }
           case 'copydm': {
-            const msg = t('dmMessage', { pid: profile.playerId, n: 2 });
+            const msg = t('dmMessage', {
+              pid: profile.playerId,
+              n: this.unlockTarget,
+              done: this.unlockTarget - 1,
+            });
             void copyText(msg).then((ok) => this.toast(ok ? t('copied') : `${t('copyFailed')}: ${msg}`));
             return;
           }
@@ -480,8 +491,8 @@ export class Flow {
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
       const input = form.querySelector('input') as HTMLInputElement;
-      if (checkCode(profile.playerId, 2, input.value)) {
-        profile.unlocked = 2;
+      if (checkCode(profile.playerId, this.unlockTarget, input.value)) {
+        profile.unlocked = this.unlockTarget;
         sfx('unlock');
         this.show('unlock');
       } else {

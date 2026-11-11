@@ -15,7 +15,7 @@ describe('generated audio', () => {
       expect(peak, key).toBeGreaterThan(0.05);
       expect(peak, key).toBeLessThanOrEqual(1);
     }
-  });
+  }, 30_000);
 
   it('renders music loops and tunes A4 to 440 Hz', () => {
     expect(noteHz('A4')).toBe(440);

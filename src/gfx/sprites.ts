@@ -822,6 +822,140 @@ def('dpad', 4, 4, (c) => {
   c.fillRect(0, 0, 4, 4);
 });
 
+// ------------------------------------------------------------------ Level 3: lunch break
+def(
+  'aunty',
+  124,
+  134,
+  (c, f) => {
+    // Saree + apron, hair bun, ladle in hand.
+    limb(c, 46, 104, 44, 132, 14, '#7A1F5C', 4);
+    limb(c, 78, 104, 80, 132, 14, '#7A1F5C', 4);
+    rr(c, 24, 54, 76, 66, 26);
+    fillStroke(c, '#C2255C', 4);
+    // Saree pallu stripe.
+    poly(c, [30, 58, 50, 56, 96, 116, 76, 118], '#FFD43B', 3);
+    // Apron.
+    rr(c, 40, 76, 44, 44, 8);
+    fillStroke(c, '#F8F9FA', 3);
+    c.fillStyle = '#FF8787';
+    c.fillRect(46, 84, 32, 3);
+    // Arms: ladle up on frame 1.
+    limb(c, 28, 66, 16, 100, 12, '#C98B5B', 4);
+    if (f === 0) limb(c, 96, 66, 108, 96, 12, '#C98B5B', 4);
+    else {
+      limb(c, 96, 66, 104, 34, 12, '#C98B5B', 4);
+      limb(c, 104, 34, 112, 8, 5, '#ADB5BD', 2.5);
+      ellipse(c, 113, 6, 9, 6, '#ADB5BD', 3);
+    }
+    // Head.
+    circle(c, 62, 32, 25, '#B97A4B', 4);
+    circle(c, 62, 4, 12, '#2B2235', 3);
+    c.fillStyle = '#2B2235';
+    c.beginPath();
+    c.arc(62, 26, 26, Math.PI * 1.02, Math.PI * 1.98);
+    c.fill();
+    // Bindi, eyes, smile-scowl.
+    circle(c, 62, 20, 3, '#FF2D55', 0);
+    c.fillStyle = OUTLINE;
+    c.fillRect(50, 30, 4, 4);
+    c.fillRect(70, 30, 4, 4);
+    c.strokeStyle = OUTLINE;
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(47, 24);
+    c.lineTo(56, 27);
+    c.moveTo(77, 24);
+    c.lineTo(68, 27);
+    c.stroke();
+    c.beginPath();
+    c.arc(62, 44, 7, 0.1 * Math.PI, 0.9 * Math.PI);
+    c.stroke();
+    // Gold earrings.
+    circle(c, 37, 38, 4, '#FFD43B', 2);
+    circle(c, 87, 38, 4, '#FFD43B', 2);
+  },
+  2,
+);
+def('cooker', 64, 40, (c) => {
+  const g = c.createRadialGradient(32, 22, 4, 32, 22, 32);
+  g.addColorStop(0, 'rgba(255,212,59,0.65)');
+  g.addColorStop(1, 'rgba(255,212,59,0)');
+  c.fillStyle = g;
+  c.fillRect(0, 0, 64, 40);
+  rr(c, 12, 14, 40, 22, 8);
+  fillStroke(c, '#CED4DA', 3);
+  box(c, 16, 9, 32, 7, '#868E96', 3, 3);
+  box(c, 29, 2, 6, 8, '#343A40', 2, 2);
+  limb(c, 50, 22, 62, 20, 5, '#343A40', 2);
+  c.fillStyle = 'rgba(255,255,255,0.6)';
+  c.fillRect(17, 18, 6, 12);
+});
+def('roti', 28, 28, (c) => {
+  circle(c, 14, 14, 12, '#E8B96A', 3);
+  c.fillStyle = '#B07A3A';
+  for (const [x, y] of [
+    [9, 10],
+    [17, 8],
+    [15, 17],
+    [8, 18],
+    [20, 15],
+  ] as const) {
+    c.beginPath();
+    c.arc(x, y, 2, 0, Math.PI * 2);
+    c.fill();
+  }
+});
+def('sambar', 30, 20, (c) => {
+  c.beginPath();
+  c.moveTo(0, 20);
+  c.quadraticCurveTo(6, 2, 15, 8);
+  c.quadraticCurveTo(24, 0, 30, 20);
+  c.closePath();
+  fillStroke(c, '#E8590C', 2.5);
+  c.fillStyle = '#FFA94D';
+  c.fillRect(8, 12, 4, 4);
+  c.fillRect(18, 10, 3, 3);
+});
+def('chilli', 18, 28, (c) => {
+  c.beginPath();
+  c.moveTo(9, 4);
+  c.quadraticCurveTo(18, 14, 10, 27);
+  c.quadraticCurveTo(4, 16, 9, 4);
+  fillStroke(c, '#E03131', 2.5);
+  limb(c, 9, 4, 12, 0, 3, '#2F9E44', 1.5);
+});
+def('tray', 100, 18, (c) => {
+  box(c, 1.5, 3, 97, 13, '#4DABF7', 3, 4);
+  for (const x of [12, 40, 68]) {
+    c.fillStyle = '#E7F5FF';
+    c.beginPath();
+    c.arc(x + 8, 9, 6, 0, Math.PI * 2);
+    c.fill();
+  }
+});
+def('plate', 28, 12, (c) => {
+  ellipse(c, 14, 6, 12, 4.5, '#F8F9FA', 2.5);
+  ellipse(c, 14, 6, 6, 2, '#DEE2E6', 0);
+});
+def('oil', 10, 10, (c) => {
+  c.beginPath();
+  c.moveTo(5, 0);
+  c.quadraticCurveTo(10, 7, 5, 10);
+  c.quadraticCurveTo(0, 7, 5, 0);
+  fillStroke(c, '#FAB005', 1.5);
+});
+def('tawa', 64, 40, (c) => {
+  box(c, 6, 24, 52, 14, '#495057', 3, 3);
+  ellipse(c, 32, 20, 26, 7, '#212529', 3);
+  c.fillStyle = 'rgba(255,120,40,0.6)';
+  c.fillRect(14, 30, 36, 4);
+  circle(c, 32, 18, 7, '#E8B96A', 2);
+});
+def('plateStack', 60, 120, (c) => {
+  for (let i = 0; i < 9; i++) ellipse(c, 30, 112 - i * 12, 26, 6, i % 2 ? '#F1F3F5' : '#FFFFFF', 2.5);
+});
+
 // ------------------------------------------------------------------ ambient life
 def(
   'bird',

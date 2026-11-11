@@ -1,0 +1,1669 @@
+{
+ "compressionlevel": -1,
+ "type": "map",
+ "version": "1.10",
+ "tiledversion": "1.11.0",
+ "orientation": "orthogonal",
+ "renderorder": "right-down",
+ "infinite": false,
+ "tilewidth": 20,
+ "tileheight": 20,
+ "width": 330,
+ "height": 27,
+ "nextlayerid": 7,
+ "nextobjectid": 90,
+ "properties": [
+  {
+   "name": "worldWidth",
+   "type": "int",
+   "value": 6600
+  },
+  {
+   "name": "spawnX",
+   "type": "int",
+   "value": 80
+  },
+  {
+   "name": "spawnY",
+   "type": "int",
+   "value": 400
+  },
+  {
+   "name": "finishX",
+   "type": "int",
+   "value": 6080
+  },
+  {
+   "name": "groundY",
+   "type": "int",
+   "value": 460
+  },
+  {
+   "name": "level",
+   "type": "int",
+   "value": 3
+  }
+ ],
+ "tilesets": [],
+ "layers": [
+  {
+   "id": 1,
+   "name": "zones",
+   "type": "objectgroup",
+   "draworder": "topdown",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 74,
+     "name": "",
+     "type": "section",
+     "x": 0,
+     "y": 0,
+     "width": 1000,
+     "height": 540,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "key",
+       "type": "string",
+       "value": "z3_1"
+      },
+      {
+       "name": "skyTop",
+       "type": "string",
+       "value": "#FFE8CC"
+      },
+      {
+       "name": "skyBottom",
+       "type": "string",
+       "value": "#FFF3E0"
+      },
+      {
+       "name": "difficulty",
+       "type": "int",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "id": 75,
+     "name": "",
+     "type": "section",
+     "x": 1000,
+     "y": 0,
+     "width": 1300,
+     "height": 540,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "key",
+       "type": "string",
+       "value": "z3_2"
+      },
+      {
+       "name": "skyTop",
+       "type": "string",
+       "value": "#FFD8A8"
+      },
+      {
+       "name": "skyBottom",
+       "type": "string",
+       "value": "#FFE8CC"
+      },
+      {
+       "name": "difficulty",
+       "type": "int",
+       "value": 2
+      }
+     ]
+    },
+    {
+     "id": 76,
+     "name": "",
+     "type": "section",
+     "x": 2300,
+     "y": 0,
+     "width": 400,
+     "height": 540,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "key",
+       "type": "string",
+       "value": "z3_cp"
+      },
+      {
+       "name": "skyTop",
+       "type": "string",
+       "value": "#FFC078"
+      },
+      {
+       "name": "skyBottom",
+       "type": "string",
+       "value": "#FFF4E6"
+      },
+      {
+       "name": "difficulty",
+       "type": "int",
+       "value": 0
+      }
+     ]
+    },
+    {
+     "id": 77,
+     "name": "",
+     "type": "section",
+     "x": 2700,
+     "y": 0,
+     "width": 1200,
+     "height": 540,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "key",
+       "type": "string",
+       "value": "z3_3"
+      },
+      {
+       "name": "skyTop",
+       "type": "string",
+       "value": "#FFEC99"
+      },
+      {
+       "name": "skyBottom",
+       "type": "string",
+       "value": "#FFF9DB"
+      },
+      {
+       "name": "difficulty",
+       "type": "int",
+       "value": 3
+      }
+     ]
+    },
+    {
+     "id": 78,
+     "name": "",
+     "type": "section",
+     "x": 3900,
+     "y": 0,
+     "width": 1100,
+     "height": 540,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "key",
+       "type": "string",
+       "value": "z3_4"
+      },
+      {
+       "name": "skyTop",
+       "type": "string",
+       "value": "#99E9F2"
+      },
+      {
+       "name": "skyBottom",
+       "type": "string",
+       "value": "#E3FAFC"
+      },
+      {
+       "name": "difficulty",
+       "type": "int",
+       "value": 4
+      }
+     ]
+    },
+    {
+     "id": 79,
+     "name": "",
+     "type": "section",
+     "x": 5000,
+     "y": 0,
+     "width": 1000,
+     "height": 540,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "key",
+       "type": "string",
+       "value": "z3_boss"
+      },
+      {
+       "name": "skyTop",
+       "type": "string",
+       "value": "#5F3A1E"
+      },
+      {
+       "name": "skyBottom",
+       "type": "string",
+       "value": "#8B5A2B"
+      },
+      {
+       "name": "difficulty",
+       "type": "int",
+       "value": 5
+      }
+     ]
+    },
+    {
+     "id": 80,
+     "name": "",
+     "type": "section",
+     "x": 6000,
+     "y": 0,
+     "width": 600,
+     "height": 540,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "key",
+       "type": "string",
+       "value": "z3_fin"
+      },
+      {
+       "name": "skyTop",
+       "type": "string",
+       "value": "#A5D8FF"
+      },
+      {
+       "name": "skyBottom",
+       "type": "string",
+       "value": "#E7F5FF"
+      },
+      {
+       "name": "difficulty",
+       "type": "int",
+       "value": 0
+      }
+     ]
+    },
+    {
+     "id": 81,
+     "name": "",
+     "type": "microwave",
+     "x": 1060,
+     "y": 420,
+     "width": 50,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "tex",
+       "type": "string",
+       "value": "tawa"
+      },
+      {
+       "name": "proj",
+       "type": "string",
+       "value": "oil"
+      },
+      {
+       "name": "hurt",
+       "type": "string",
+       "value": "oilHit"
+      },
+      {
+       "name": "label",
+       "type": "string",
+       "value": "sizzle"
+      },
+      {
+       "name": "title",
+       "type": "string",
+       "value": "hotTawa"
+      }
+     ]
+    },
+    {
+     "id": 82,
+     "name": "",
+     "type": "microwave",
+     "x": 2180,
+     "y": 420,
+     "width": 50,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "tex",
+       "type": "string",
+       "value": "tawa"
+      },
+      {
+       "name": "proj",
+       "type": "string",
+       "value": "oil"
+      },
+      {
+       "name": "hurt",
+       "type": "string",
+       "value": "oilHit"
+      },
+      {
+       "name": "label",
+       "type": "string",
+       "value": "sizzle"
+      },
+      {
+       "name": "title",
+       "type": "string",
+       "value": "hotTawa"
+      }
+     ]
+    },
+    {
+     "id": 83,
+     "name": "",
+     "type": "wet",
+     "x": 2780,
+     "y": 440,
+     "width": 420,
+     "height": 30,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "style",
+       "type": "string",
+       "value": "dal"
+      }
+     ]
+    },
+    {
+     "id": 84,
+     "name": "",
+     "type": "wet",
+     "x": 3400,
+     "y": 440,
+     "width": 420,
+     "height": 30,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "style",
+       "type": "string",
+       "value": "dal"
+      }
+     ]
+    },
+    {
+     "id": 85,
+     "name": "",
+     "type": "brickRain",
+     "x": 3950,
+     "y": 0,
+     "width": 1000,
+     "height": 540,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "tex",
+       "type": "string",
+       "value": "plate"
+      },
+      {
+       "name": "hurt",
+       "type": "string",
+       "value": "plateHit"
+      }
+     ]
+    },
+    {
+     "id": 86,
+     "name": "",
+     "type": "checkpoint",
+     "x": 2600,
+     "y": 300,
+     "width": 40,
+     "height": 160,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "respawnX",
+       "type": "int",
+       "value": 2580
+      },
+      {
+       "name": "respawnY",
+       "type": "int",
+       "value": 400
+      },
+      {
+       "name": "style",
+       "type": "string",
+       "value": "chai"
+      }
+     ]
+    },
+    {
+     "id": 87,
+     "name": "",
+     "type": "bossArena",
+     "x": 5080,
+     "y": 0,
+     "width": 900,
+     "height": 540,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "boss",
+       "type": "string",
+       "value": "aunty"
+      },
+      {
+       "name": "respawnX",
+       "type": "int",
+       "value": 5060
+      },
+      {
+       "name": "respawnY",
+       "type": "int",
+       "value": 400
+      }
+     ]
+    },
+    {
+     "id": 88,
+     "name": "",
+     "type": "finish",
+     "x": 6080,
+     "y": 370,
+     "width": 60,
+     "height": 90,
+     "rotation": 0,
+     "visible": true
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "name": "decor",
+   "type": "objectgroup",
+   "draworder": "topdown",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 89,
+     "name": "",
+     "type": "queueSign",
+     "x": 260,
+     "y": 330,
+     "width": 80,
+     "height": 30,
+     "rotation": 0,
+     "visible": true
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "name": "solids",
+   "type": "objectgroup",
+   "draworder": "topdown",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 1,
+     "name": "",
+     "type": "ground",
+     "x": 0,
+     "y": 460,
+     "width": 1200,
+     "height": 80,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "tex",
+       "type": "string",
+       "value": "cafe"
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "name": "",
+     "type": "person",
+     "x": 330,
+     "y": 400,
+     "width": 40,
+     "height": 60,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "look",
+       "type": "int",
+       "value": 0
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "name": "",
+     "type": "person",
+     "x": 380,
+     "y": 390,
+     "width": 40,
+     "height": 70,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "look",
+       "type": "int",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "",
+     "type": "person",
+     "x": 430,
+     "y": 405,
+     "width": 40,
+     "height": 55,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "look",
+       "type": "int",
+       "value": 2
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "",
+     "type": "person",
+     "x": 480,
+     "y": 395,
+     "width": 40,
+     "height": 65,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "look",
+       "type": "int",
+       "value": 0
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "",
+     "type": "ground",
+     "x": 2100,
+     "y": 460,
+     "width": 600,
+     "height": 80,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "tex",
+       "type": "string",
+       "value": "cafe"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "",
+     "type": "ground",
+     "x": 2700,
+     "y": 460,
+     "width": 550,
+     "height": 80,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "tex",
+       "type": "string",
+       "value": "cafe"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "",
+     "type": "ground",
+     "x": 3350,
+     "y": 460,
+     "width": 550,
+     "height": 80,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "tex",
+       "type": "string",
+       "value": "cafe"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "",
+     "type": "ground",
+     "x": 3900,
+     "y": 460,
+     "width": 650,
+     "height": 80,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "tex",
+       "type": "string",
+       "value": "kitchen"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "",
+     "type": "ground",
+     "x": 4680,
+     "y": 460,
+     "width": 1920,
+     "height": 80,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "tex",
+       "type": "string",
+       "value": "kitchen"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "",
+     "type": "plateStack",
+     "x": 4150,
+     "y": 340,
+     "width": 60,
+     "height": 120,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 12,
+     "name": "",
+     "type": "plateStack",
+     "x": 4330,
+     "y": 280,
+     "width": 60,
+     "height": 180,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 13,
+     "name": "",
+     "type": "plateStack",
+     "x": 4900,
+     "y": 330,
+     "width": 60,
+     "height": 130,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 14,
+     "name": "",
+     "type": "bossDoor",
+     "x": 5980,
+     "y": 0,
+     "width": 20,
+     "height": 460,
+     "rotation": 0,
+     "visible": true
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "name": "platforms",
+   "type": "objectgroup",
+   "draworder": "topdown",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 15,
+     "name": "",
+     "type": "mover",
+     "x": 1220,
+     "y": 400,
+     "width": 100,
+     "height": 18,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "style",
+       "type": "string",
+       "value": "tray"
+      },
+      {
+       "name": "axis",
+       "type": "string",
+       "value": "x"
+      },
+      {
+       "name": "min",
+       "type": "int",
+       "value": 1220
+      },
+      {
+       "name": "max",
+       "type": "int",
+       "value": 1500
+      },
+      {
+       "name": "speed",
+       "type": "float",
+       "value": 1.5
+      },
+      {
+       "name": "pause",
+       "type": "int",
+       "value": 20
+      },
+      {
+       "name": "phase",
+       "type": "int",
+       "value": 0
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "name": "",
+     "type": "mover",
+     "x": 1560,
+     "y": 360,
+     "width": 100,
+     "height": 18,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "style",
+       "type": "string",
+       "value": "tray"
+      },
+      {
+       "name": "axis",
+       "type": "string",
+       "value": "x"
+      },
+      {
+       "name": "min",
+       "type": "int",
+       "value": 1560
+      },
+      {
+       "name": "max",
+       "type": "int",
+       "value": 1840
+      },
+      {
+       "name": "speed",
+       "type": "float",
+       "value": 1.5
+      },
+      {
+       "name": "pause",
+       "type": "int",
+       "value": 20
+      },
+      {
+       "name": "phase",
+       "type": "float",
+       "value": 0.5
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "name": "",
+     "type": "conveyor",
+     "x": 1880,
+     "y": 420,
+     "width": 220,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "speed",
+       "type": "int",
+       "value": 2
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "name": "",
+     "type": "counter",
+     "x": 2780,
+     "y": 380,
+     "width": 280,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 19,
+     "name": "",
+     "type": "counter",
+     "x": 3160,
+     "y": 380,
+     "width": 280,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 20,
+     "name": "",
+     "type": "counter",
+     "x": 3620,
+     "y": 380,
+     "width": 240,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 21,
+     "name": "",
+     "type": "mover",
+     "x": 4580,
+     "y": 400,
+     "width": 100,
+     "height": 18,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "style",
+       "type": "string",
+       "value": "tray"
+      },
+      {
+       "name": "axis",
+       "type": "string",
+       "value": "y"
+      },
+      {
+       "name": "min",
+       "type": "int",
+       "value": 260
+      },
+      {
+       "name": "max",
+       "type": "int",
+       "value": 410
+      },
+      {
+       "name": "speed",
+       "type": "float",
+       "value": 1.1
+      },
+      {
+       "name": "pause",
+       "type": "int",
+       "value": 20
+      },
+      {
+       "name": "phase",
+       "type": "int",
+       "value": 0
+      }
+     ]
+    },
+    {
+     "id": 22,
+     "name": "",
+     "type": "shelf",
+     "x": 5120,
+     "y": 330,
+     "width": 80,
+     "height": 14,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 23,
+     "name": "",
+     "type": "table",
+     "x": 5350,
+     "y": 380,
+     "width": 400,
+     "height": 16,
+     "rotation": 0,
+     "visible": true
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "name": "items",
+   "type": "objectgroup",
+   "draworder": "topdown",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 24,
+     "name": "",
+     "type": "coin",
+     "x": 350,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 25,
+     "name": "",
+     "type": "coin",
+     "x": 400,
+     "y": 320,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 26,
+     "name": "",
+     "type": "coin",
+     "x": 450,
+     "y": 335,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 27,
+     "name": "",
+     "type": "coin",
+     "x": 500,
+     "y": 325,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 28,
+     "name": "",
+     "type": "coin",
+     "x": 760,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 29,
+     "name": "",
+     "type": "coin",
+     "x": 800,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 30,
+     "name": "",
+     "type": "coin",
+     "x": 840,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 31,
+     "name": "",
+     "type": "coin",
+     "x": 1280,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 32,
+     "name": "",
+     "type": "coin",
+     "x": 1340,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 33,
+     "name": "",
+     "type": "coin",
+     "x": 1620,
+     "y": 290,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 34,
+     "name": "",
+     "type": "coin",
+     "x": 1680,
+     "y": 290,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 35,
+     "name": "",
+     "type": "coin",
+     "x": 1950,
+     "y": 370,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 36,
+     "name": "",
+     "type": "coin",
+     "x": 2010,
+     "y": 370,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 37,
+     "name": "",
+     "type": "coin",
+     "x": 2200,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 38,
+     "name": "",
+     "type": "coin",
+     "x": 2250,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 39,
+     "name": "",
+     "type": "coin",
+     "x": 2440,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 40,
+     "name": "",
+     "type": "coin",
+     "x": 2490,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 41,
+     "name": "",
+     "type": "coin",
+     "x": 2820,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 42,
+     "name": "",
+     "type": "coin",
+     "x": 2880,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 43,
+     "name": "",
+     "type": "coin",
+     "x": 2940,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 44,
+     "name": "",
+     "type": "coin",
+     "x": 3300,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 45,
+     "name": "",
+     "type": "coin",
+     "x": 3360,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 46,
+     "name": "",
+     "type": "coin",
+     "x": 3680,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 47,
+     "name": "",
+     "type": "coin",
+     "x": 3740,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 48,
+     "name": "",
+     "type": "coin",
+     "x": 4180,
+     "y": 290,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 49,
+     "name": "",
+     "type": "coin",
+     "x": 4360,
+     "y": 230,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 50,
+     "name": "",
+     "type": "coin",
+     "x": 4400,
+     "y": 230,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 51,
+     "name": "",
+     "type": "coin",
+     "x": 4630,
+     "y": 300,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 52,
+     "name": "",
+     "type": "coin",
+     "x": 4930,
+     "y": 280,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 53,
+     "name": "",
+     "type": "coin",
+     "x": 5000,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 54,
+     "name": "",
+     "type": "coin",
+     "x": 5060,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 55,
+     "name": "",
+     "type": "coin",
+     "x": 5160,
+     "y": 290,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 56,
+     "name": "",
+     "type": "coin",
+     "x": 5420,
+     "y": 340,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 57,
+     "name": "",
+     "type": "coin",
+     "x": 5680,
+     "y": 340,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 58,
+     "name": "",
+     "type": "coin",
+     "x": 6100,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 59,
+     "name": "",
+     "type": "coin",
+     "x": 6150,
+     "y": 400,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true
+    },
+    {
+     "id": 60,
+     "name": "",
+     "type": "block",
+     "x": 600,
+     "y": 300,
+     "width": 40,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "kind",
+       "type": "string",
+       "value": "question"
+      },
+      {
+       "name": "item",
+       "type": "string",
+       "value": "coin"
+      }
+     ]
+    },
+    {
+     "id": 61,
+     "name": "",
+     "type": "block",
+     "x": 640,
+     "y": 300,
+     "width": 40,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "kind",
+       "type": "string",
+       "value": "brick"
+      },
+      {
+       "name": "item",
+       "type": "string",
+       "value": "none"
+      }
+     ]
+    },
+    {
+     "id": 62,
+     "name": "",
+     "type": "block",
+     "x": 680,
+     "y": 300,
+     "width": 40,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "kind",
+       "type": "string",
+       "value": "question"
+      },
+      {
+       "name": "item",
+       "type": "string",
+       "value": "chai"
+      }
+     ]
+    },
+    {
+     "id": 63,
+     "name": "",
+     "type": "block",
+     "x": 3000,
+     "y": 250,
+     "width": 40,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "kind",
+       "type": "string",
+       "value": "question"
+      },
+      {
+       "name": "item",
+       "type": "string",
+       "value": "headphones"
+      }
+     ]
+    },
+    {
+     "id": 64,
+     "name": "",
+     "type": "block",
+     "x": 4450,
+     "y": 200,
+     "width": 40,
+     "height": 40,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "kind",
+       "type": "string",
+       "value": "question"
+      },
+      {
+       "name": "item",
+       "type": "string",
+       "value": "coin"
+      }
+     ]
+    },
+    {
+     "id": 65,
+     "name": "",
+     "type": "pickup",
+     "x": 2450,
+     "y": 330,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "item",
+       "type": "string",
+       "value": "chai"
+      }
+     ],
+     "point": true
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "name": "enemies",
+   "type": "objectgroup",
+   "draworder": "topdown",
+   "opacity": 1,
+   "visible": true,
+   "x": 0,
+   "y": 0,
+   "objects": [
+    {
+     "id": 66,
+     "name": "",
+     "type": "coworker",
+     "x": 700,
+     "y": 400,
+     "width": 36,
+     "height": 60,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 67,
+     "name": "",
+     "type": "bug",
+     "x": 900,
+     "y": 432,
+     "width": 280,
+     "height": 28,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 68,
+     "name": "",
+     "type": "bug",
+     "x": 2850,
+     "y": 432,
+     "width": 340,
+     "height": 28,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 69,
+     "name": "",
+     "type": "coworker",
+     "x": 3500,
+     "y": 400,
+     "width": 36,
+     "height": 60,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 70,
+     "name": "",
+     "type": "invite",
+     "x": 3800,
+     "y": 230,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "speed",
+       "type": "float",
+       "value": 1.7
+      }
+     ],
+     "point": true
+    },
+    {
+     "id": 71,
+     "name": "",
+     "type": "bug",
+     "x": 4000,
+     "y": 432,
+     "width": 140,
+     "height": 28,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 72,
+     "name": "",
+     "type": "bug",
+     "x": 4700,
+     "y": 432,
+     "width": 180,
+     "height": 28,
+     "rotation": 0,
+     "visible": true
+    },
+    {
+     "id": 73,
+     "name": "",
+     "type": "aunty",
+     "x": 5490,
+     "y": 250,
+     "width": 120,
+     "height": 130,
+     "rotation": 0,
+     "visible": true
+    }
+   ]
+  }
+ ]
+}

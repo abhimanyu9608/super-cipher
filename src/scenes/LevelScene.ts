@@ -42,7 +42,7 @@ import { clearBonus, starsFor, heartsAfterCoin, formatClock } from '../systems/s
 import { Fx, FONT } from '../systems/fx';
 import { Player } from '../entities/Player';
 import { Enemy, Bug, Dog, Invite, Coworker } from '../entities/enemies';
-import { Monkey, Manager } from '../entities/bosses';
+import { Monkey, Manager, AUNTY_STYLE } from '../entities/bosses';
 import { Bus, FallingBrick, Laser, Projectile, type Hazard } from '../entities/hazards';
 import {
   Coin,
@@ -266,7 +266,7 @@ export class LevelScene extends Phaser.Scene {
     this.checkpoint = { x: m.spawnX, y: m.spawnY };
     this.safe = { ...this.checkpoint };
     this.run.totalCoins = this.items.filter((i) => i.kind === 'coin').length + this.coinBlocks;
-    this.run.clock = OFFICE.clockStartMin;
+    this.run.clock = def.clock?.start ?? 0;
 
     if (this.mode === 'attract') {
       this.player.hidden = true;
@@ -277,7 +277,7 @@ export class LevelScene extends Phaser.Scene {
       audio.startMusic(def.music);
       this.scene.launch('Hud');
       this.startIris();
-      if (this.run.level === 1) this.startIntro();
+      if (def.intro) this.startIntro();
     }
     this.langOff = onLangChange(() => this.relabel());
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -379,6 +379,8 @@ export class LevelScene extends Phaser.Scene {
       if (sign) this.label(sign.x + sign.w / 2, sign.y + sign.h / 2 - 4, 'companyName', 14, '#FFFFFF', -40);
       const sc = decor.find((d) => d.type === 'screen');
       if (sc) this.label(sc.x + sc.w / 2, sc.y + sc.h / 2, 'quickCallScreen', 14, '#FFD43B', -40);
+      const qs = decor.find((d) => d.type === 'queueSign');
+      if (qs) this.label(qs.x + qs.w / 2, qs.y, 'queueShout', 8, '#E8590C', -20);
       const ws = decor.find((d) => d.type === 'wetSign');
       if (ws) {
         this.add
@@ -481,6 +483,14 @@ export class LevelScene extends Phaser.Scene {
           this.bossDoor = { solid, gfx };
           break;
         }
+        case 'plateStack':
+          this.add
+            .image(o.x + o.w / 2, o.y + o.h, 'plateStack')
+            .setOrigin(0.5, 1)
+            .setScale(1, o.h / 120)
+            .setDepth(4);
+          this.addSolid(makeSolid(o, 'solid', { safe: true, tag: 'plates' }));
+          break;
         case 'fridge':
           this.add
             .image(o.x - 2, o.y - 2, 'fridge')
@@ -640,6 +650,7 @@ export class LevelScene extends Phaser.Scene {
           this.monkey = new Monkey(this, o.x, o.y, o.x, o.x + o.w);
           this.enemies.push(this.monkey);
           break;
+        case 'aunty':
         case 'manager': {
           const table = (this.map.layers.platforms ?? []).find((p) => p.type === 'table');
           const arena = (this.zones.bossArena ?? [])[0];
@@ -654,6 +665,7 @@ export class LevelScene extends Phaser.Scene {
             table?.y ?? 380,
             arena?.x ?? 6000,
             arena ? arena.x + arena.w : 7000,
+            o.type === 'aunty' ? AUNTY_STYLE : undefined,
           );
           this.enemies.push(this.manager);
           break;
@@ -703,7 +715,7 @@ export class LevelScene extends Phaser.Scene {
     }
     // Biometric machine.
     const fin = (z.finish ?? [])[0];
-    if (fin && this.run.level === 2) {
+    if (fin && LEVELS[this.run.level].finish === 'punch') {
       const img = this.add
         .image(fin.x + fin.w / 2, fin.y + fin.h, 'biometric')
         .setOrigin(0.5, 1)
@@ -737,9 +749,11 @@ export class LevelScene extends Phaser.Scene {
     }
     for (const o of z.microwave ?? []) {
       this.add
-        .image(o.x + o.w / 2, o.y + o.h, 'microwave')
+        .image(o.x + o.w / 2, o.y + o.h, str(o, 'tex', 'microwave'))
         .setOrigin(0.5, 1)
         .setDepth(6);
+      const title = str(o, 'title');
+      if (title) this.label(o.x + o.w / 2, o.y - 12, title as StringKey, 8, '#FF8787', 6);
       this.microwaves.push({ o, t: 30 });
     }
     // Darkness overlay (server room) with LEDs glowing above it.
@@ -763,11 +777,25 @@ export class LevelScene extends Phaser.Scene {
     for (const o of z.updraft ?? []) {
       this.add.rectangle(o.x, o.y, o.w, o.h, 0x9be7ff, 0.08).setOrigin(0, 0).setDepth(-8);
     }
-    for (const o of z.wet ?? [])
+    for (const o of z.wet ?? []) {
+      const dal = str(o, 'style') === 'dal';
       this.add
-        .rectangle(o.x, this.map.groundY - 3, o.w, 6, 0x74c0fc, 0.6)
+        .rectangle(
+          o.x,
+          this.map.groundY - (dal ? 5 : 3),
+          o.w,
+          dal ? 9 : 6,
+          dal ? 0xf59f00 : 0x74c0fc,
+          dal ? 0.85 : 0.6,
+        )
         .setOrigin(0, 0)
         .setDepth(2);
+      if (dal) {
+        for (let x = o.x + 30; x < o.x + o.w; x += 90)
+          this.add.ellipse(x, this.map.groundY - 2, 46, 10, 0xffd43b, 0.8).setDepth(2);
+        this.label(o.x + o.w / 2, this.map.groundY - 40, 'dalSpill', 8, '#E8590C', -20);
+      }
+    }
   }
 
   // ------------------------------------------------------------------ API used by entities
@@ -987,7 +1015,7 @@ export class LevelScene extends Phaser.Scene {
       dashPressed: consumeDash(),
     };
     if (this.state === 'finishing') {
-      inp.right = this.run.level === 1 && b.x < this.map.finishX + 50;
+      inp.right = LEVELS[this.run.level].finish === 'doors' && b.x < this.map.finishX + 50;
       inp.left = false;
       inp.jumpPressed = false;
     }
@@ -1004,7 +1032,7 @@ export class LevelScene extends Phaser.Scene {
       updraft: inZone('updraft'),
       locked: locked && this.state !== 'finishing',
     });
-    if (this.state === 'finishing' && this.run.level === 1) {
+    if (this.state === 'finishing' && LEVELS[this.run.level].finish === 'doors') {
       // Auto-walk in (input is overridden above).
       if (b.x < this.map.finishX + 50) b.vx = CHARACTERS[r.character].maxRun * 0.6;
     }
@@ -1046,7 +1074,7 @@ export class LevelScene extends Phaser.Scene {
       this.fx.speedLine(p.cx - b.facing * 34, b.y + 12 + Math.random() * 40, b.facing);
     p.worried =
       (r.doorFrames !== null && r.doorFrames < METRO.pulseUnder) ||
-      (LEVELS[r.level].officeClock && r.clock >= OFFICE.clockRedMin);
+      (!!LEVELS[r.level].clock && r.clock >= (LEVELS[r.level].clock?.red ?? Infinity));
     if (p.worried && this.frame % 40 === 0) this.fx.trail(p.cx + b.facing * 12, b.y + 4, 0x74c0fc, 'spark');
 
     // Pit fall.
@@ -1104,7 +1132,12 @@ export class LevelScene extends Phaser.Scene {
     if (this.monkey && this.monkey.active && this.monkey.alive && !this.monkey.passive)
       r.boss = { name: 'monkeyName', hp: this.monkey.statusHp, max: 3 };
     else if (this.manager && this.manager.active && !this.manager.defeated)
-      r.boss = { name: 'managerName', hp: this.manager.hp, max: 3, phase: this.manager.phaseKey };
+      r.boss = {
+        name: this.manager.style === AUNTY_STYLE ? 'auntyName' : 'managerName',
+        hp: this.manager.hp,
+        max: 3,
+        phase: this.manager.phaseKey,
+      };
     else r.boss = null;
   }
 
@@ -1254,7 +1287,15 @@ export class LevelScene extends Phaser.Scene {
       if (--this.brickTimer <= 0) {
         this.brickTimer = Phaser.Math.Between(BRICK.minGap, BRICK.maxGap);
         const x = p.cx + Phaser.Math.Between(BRICK.spawnMin, BRICK.spawnMax);
-        this.hazards.push(new FallingBrick(this, x, m.groundY));
+        this.hazards.push(
+          new FallingBrick(
+            this,
+            x,
+            m.groundY,
+            str(rain, 'tex', 'brick'),
+            str(rain, 'hurt', 'brickHit') as StringKey,
+          ),
+        );
       }
     }
 
@@ -1290,10 +1331,18 @@ export class LevelScene extends Phaser.Scene {
       }
       if (this.manager && !this.manager.active && p.cx > arena.x) {
         this.manager.active = true;
-        this.events.emit('bossBanner', 'bossManager');
+        const aunty = this.manager.style === AUNTY_STYLE;
+        this.events.emit('bossBanner', aunty ? 'bossAunty' : 'bossManager');
         events.emit('bossStart', { level: r.level });
-        if (this.once('scareManager')) this.jumpscare('manager', 1, 'scareManager');
-        this.fx.popup(this.manager.cx, this.manager.y - 20, t('quickCall'), '#FFFFFF', 12);
+        if (this.once('scareManager'))
+          this.jumpscare(aunty ? 'aunty' : 'manager', 1, aunty ? 'scareAunty' : 'scareManager');
+        this.fx.popup(
+          this.manager.cx,
+          this.manager.y - 20,
+          t(aunty ? 'auntyHi' : 'quickCall'),
+          '#FFFFFF',
+          12,
+        );
         sfx('manager');
       }
     }
@@ -1334,13 +1383,14 @@ export class LevelScene extends Phaser.Scene {
       this.jumpscare('bug', 0, 'scareBug');
 
     // ---------------- Level 2: office clock
-    if (LEVELS[r.level].officeClock && this.state === 'play') {
+    const clk = LEVELS[r.level].clock;
+    if (clk && this.state === 'play') {
       r.clock += 1 / OFFICE.framesPerMinute;
-      if (r.clock >= OFFICE.clockLateMin) {
+      if (r.clock >= clk.late) {
         r.hearts--;
-        r.clock = OFFICE.clockResetMin;
+        r.clock = clk.reset;
         sfx('late');
-        this.fx.popup(p.cx, b.y - 24, t('late'), '#FF5C5C', 14);
+        this.fx.popup(p.cx, b.y - 24, t(r.level === 3 ? 'lunchOver' : 'late'), '#FF5C5C', 14);
         this.fx.addShake(FX.shakeHit);
         if (r.hearts <= 0) this.gameOver();
       }
@@ -1401,7 +1451,7 @@ export class LevelScene extends Phaser.Scene {
           this.hazards.push(
             new Projectile(
               this,
-              'popcorn',
+              str(mw.o, 'proj', 'popcorn'),
               mw.o.x + mw.o.w / 2 - 5,
               mw.o.y - 4,
               10,
@@ -1409,12 +1459,18 @@ export class LevelScene extends Phaser.Scene {
               vx,
               vy,
               OFFICE.popcornGravity,
-              'popcornHit',
+              str(mw.o, 'hurt', 'popcornHit') as StringKey,
               { spin: 0.2 },
             ),
           );
         }
-        this.fx.popup(mw.o.x + mw.o.w / 2, mw.o.y - 24, t('popPop'), '#FFF3BF', 9);
+        this.fx.popup(
+          mw.o.x + mw.o.w / 2,
+          mw.o.y - 24,
+          t(str(mw.o, 'label', 'popPop') as StringKey),
+          '#FFF3BF',
+          9,
+        );
         sfx('pop');
       }
     }
@@ -1422,8 +1478,9 @@ export class LevelScene extends Phaser.Scene {
     // ---------------- Finish
     const fin = (z.finish ?? [])[0];
     if (fin && this.state === 'play') {
-      if (r.level === 1 && p.cx > m.finishX) this.startFinish();
-      if (r.level === 2 && this.biometric && overlaps(b, fin)) {
+      const finish = LEVELS[r.level].finish;
+      if (finish === 'doors' && p.cx > m.finishX) this.startFinish();
+      if (finish === 'punch' && this.biometric && overlaps(b, fin)) {
         if (this.biometric.unlocked) this.startFinish();
         else if (this.frame % 60 === 0)
           this.fx.popup(fin.x + fin.w / 2, fin.y - 30, t('bioLocked'), '#FF8787', 9);
@@ -1436,7 +1493,7 @@ export class LevelScene extends Phaser.Scene {
     this.state = 'finishing';
     this.finishTimer = 0;
     const r = this.run;
-    if (r.level === 2) {
+    if (LEVELS[r.level].finish === 'punch') {
       this.scanFrames = 60;
       this.player.body.vx = 0;
       sfx('scan');
@@ -1447,7 +1504,7 @@ export class LevelScene extends Phaser.Scene {
   private stepFinish(): void {
     const p = this.player;
     const r = this.run;
-    if (r.level === 2 && this.scanFrames > 0) {
+    if (LEVELS[r.level].finish === 'punch' && this.scanFrames > 0) {
       this.scanFrames--;
       if (this.scanFrames === 0) {
         this.fx.popup(p.cx, p.body.y - 40, t('present', { time: formatClock(r.clock) }), '#69DB7C', 13);
@@ -1456,8 +1513,9 @@ export class LevelScene extends Phaser.Scene {
       return;
     }
     this.finishTimer++;
-    if (r.level === 1 && this.finishTimer === 1) sfx('victory');
-    if (r.level === 1 && p.body.x > this.map.finishX + 40) p.hidden = true;
+    const doors = LEVELS[r.level].finish === 'doors';
+    if (doors && this.finishTimer === 1) sfx('victory');
+    if (doors && p.body.x > this.map.finishX + 40) p.hidden = true;
     p.win = true;
     if (this.finishTimer % 3 === 0) this.fx.confetti(this.camX, this.camX + VIEW.width, -10, 5);
     if (this.finishTimer >= FX.confettiFrames) this.levelClear();
@@ -1467,9 +1525,9 @@ export class LevelScene extends Phaser.Scene {
     this.state = 'cleared';
     const r = this.run;
     const secondsLeft =
-      r.level === 1
+      LEVELS[r.level].clock === undefined
         ? (r.doorFrames ?? 0) / 60
-        : Math.max(0, (OFFICE.clockLateMin - r.clock) * (OFFICE.framesPerMinute / 60));
+        : Math.max(0, ((LEVELS[r.level].clock?.late ?? 0) - r.clock) * (OFFICE.framesPerMinute / 60));
     if (this.hits === 0) this.sticker(STICKERS.noHit);
     else if (secondsLeft < 4) this.sticker(STICKERS.closeCall);
     const bonus = clearBonus(r.hearts, secondsLeft);
@@ -1518,7 +1576,8 @@ export class LevelScene extends Phaser.Scene {
     r.score = Math.floor(r.score / 2);
     r.combo = 0;
     r.doorFrames = r.doorFrames === null ? null : METRO.doorFrames;
-    if (LEVELS[r.level].officeClock) r.clock = Math.min(r.clock, OFFICE.clockResetMin - 2);
+    const clock = LEVELS[r.level].clock;
+    if (clock) r.clock = Math.min(r.clock, clock.reset - 2);
     this.player.respawn(this.checkpoint.x, this.checkpoint.y);
     this.player.sinceHit = 999;
     this.safe = { ...this.checkpoint };

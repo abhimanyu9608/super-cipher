@@ -7,7 +7,7 @@ import { makeSolid, pushOut, overlaps, type Solid } from '../systems/physics';
 import { sfx } from '../audio/sfx';
 import type { LevelScene } from '../scenes/LevelScene';
 
-export type MoverStyle = 'beam' | 'auto' | 'lift' | 'liftFull';
+export type MoverStyle = 'beam' | 'auto' | 'lift' | 'liftFull' | 'tray';
 
 export class Mover {
   solid: Solid;
@@ -46,6 +46,7 @@ export class Mover {
         .image(0, 0, style === 'lift' ? 'liftCabin' : 'liftCabinFull')
         .setOrigin(0, 0)
         .setDepth(-5);
+    else if (style === 'tray') this.sprite = L.add.image(0, 0, 'tray').setOrigin(0, 0).setDepth(6);
     else this.sprite = L.add.tileSprite(0, 0, w, h, 'stripe').setOrigin(0, 0).setDepth(6);
     if (style === 'liftFull') {
       this.solid.onStand = () => this.shove();
@@ -158,7 +159,11 @@ export class Conveyor {
       .rectangle(x, y + h, w, 80 - h, 0x1a1530)
       .setOrigin(0, 0)
       .setDepth(0);
-    this.sprite = L.add.tileSprite(x, y, w, h, 'chevron').setOrigin(0, 0).setDepth(1);
+    this.sprite = L.add
+      .tileSprite(x, y, w, h, 'chevron')
+      .setOrigin(0, 0)
+      .setDepth(1)
+      .setFlipX(speed > 0);
   }
 
   step(): void {

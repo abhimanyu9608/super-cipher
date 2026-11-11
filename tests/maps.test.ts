@@ -63,3 +63,26 @@ describe('Level 2 map follows PRD section 7', () => {
       expect([num(l, 'min'), num(l, 'max'), num(l, 'speed'), num(l, 'pause')]).toEqual([200, 420, 1.2, 45]);
   });
 });
+
+describe('Level 3 map: Lunch Break', () => {
+  const m = load(3);
+  it('has 7 translated sections, the aunty boss and a punch finish', () => {
+    const secs = objectsOf(m, 'section');
+    expect(secs).toHaveLength(7);
+    for (const s of secs) expect(STRINGS).toHaveProperty(String(s.props.key));
+    expect(objectsOf(m, 'aunty')).toHaveLength(1);
+    expect(objectsOf(m, 'table')).toHaveLength(1);
+    expect(objectsOf(m, 'finish')).toHaveLength(1);
+    expect(objectsOf(m, 'bossDoor')).toHaveLength(1);
+  });
+  it('has the lunch mechanics: queue, trays, conveyor, dal, tawa, falling plates', () => {
+    expect(objectsOf(m, 'person').length).toBeGreaterThanOrEqual(3);
+    expect(objectsOf(m, 'mover').filter((o) => o.props.style === 'tray').length).toBeGreaterThanOrEqual(2);
+    expect(objectsOf(m, 'conveyor')).toHaveLength(1);
+    expect(objectsOf(m, 'wet').every((o) => o.props.style === 'dal')).toBe(true);
+    expect(objectsOf(m, 'microwave').every((o) => o.props.tex === 'tawa')).toBe(true);
+    expect(objectsOf(m, 'brickRain')[0].props.tex).toBe('plate');
+    for (const o of [...objectsOf(m, 'microwave'), ...objectsOf(m, 'brickRain')])
+      expect(STRINGS).toHaveProperty(String(o.props.hurt));
+  });
+});

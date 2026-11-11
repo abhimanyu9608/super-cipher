@@ -146,11 +146,27 @@ export class Ambient {
         ['z2_3', 2],
         ['z2_cp', 1],
         ['z2_4', 1],
+        ['z3_1', 2],
+        ['z3_cp', 1],
+        ['z3_3', 2],
+        ['z3_4', 1],
       ] as const) {
         const s = sec(key);
         if (s) for (let i = 0; i < n; i++) this.addWalker(s.x0 + 40, s.x1 - 40, i + 3);
       }
       // Flickering ceiling lights in the open office.
+      // Cafeteria hanging lamps glow warmly.
+      const cafe = sec('z3_1');
+      if (cafe)
+        for (let x = cafe.x0 + 120; x < cafe.x1; x += 260) {
+          const img = L.add
+            .image(x, 90, 'glow')
+            .setScale(1.4)
+            .setDepth(-44)
+            .setBlendMode(Phaser.BlendModes.ADD)
+            .setTint(0xffd8a8);
+          this.flickers.push({ img, base: 0.6, t: Math.floor(Math.random() * 400) });
+        }
       const office = sec('z2_3');
       if (office)
         for (let x = office.x0 + 110; x < office.x1; x += 220) {

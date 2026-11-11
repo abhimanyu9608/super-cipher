@@ -115,7 +115,10 @@ export class FallingBrick implements Hazard {
     private L: LevelScene,
     public x: number,
     groundY: number,
+    private tex = 'brick',
+    hurtKey: StringKey = 'brickHit',
   ) {
+    this.hurtKey = hurtKey;
     this.column = L.add
       .rectangle(x + this.w / 2, 0, this.w + 8, groundY, 0xff3b3b, 0.22)
       .setOrigin(0.5, 0)
@@ -130,7 +133,7 @@ export class FallingBrick implements Hazard {
       })
       .setOrigin(0.5)
       .setDepth(34);
-    this.sprite = L.add.image(x, this.y, 'brick').setOrigin(0, 0).setDepth(35).setVisible(false);
+    this.sprite = L.add.image(x, this.y, this.tex).setOrigin(0, 0).setDepth(35).setVisible(false);
   }
 
   step(): void {
@@ -188,9 +191,12 @@ export class RingWave implements Hazard {
     private vx: number,
     private minX: number,
     private maxX: number,
+    tex = 'ring',
+    hurtKey: StringKey = 'ringHit',
   ) {
     this.y = groundY - this.h;
-    this.sprite = L.add.image(x, this.y, 'ring').setOrigin(0, 0).setDepth(35);
+    this.hurtKey = hurtKey;
+    this.sprite = L.add.image(x, this.y, tex).setOrigin(0, 0).setDepth(35);
   }
 
   step(): void {

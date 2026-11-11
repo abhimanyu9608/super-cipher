@@ -1,7 +1,7 @@
 /** Canvas HUD (PRD section 9): hearts, power-ups, zone + progress, coins/score/time, boss bar, warnings, banners. */
 import Phaser from 'phaser';
 import { VIEW } from '../config/physics';
-import { HEARTS, METRO, OFFICE, POWERUP_FRAMES, FX, type PowerUpId } from '../config/game';
+import { HEARTS, METRO, POWERUP_FRAMES, FX, type PowerUpId } from '../config/game';
 import { LEVELS } from '../config/levels';
 import { t, type StringKey } from '../i18n/strings';
 import { session } from '../game/session';
@@ -107,7 +107,7 @@ export class HudScene extends Phaser.Scene {
     this.coins = label(this, VIEW.width - 208, 12, 11);
     this.score = label(this, VIEW.width - 16, 12, 11).setOrigin(1, 0);
     this.timeText = label(this, VIEW.width - 16, 34, 10, '#BDB5E0').setOrigin(1, 0);
-    const office = LEVELS[run.level].officeClock;
+    const office = LEVELS[run.level].thirdStar === 'appraisal';
     this.add
       .image(VIEW.width - 222, 42, 'appraisal')
       .setScale(0.55)
@@ -301,9 +301,10 @@ export class HudScene extends Phaser.Scene {
     if (this.shownScore > run.score) this.shownScore = run.score;
     this.shownScore += Math.ceil((run.score - this.shownScore) * Math.min(1, 0.18 * f));
     this.score.setText(padScore(this.shownScore));
-    if (LEVELS[run.level].officeClock) {
+    const clk = LEVELS[run.level].clock;
+    if (clk) {
       this.timeText.setText(formatClock(run.clock));
-      this.timeText.setColor(run.clock >= OFFICE.clockRedMin ? '#FF5C5C' : '#BDB5E0');
+      this.timeText.setColor(run.clock >= clk.red ? '#FF5C5C' : '#BDB5E0');
     } else this.timeText.setText(`${t('time')} ${formatTime(run.frames)}`);
     this.appraisal.setText(`${run.appraisal}/5`);
 

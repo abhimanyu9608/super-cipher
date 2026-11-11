@@ -30,6 +30,8 @@ export type GroundTex =
   | 'pantry'
   | 'server'
   | 'boardroom'
+  | 'cafe'
+  | 'kitchen'
   | 'fridge';
 
 /** Paint a ground solid of the given size. */
@@ -248,6 +250,27 @@ export function paintGround(tex: string, w: number, h: number, seed = 1): HTMLCa
       c.fillStyle = '#6E2222';
       for (let y = 8; y < h; y += 12) c.fillRect(0, y, w, 4);
       c.fillStyle = '#3A0F0F';
+      c.fillRect(0, 0, w, 7);
+      break;
+    }
+    case 'cafe': {
+      // Warm terracotta + cream checker tiles.
+      for (let y = 0; y < h; y += 26)
+        for (let x = 0; x < w; x += 26) {
+          c.fillStyle = (x / 26 + y / 26) % 2 === 0 ? '#F4C38A' : '#E8590C';
+          c.fillRect(x, y, 26, 26);
+        }
+      c.fillStyle = '#8B5A2B';
+      c.fillRect(0, 0, w, 7);
+      break;
+    }
+    case 'kitchen': {
+      for (let y = 0; y < h; y += 20)
+        for (let x = 0; x < w; x += 40) {
+          c.fillStyle = (x / 40 + y / 20) % 2 === 0 ? '#ADB5BD' : '#CED4DA';
+          c.fillRect(x, y, 40, 20);
+        }
+      c.fillStyle = '#495057';
       c.fillRect(0, 0, w, 7);
       break;
     }
@@ -789,6 +812,134 @@ const PAINTERS: Record<string, Painter> = {
     c.fillStyle = '#ADB5BD';
     for (let x = inp.x0; x < inp.x0 + inp.w; x += 50) c.fillRect(x, 0, 3, 460);
     box(c, 7020, 160, 120, 40, '#14121F', 3, 4);
+  },
+
+  // ---------------- Level 3: lunch break
+  z3_1(c, inp) {
+    c.fillStyle = '#FFF3E0';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#FFE0B2';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 60) c.fillRect(x, 0, 30, 460);
+    // Menu board.
+    box(c, inp.x0 + 380, 70, 300, 170, '#2B3A2F', 6, 8);
+    const items = ['Rajma Chawal ₹60', 'Chole Bhature ₹70', 'Thali ₹90', 'Cutting Chai ₹10'];
+    items.forEach((it, i) =>
+      text(c, it, inp.x0 + 530, 110 + i * 34, 13, '#F8F9FA', { font: '"Baloo 2", sans-serif' }),
+    );
+    // Hanging lamps.
+    for (let x = inp.x0 + 120; x < inp.x0 + inp.w; x += 260) {
+      limb(c, x, 0, x, 60, 3, '#495057', 1);
+      poly(c, [x - 26, 60, x + 26, 60, x + 16, 84, x - 16, 84], '#FFD43B', 3);
+    }
+    // Round cafeteria tables (decor, behind the queue).
+    for (let x = inp.x0 + 150; x < inp.x0 + inp.w - 100; x += 330) {
+      ellipse(c, x, 392, 56, 12, '#8B5A2B', 3);
+      limb(c, x, 400, x, 460, 6, '#495057', 2);
+    }
+  },
+  z3_2(c, inp) {
+    c.fillStyle = '#FFE8CC';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    // Steel counters with sneeze guards and pots.
+    for (let x = inp.x0 + 40; x < inp.x0 + inp.w - 160; x += 280) {
+      box(c, x, 300, 220, 160, '#ADB5BD', 4, 6);
+      box(c, x + 10, 250, 200, 12, 'rgba(165,216,255,0.6)', 3, 4);
+      for (let k = 0; k < 3; k++)
+        ellipse(c, x + 45 + k * 65, 296, 24, 9, ['#E8590C', '#FAB005', '#40C057'][k], 3);
+      text(
+        c,
+        ['DAL', 'SABZI', 'CHAWAL', 'ROTI'][Math.floor((x - inp.x0) / 280) % 4],
+        x + 110,
+        340,
+        14,
+        '#14121F',
+        {},
+      );
+    }
+    // Ventilation hood.
+    box(c, inp.x0, 40, inp.w, 50, '#868E96', 4, 4);
+  },
+  z3_cp(c, inp) {
+    c.fillStyle = '#FFF4E6';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    box(c, inp.x0 + 40, 300, 200, 160, '#8B5A2B', 4, 6);
+    box(c, inp.x0 + 30, 240, 220, 34, '#FF922B', 4, 6);
+    text(c, 'CUTTING CHAI', inp.x0 + 140, 258, 12, '#FFFFFF', { stroke: 3 });
+    for (let i = 0; i < 5; i++)
+      poly(
+        c,
+        [
+          inp.x0 + 60 + i * 34,
+          282,
+          inp.x0 + 78 + i * 34,
+          282,
+          inp.x0 + 76 + i * 34,
+          300,
+          inp.x0 + 62 + i * 34,
+          300,
+        ],
+        '#C2622D',
+        2,
+      );
+    limb(c, inp.x0 + 300, 300, inp.x0 + 300, 460, 5, '#DEE2E6', 2.5);
+    circle(c, inp.x0 + 300, 298, 5, '#FFD43B', 2);
+  },
+  z3_3(c, inp) {
+    c.fillStyle = '#FFF9DB';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#FFEC99';
+    for (let y = 0; y < 460; y += 40)
+      for (let x = inp.x0; x < inp.x0 + inp.w; x += 40)
+        if ((x / 40 + y / 40) % 2 === 0) c.fillRect(x, y, 40, 40);
+    // Posters.
+    box(c, inp.x0 + 300, 120, 200, 110, '#FFFFFF', 3, 4);
+    text(c, 'CLEAN AS', inp.x0 + 400, 158, 12, '#E8590C', {});
+    text(c, 'YOU GO! 🧽', inp.x0 + 400, 190, 12, '#E8590C', {});
+  },
+  z3_4(c, inp) {
+    c.fillStyle = '#E3FAFC';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    // Wash-area tiles + sinks.
+    c.fillStyle = '#C5F6FA';
+    for (let y = 0; y < 460; y += 30)
+      for (let x = inp.x0; x < inp.x0 + inp.w; x += 30)
+        if ((x / 30 + y / 30) % 2 === 0) c.fillRect(x, y, 30, 30);
+    for (let x = inp.x0 + 100; x < inp.x0 + inp.w; x += 360) {
+      box(c, x, 330, 120, 40, '#DEE2E6', 3, 6);
+      limb(c, x + 60, 300, x + 60, 330, 5, '#868E96', 2);
+      limb(c, x + 60, 300, x + 76, 300, 5, '#868E96', 2);
+    }
+  },
+  z3_boss(c, inp) {
+    c.fillStyle = '#5F3A1E';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#6E4520';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 60) c.fillRect(x, 0, 30, 460);
+    // Big kadhai + stove + shelves of masala.
+    for (let x = inp.x0 + 60; x < inp.x0 + inp.w - 100; x += 300) {
+      box(c, x, 110, 220, 14, '#3A2412', 3, 3);
+      for (let k = 0; k < 5; k++)
+        box(
+          c,
+          x + 12 + k * 42,
+          76,
+          28,
+          34,
+          ['#FAB005', '#E03131', '#40C057', '#E8590C', '#FFFFFF'][k],
+          2.5,
+          4,
+        );
+    }
+    ellipse(c, inp.x0 + inp.w - 180, 360, 90, 26, '#212529', 5);
+    c.fillStyle = 'rgba(255,120,40,0.5)';
+    c.fillRect(inp.x0 + inp.w - 260, 380, 160, 16);
+  },
+  z3_fin(c, inp) {
+    c.fillStyle = '#E7F5FF';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#D0EBFF';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 50) c.fillRect(x, 0, 3, 460);
+    box(c, inp.x0 + 40, 160, 160, 40, '#14121F', 3, 4);
   },
 };
 

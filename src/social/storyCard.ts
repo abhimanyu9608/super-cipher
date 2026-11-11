@@ -78,7 +78,7 @@ export function renderStoryCard(d: CardData): HTMLCanvasElement {
   fillStroke(c, '#14121F', 0);
   rr(c, -430, -60, 860, 120, 30);
   fillStroke(c, '#FFD43B', 8, '#14121F');
-  text(c, t('cardClear', { n: d.level === 1 ? '1-1' : '1-2' }, L), 0, 4, 46, '#14121F', {
+  text(c, t('cardClear', { n: `1-${d.level}` }, L), 0, 4, 46, '#14121F', {
     maxWidth: 800,
   });
   c.restore();

@@ -32,6 +32,15 @@ const ZONES: Record<LevelId, { key: string; icon: string; stars: number }[]> = {
     { key: 'z2_boss', icon: '👔', stars: 5 },
     { key: 'z2_fin', icon: '☝️', stars: 0 },
   ],
+  3: [
+    { key: 'z3_1', icon: '🍽️', stars: 1 },
+    { key: 'z3_2', icon: '🍛', stars: 2 },
+    { key: 'z3_cp', icon: '☕', stars: 0 },
+    { key: 'z3_3', icon: '🥣', stars: 3 },
+    { key: 'z3_4', icon: '🍽️', stars: 4 },
+    { key: 'z3_boss', icon: '👩‍🍳', stars: 5 },
+    { key: 'z3_fin', icon: '💻', stars: 0 },
+  ],
 };
 
 export function initShell(flow: Flow): void {
@@ -59,8 +68,8 @@ export function initShell(flow: Flow): void {
   };
 
   const renderPanels = () => {
-    $('#map-title').textContent = t(mapLevel === 1 ? 'mapTitle1' : 'mapTitle2');
-    $('#map-goal').textContent = t(mapLevel === 1 ? 'mapGoal1' : 'mapGoal2');
+    $('#map-title').textContent = t(LEVELS[mapLevel].mapTitleKey);
+    $('#map-goal').textContent = t(LEVELS[mapLevel].mapGoalKey);
     $('#zone-list').innerHTML = ZONES[mapLevel]
       .map(
         (z) => `<li><span class="ico" aria-hidden="true">${z.icon}</span>
