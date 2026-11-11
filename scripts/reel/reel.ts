@@ -14,9 +14,9 @@ export const H = 1920;
 export const FPS = 30;
 export const DURATION = 20;
 
-const PIXEL = '"Press Start 2P", monospace';
-const BODY = '"Baloo 2", sans-serif';
-const OUT = '#14121F';
+export const PIXEL = '"Press Start 2P", monospace';
+export const BODY = '"Baloo 2", sans-serif';
+export const OUT = '#14121F';
 
 // ------------------------------------------------------------------ sprite access
 interface Frame {
@@ -27,7 +27,8 @@ interface Frame {
   name: string | number;
 }
 const sprites = new Map<string, { canvas: HTMLCanvasElement; frames: Frame[] }>();
-registerSprites({
+/** Texture host that keeps generated sprite canvases for drawing straight onto the reel canvas. */
+export const host: Parameters<typeof registerSprites>[0] = {
   exists: (k) => sprites.has(k),
   addCanvas: (k, canvas) => {
     const e = { canvas, frames: [] as Frame[] };
@@ -37,9 +38,10 @@ registerSprites({
         e.frames.push({ x, y, w, h, name }),
     };
   },
-});
+};
+registerSprites(host);
 
-function sprite(
+export function sprite(
   c: CanvasRenderingContext2D,
   key: string,
   frame: string | number,
@@ -67,7 +69,7 @@ function sprite(
 }
 
 /** Player sprite with feet at (x, y). */
-const hero = (
+export const hero = (
   c: CanvasRenderingContext2D,
   id: 'boy' | 'girl',
   frame: string,
@@ -89,7 +91,7 @@ const obj = (type: string, x: number, y: number, w: number, h: number): MapObjec
   props: {},
 });
 
-interface Strip {
+export interface Strip {
   canvas: HTMLCanvasElement;
   x0: number;
 }
@@ -122,6 +124,11 @@ function strip(
 }
 
 let worlds: Record<'lane' | 'roof' | 'office' | 'server', Strip> | null = null;
+export function getWorlds(): Record<'lane' | 'roof' | 'office' | 'server', Strip> {
+  if (!worlds) buildWorlds();
+  return worlds as Record<'lane' | 'roof' | 'office' | 'server', Strip>;
+}
+
 function buildWorlds() {
   const lane = strip(
     1150,
@@ -194,21 +201,21 @@ function buildWorlds() {
 }
 
 // ------------------------------------------------------------------ helpers
-const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
-const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
-const easeOut = (k: number) => 1 - Math.pow(1 - clamp(k), 3);
-const backOut = (k: number) => {
+export const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+export const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
+export const easeOut = (k: number) => 1 - Math.pow(1 - clamp(k), 3);
+export const backOut = (k: number) => {
   const x = clamp(k);
   const s = 2.2;
   return 1 + (s + 1) * Math.pow(x - 1, 3) + s * Math.pow(x - 1, 2);
 };
 /** Parabolic jump height in [0,1] → [0,h]. */
-const arc = (t: number, t0: number, dur: number, h: number) => {
+export const arc = (t: number, t0: number, dur: number, h: number) => {
   const u = (t - t0) / dur;
   return u > 0 && u < 1 ? 4 * h * u * (1 - u) : 0;
 };
 
-function txt(
+export function txt(
   c: CanvasRenderingContext2D,
   s: string,
   x: number,
@@ -244,7 +251,7 @@ function txt(
 }
 
 /** Big punchy caption: pops in with overshoot. Lines are [text, color]. */
-function caption(
+export function caption(
   c: CanvasRenderingContext2D,
   t: number,
   t0: number,
@@ -268,7 +275,7 @@ function caption(
 }
 
 /** Particle burst computed analytically from its start time (deterministic). */
-function burst(
+export function burst(
   c: CanvasRenderingContext2D,
   t: number,
   te: number,
@@ -295,7 +302,7 @@ function burst(
   c.restore();
 }
 
-function popup(
+export function popup(
   c: CanvasRenderingContext2D,
   t: number,
   te: number,
@@ -313,7 +320,7 @@ function popup(
   c.restore();
 }
 
-function confetti(c: CanvasRenderingContext2D, t: number, t0: number, n = 90, seed = 4) {
+export function confetti(c: CanvasRenderingContext2D, t: number, t0: number, n = 90, seed = 4) {
   if (t < t0) return;
   const r = seeded(seed);
   const cols = ['#FFD43B', '#F06595', '#22D3EE', '#40C057', '#FF5C5C', '#7C3AED'];
@@ -332,7 +339,7 @@ function confetti(c: CanvasRenderingContext2D, t: number, t0: number, n = 90, se
   }
 }
 
-function bgGradient(c: CanvasRenderingContext2D, top: string, bottom: string) {
+export function bgGradient(c: CanvasRenderingContext2D, top: string, bottom: string) {
   const g = c.createLinearGradient(0, 0, W * 0.3, H);
   g.addColorStop(0, top);
   g.addColorStop(1, bottom);
@@ -341,7 +348,7 @@ function bgGradient(c: CanvasRenderingContext2D, top: string, bottom: string) {
 }
 
 /** Mini game HUD drawn inside the gameplay window. */
-function miniHud(
+export function miniHud(
   c: CanvasRenderingContext2D,
   y: number,
   coins: number,
@@ -377,7 +384,7 @@ function miniHud(
 }
 
 /** Draw a world strip into the gameplay window. */
-function drawWorld(c: CanvasRenderingContext2D, s: Strip, camX: number, scale: number, top: number) {
+export function drawWorld(c: CanvasRenderingContext2D, s: Strip, camX: number, scale: number, top: number) {
   const vw = W / scale;
   const sx = clamp(camX - s.x0, 0, s.canvas.width - vw);
   c.drawImage(s.canvas, sx, Y0, vw, 540 - Y0, 0, top, W, (540 - Y0) * scale);
@@ -385,14 +392,14 @@ function drawWorld(c: CanvasRenderingContext2D, s: Strip, camX: number, scale: n
 }
 
 // ------------------------------------------------------------------ scenes
-const WIN_TOP = 470;
-const WS = 2.6;
-const Y0 = 120;
-const WIN_H = (540 - Y0) * WS;
-const toScreen = (wx: number, wy: number, cam: number) =>
+export const WIN_TOP = 470;
+export const WS = 2.6;
+export const Y0 = 120;
+export const WIN_H = (540 - Y0) * WS;
+export const toScreen = (wx: number, wy: number, cam: number) =>
   [(wx - cam) * WS, WIN_TOP + (wy - Y0) * WS] as const;
 
-function windowFrame(c: CanvasRenderingContext2D) {
+export function windowFrame(c: CanvasRenderingContext2D) {
   c.save();
   c.strokeStyle = OUT;
   c.lineWidth = 12;
@@ -651,7 +658,7 @@ function sceneRoof(c: CanvasRenderingContext2D, t: number) {
   caption(c, t, 7.4, 8.45, 1460, [['Chai = DOUBLE JUMP!', '#22D3EE']], 70);
 }
 
-function sceneScare(c: CanvasRenderingContext2D, t: number) {
+export function sceneScare(c: CanvasRenderingContext2D, t: number) {
   const t0 = 8.55;
   if (t < t0) {
     c.fillStyle = '#000';
@@ -850,7 +857,7 @@ function sceneResult(c: CanvasRenderingContext2D, t: number) {
   );
 }
 
-function sceneCta(c: CanvasRenderingContext2D, t: number) {
+export function sceneCta(c: CanvasRenderingContext2D, t: number) {
   const t0 = 17.05;
   bgGradient(c, '#0E0B1F', '#2A1F5C');
   // Sunburst.

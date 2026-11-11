@@ -25,8 +25,8 @@ export const STRINGS = {
     en: 'Rotate your phone: landscape is twice the fun',
   },
   credits: {
-    hi: 'Original characters aur art: @cipherboy.dev · Sound effects code se bane (8-bit) · Fonts: Press Start 2P, Baloo 2 (SIL OFL)',
-    en: 'Original characters and art: @cipherboy.dev · Sound effects generated in code (8-bit) · Fonts: Press Start 2P, Baloo 2 (SIL OFL)',
+    hi: 'Original characters aur art: @cipherboy.dev',
+    en: 'Original characters and art: @cipherboy.dev',
   },
 
   // ---- info panels ----
