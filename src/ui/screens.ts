@@ -9,7 +9,9 @@ import { t, getLang, onLangChange, type StringKey } from '../i18n/strings';
 import { profile, session } from '../game/session';
 import { bus, type ClearResult } from '../game/events';
 import { titleKey, formatTime, padScore } from '../systems/score';
-import { portraitDataUrl } from '../gfx/sprites';
+import { portraitDataUrl, headDataUrl } from '../gfx/sprites';
+import { SKINS, moodFor, skinUnlocked, type SkinId } from '../config/extras';
+import { currentClip } from './clip';
 import { renderStoryCard } from '../social/storyCard';
 import { checkCode } from '../social/unlock';
 import { audio, sfx } from '../audio/sfx';
@@ -28,6 +30,10 @@ const esc = (s: string): string =>
     /[&<>"']/g,
     (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch] as string,
   );
+
+/** Wrap each letter in a span so the logo can bounce in letter by letter. */
+const letters = (word: string, offset: number): string =>
+  [...word].map((ch, i) => `<i style="--i:${i + offset}">${ch === ' ' ? '&nbsp;' : esc(ch)}</i>`).join('');
 
 export class Flow {
   screen: Screen = 'loading';
@@ -50,6 +56,14 @@ export class Flow {
     });
     window.addEventListener('blur', () => this.autoPause());
     window.addEventListener('keydown', (e) => this.onKey(e));
+    window.addEventListener('sc-clip-ready', () => this.fillClipSlot());
+  }
+
+  private fillClipSlot(): void {
+    const slot = this.root.querySelector('#clip-slot');
+    const clip = currentClip();
+    if (!slot || !clip || this.screen !== 'clear') return;
+    slot.innerHTML = `<a class="btn btn-pink" href="${clip.url}" download="super-cipher-boss.${clip.ext}">${t('saveClip')}</a>`;
   }
 
   onScreen(fn: (s: Screen) => void): void {
@@ -67,7 +81,7 @@ export class Flow {
     session.run = null;
     session.paused = false;
     audio.stopMusic();
-    this.startLevelScene({ level: 1, character: profile.character, mode: 'attract' });
+    this.startLevelScene({ level: 1, character: profile.character, mode: 'attract', skin: profile.skin });
     this.show('title');
   }
 
@@ -81,11 +95,16 @@ export class Flow {
     session.paused = false;
     audio.suspend(false);
     this.game.scene.stop('Hud');
-    this.startLevelScene({ level, character: profile.character, mode: 'play' });
+    this.startLevelScene({ level, character: profile.character, mode: 'play', skin: profile.skin });
     this.show('playing');
   }
 
-  private startLevelScene(data: { level: LevelId; character: CharacterId; mode: 'play' | 'attract' }): void {
+  private startLevelScene(data: {
+    level: LevelId;
+    character: CharacterId;
+    mode: 'play' | 'attract';
+    skin: SkinId;
+  }): void {
     const sc = this.game.scene;
     if (sc.isActive('Level') || sc.isPaused('Level')) sc.stop('Level');
     sc.start('Level', data);
@@ -214,18 +233,30 @@ export class Flow {
 
   private titleHtml(): string {
     const ch = profile.character;
+    const mood = moodFor(new Date());
+    const stars = profile.totalStars();
     const card = (id: CharacterId, name: StringKey, perk: StringKey) =>
       `<button class="char-card" data-char="${id}" aria-pressed="${ch === id}">
-        <img src="${portraitDataUrl(id)}" alt="" width="64" height="82" />
+        <img src="${portraitDataUrl(id, 'idle0', ch === id ? profile.skin : 'none')}" alt="" width="64" height="82" />
         <span><span class="char-name">${t(name)}</span><span class="char-perk">${t(perk)}</span></span>
       </button>`;
     return `<div class="overlay title">
       <p class="eyebrow">${t('world1')}</p>
-      <h1 class="big-logo">${t('logoTop')}<span>${t('logoBottom')}</span></h1>
+      <h1 class="big-logo" aria-label="${esc(t('logoTop'))} ${esc(t('logoBottom'))}">${letters(t('logoTop'), 0)}<span>${letters(t('logoBottom'), 12)}</span></h1>
+      <p class="mood-chip"><b>${t('moodTitle')}:</b> ${t(mood.nameKey)} · ${t(mood.descKey)}</p>
       <p class="lead">${t('sub')}</p>
       <div class="chars" role="group" aria-label="${esc(t('chooseChar'))}">
         ${card('boy', 'charBoy', 'perkHighJump')}
         ${card('girl', 'charGirl', 'perkFastRun')}
+      </div>
+      <div class="skins" role="group" aria-label="${esc(t('skinTitle'))}">
+        ${SKINS.map((sk) => {
+          const open = skinUnlocked(sk.id, stars);
+          return `<button class="skin ${open ? '' : 'locked'}" data-skin="${sk.id}" aria-pressed="${profile.skin === sk.id}" ${open ? '' : 'aria-disabled="true"'} title="${esc(open ? t(sk.nameKey) : t('skinLocked', { n: sk.stars }))}">
+            <img src="${headDataUrl(ch, 40, sk.id)}" alt="" width="40" height="40" />
+            <span>${open ? t(sk.nameKey) : t('skinLocked', { n: sk.stars })}</span>
+          </button>`;
+        }).join('')}
       </div>
       <div class="row">
         <button class="btn btn-gold btn-big" data-act="start" data-main>${t('start')}</button>
@@ -237,29 +268,36 @@ export class Flow {
 
   private selectHtml(): string {
     const unlocked = profile.unlocked;
-    const cards = LEVEL_IDS.map((id) => {
-      const def = LEVELS[id];
-      const open = isUnlocked(id, unlocked);
-      const stars = profile.stars(id);
-      const best = profile.best(id);
-      return `<button class="level-card ${open ? '' : 'locked'}" data-level="${id}" ${id === 1 ? 'data-main' : ''}>
-        <span class="lc-world">${t(def.worldKey)}</span>
-        <span class="lc-name">${open ? '' : '🔒 '}${t(def.nameKey)}</span>
-        <span class="lc-meta">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)} · ${t('best')} ${padScore(best)}</span>
-        <span class="lc-cta">${open ? t('play') : t('unlockToPlay')}</span>
-      </button>`;
-    }).join('');
+    const icons = ['🏠', '🚇', '🏢', '🍛', '🌙', '🤝', '🏝️', '📈', '👑'];
+    const soonKeys: StringKey[] = ['lv3', 'lv4', 'lv5', 'lv6', 'lv7', 'lv8'];
+    const here = Math.max(...LEVEL_IDS.filter((id) => isUnlocked(id, unlocked)));
+    const nodes = [
+      `<div class="node done"><span class="node-ico">${icons[0]}</span><span class="node-name">${t('mapHome')}</span></div>`,
+      ...LEVEL_IDS.map((id) => {
+        const def = LEVELS[id];
+        const open = isUnlocked(id, unlocked);
+        const stars = profile.stars(id);
+        return `<button class="node ${open ? 'open' : 'locked'}" data-level="${id}" ${id === here ? 'data-main' : ''}>
+          ${id === here ? `<img class="node-me" src="${headDataUrl(profile.character, 44, profile.skin)}" alt="" />` : ''}
+          <span class="node-ico">${open ? icons[id] : '🔒'}</span>
+          <span class="node-name">${t(def.nameKey)}</span>
+          <span class="node-meta">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</span>
+          <span class="node-meta">${t('best')} ${padScore(profile.best(id))}</span>
+          <span class="node-cta">${open ? t('play') : t('unlockToPlay')}</span>
+        </button>`;
+      }),
+      ...soonKeys.map(
+        (k, i) =>
+          `<div class="node soon"><span class="node-ico">${icons[i + 3]}</span><span class="node-name">${t(k)}</span><span class="node-meta">${t('soonShort')}</span></div>`,
+      ),
+    ];
     return `<div class="overlay dim" role="dialog" aria-modal="true" aria-labelledby="ov-h">
-      <h2 id="ov-h" class="h-big">${t('selectTitle')}</h2>
-      <div class="levels">${cards}
-        <div class="level-card soon">
-          <span class="lc-world">WORLD 1-3</span>
-          <span class="lc-name">⏳ ${t('comingSoon')}</span>
-          <span class="lc-meta">${t('followForNews')}</span>
-          <a class="btn btn-pink" href="${IG_PROFILE}" target="_blank" rel="noopener">${t('follow')}</a>
-        </div>
+      <h2 id="ov-h" class="h-big">${t('mapWorld')}</h2>
+      <div class="overworld">${nodes.join('<span class="road" aria-hidden="true"></span>')}</div>
+      <div class="row">
+        <a class="btn btn-pink" href="${IG_PROFILE}" target="_blank" rel="noopener">${t('followForNews')}</a>
+        <button class="btn btn-ghost" data-act="title">${t('back')}</button>
       </div>
-      <button class="btn btn-ghost" data-act="title">${t('back')}</button>
     </div>`;
   }
 
@@ -291,13 +329,19 @@ export class Flow {
     return `<div class="overlay dim" role="dialog" aria-modal="true" aria-labelledby="ov-h">
       <div class="stars" aria-label="${r.stars}/3">${starHtml}</div>
       <h2 id="ov-h" class="h-big">${r.level === 1 ? t('clearBig') : t('clearBig2')}</h2>
-      <p class="title-badge">${t(titleKey(r.stars))} · ${t('promotion', { from: def.promotion.from, to: def.promotion.to })}</p>
+      <div class="promo">
+        <img src="${portraitDataUrl(profile.character, 'idle0', 'none')}" alt="" />
+        <span class="promo-arrow">➜</span>
+        <img class="promo-new" src="${portraitDataUrl(profile.character, 'win1', r.level === 1 ? 'lanyard' : 'goldPhones')}" alt="" />
+        <p class="title-badge"><b>${t('promoted')}</b> ${t(titleKey(r.stars))}<br />${t('promotion', { from: def.promotion.from, to: def.promotion.to })}</p>
+      </div>
       ${this.newBest ? `<p class="new-best">${t('newBest')}</p>` : ''}
       <dl class="stats">${stats}</dl>
       <div class="row">
         ${nextBtn}
         <button class="btn" data-act="restart" ${next === null ? 'data-main' : ''}>${t('playAgain')}</button>
         <button class="btn btn-cyan" data-act="challenge">${t('copyChallenge')}</button>
+        <span id="clip-slot"></span>
       </div>
       <p class="toast" id="toast" aria-live="polite"></p>
     </div>`;
@@ -370,6 +414,20 @@ export class Flow {
   }
 
   private bind(): void {
+    this.root.querySelectorAll<HTMLButtonElement>('[data-skin]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const id = b.dataset.skin as SkinId;
+        if (!skinUnlocked(id, profile.totalStars())) {
+          sfx('hurt', { volume: 0.4 });
+          return;
+        }
+        profile.skin = id;
+        sfx('powerup', { volume: 0.5 });
+        this.render();
+        this.root.querySelector<HTMLElement>(`[data-skin="${id}"]`)?.focus();
+        this.listeners.forEach((fn) => fn(this.screen));
+      }),
+    );
     this.root.querySelectorAll<HTMLButtonElement>('[data-char]').forEach((b) =>
       b.addEventListener('click', () => {
         profile.character = b.dataset.char as CharacterId;

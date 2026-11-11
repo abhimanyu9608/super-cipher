@@ -471,14 +471,76 @@ export function musicSpec(kind: 'commute' | 'office'): SoundSpec {
     for (let i = 0; i < 8; i++) bass.push({ f: i % 2 === 0 ? noteHz(b) : noteHz(b) * 2, d: s16 });
   const hat: Note[] = [];
   for (let i = 0; i < 64; i++) hat.push({ f: i % 2 === 0 ? 9000 : 0, d: s16, v: i % 4 === 0 ? 1 : 0.6 });
-  const kick: Note[] = [];
-  for (let i = 0; i < 16; i++) kick.push({ f: 150, f1: 45, d: s16 }, { f: 0, d: s16 * 3 });
+  // Desi percussion: dhol (bhangra chaal) on the commute, tabla on the office track. 16 steps per bar, 4 bars.
+  const drums: Voice[] =
+    kind === 'commute'
+      ? [
+          // Dhol bass side (dagga): deep boom.
+          {
+            wave: 'sine',
+            notes: pattern('X.....X.X..X....', s16, () => ({ f: 120, f1: 48, d: s16 })),
+            gain: 0.5,
+            release: 0.12,
+          },
+          // Dhol treble side (tilli): sharp slap.
+          {
+            wave: 'noise',
+            notes: pattern('...x.x.x..x.x.xx', s16, () => ({ f: 4200, f1: 2600, d: s16 * 0.45 })),
+            gain: 0.16,
+            release: 0.02,
+          },
+          {
+            wave: 'triangle',
+            notes: pattern('...x.x.x..x.x.xx', s16, () => ({ f: 420, f1: 300, d: s16 * 0.4 })),
+            gain: 0.14,
+            release: 0.02,
+          },
+        ]
+      : [
+          // Tabla bayan "ge": low note that bends up.
+          {
+            wave: 'sine',
+            notes: pattern('X..X..X...X..X..', s16, () => ({ f: 85, f1: 135, d: s16 })),
+            gain: 0.45,
+            release: 0.14,
+          },
+          // Tabla dayan "na/tin": ringing high tone.
+          {
+            wave: 'sine',
+            notes: pattern('.xx.x.xx.x.xx.xx', s16, () => ({ f: 720, f1: 690, d: s16 * 0.7 })),
+            gain: 0.14,
+            release: 0.06,
+          },
+          {
+            wave: 'noise',
+            notes: pattern('.x...x...x...x..', s16, () => ({ f: 6000, d: s16 * 0.2 })),
+            gain: 0.05,
+            release: 0.01,
+          },
+        ];
   return {
     voices: [
-      { wave: 'square', duty: 0.25, notes: leadNotes, gain: 0.16, release: 0.03 },
-      { wave: 'triangle', notes: bass, gain: 0.32, release: 0.01 },
-      { wave: 'noise', notes: hat, gain: 0.05, release: 0.005 },
-      { wave: 'sine', notes: kick, gain: 0.35, release: 0.01 },
+      { wave: 'square', duty: 0.25, notes: leadNotes, gain: 0.15, release: 0.03 },
+      { wave: 'triangle', notes: bass, gain: 0.3, release: 0.01 },
+      { wave: 'noise', notes: hat, gain: 0.035, release: 0.005 },
+      ...drums,
     ],
   };
+}
+
+/** Repeat a 16-step pattern ("X"/"x" = hit, "." = rest) for 4 bars; the voice release lets hits ring. */
+function pattern(steps: string, s16: number, hit: () => Note, bars = 4): Note[] {
+  const notes: Note[] = [];
+  for (let b = 0; b < bars; b++)
+    for (const ch of steps) {
+      if (ch === '.') {
+        notes.push({ f: 0, d: s16 });
+        continue;
+      }
+      const n = hit();
+      n.d = Math.min(n.d, s16);
+      notes.push(n);
+      if (s16 - n.d > 1e-6) notes.push({ f: 0, d: s16 - n.d });
+    }
+  return notes;
 }

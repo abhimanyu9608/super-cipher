@@ -62,11 +62,16 @@ import { session, newRun, type RunState } from '../game/session';
 import { bus as events } from '../game/events';
 import { input, consumeJump, consumeDash } from '../ui/input';
 import { sfx, audio } from '../audio/sfx';
+import { moodFor, STICKERS, type Mood, type SkinId } from '../config/extras';
+import { Ambient } from '../systems/ambient';
+import { ensureCharacter } from '../gfx/sprites';
+import type { HurtStyle } from '../entities/Player';
 
 export interface LevelStart {
   level: LevelId;
   character: CharacterId;
   mode: 'play' | 'attract';
+  skin?: SkinId;
 }
 
 interface Section {
@@ -77,7 +82,7 @@ interface Section {
   bottom: string;
 }
 
-type State = 'play' | 'finishing' | 'over' | 'cleared';
+type State = 'intro' | 'play' | 'finishing' | 'over' | 'cleared';
 
 export class LevelScene extends Phaser.Scene {
   map!: LevelMap;
@@ -147,6 +152,20 @@ export class LevelScene extends Phaser.Scene {
   private onceFlags = new Set<string>();
   private scanFrames = 0;
   private scareFrames = 0;
+  /** Daily modifiers (enemy speed, power-up time, score multipliers, rain). */
+  mood: Mood = moodFor(new Date());
+  private skin: SkinId = 'none';
+  private ambient!: Ambient;
+  /** Hit-stop: frames the simulation freezes after a big hit. */
+  private hitStop = 0;
+  /** Game-over slow motion zoom. */
+  private dying = 0;
+  private introT = -1;
+  private introProps: Phaser.GameObjects.GameObject[] = [];
+  private iris: Phaser.GameObjects.Graphics | null = null;
+  private irisT = -1;
+  private pitCount = 0;
+  private hits = 0;
 
   constructor() {
     super('Level');
@@ -155,6 +174,16 @@ export class LevelScene extends Phaser.Scene {
   init(data: LevelStart): void {
     this.mode = data.mode;
     this.run = newRun(data.level, data.character);
+    this.skin = data.skin ?? 'none';
+    this.mood = moodFor(new Date());
+    this.hitStop = 0;
+    this.dying = 0;
+    this.introT = -1;
+    this.introProps = [];
+    this.iris = null;
+    this.irisT = -1;
+    this.pitCount = 0;
+    this.hits = 0;
     this.state = 'play';
     this.frame = 0;
     this.acc = 0;
@@ -230,7 +259,10 @@ export class LevelScene extends Phaser.Scene {
     this.buildEnemies();
     this.buildSystems();
 
-    this.player = new Player(this, this.run.character, m.spawnX, m.spawnY);
+    ensureCharacter(this.textures, this.run.character, this.skin);
+    this.player = new Player(this, this.run.character, m.spawnX, m.spawnY, this.skin);
+    this.ambient = new Ambient(this);
+    this.ambient.build();
     this.checkpoint = { x: m.spawnX, y: m.spawnY };
     this.safe = { ...this.checkpoint };
     this.run.totalCoins = this.items.filter((i) => i.kind === 'coin').length + this.coinBlocks;
@@ -244,11 +276,17 @@ export class LevelScene extends Phaser.Scene {
       this.camX = 0;
       audio.startMusic(def.music);
       this.scene.launch('Hud');
+      this.startIris();
+      if (this.run.level === 1) this.startIntro();
     }
     this.langOff = onLangChange(() => this.relabel());
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.langOff?.();
       this.langOff = null;
+      // The camera may already be gone during shutdown; a fresh one is created on restart.
+      const cam = this.cameras?.main;
+      cam?.clearMask();
+      cam?.setZoom(1);
     });
     events.emit('levelReady', { level: this.run.level });
   }
@@ -749,7 +787,7 @@ export class LevelScene extends Phaser.Scene {
 
   collectBlockCoin(x: number, y: number): void {
     this.blockCoins.push(new BlockCoin(this, x, y));
-    this.gainCoin();
+    this.gainCoin(x, y);
   }
 
   spawnPowerUp(kind: ItemKind, cx: number, blockTop: number): void {
@@ -759,6 +797,24 @@ export class LevelScene extends Phaser.Scene {
 
   dropIdCard(x: number, y: number): void {
     this.items.push(new IdCard(this, x, y));
+    this.hitStop = 10;
+    this.sticker(STICKERS.bossDown);
+  }
+
+  /** Short pause on impact so hits feel crunchy. */
+  freeze(frames: number): void {
+    if (!session.reducedMotion) this.hitStop = Math.max(this.hitStop, frames);
+  }
+
+  /** Meme-style reaction sticker over the stage (once per kind per run). */
+  sticker(key: StringKey): void {
+    if (this.mode !== 'play' || !this.once(`sticker-${key}`)) return;
+    events.emit('sticker', { text: t(key) });
+  }
+
+  onSkid(x: number, y: number): void {
+    this.fx.dust(x, y);
+    this.fx.dust(x, y);
   }
 
   onManagerDefeated(): void {
@@ -778,6 +834,8 @@ export class LevelScene extends Phaser.Scene {
       });
     }
     this.run.boss = null;
+    this.hitStop = 12;
+    this.sticker(STICKERS.bossDown);
   }
 
   hurtPlayer(reason: StringKey, fromX: number): void {
@@ -785,18 +843,31 @@ export class LevelScene extends Phaser.Scene {
     const p = this.player;
     if (p.invuln > 0 || this.run.power.headphones > 0) return;
     this.run.hearts--;
-    this.fx.popup(p.cx, p.body.y - 12, t(reason), '#FF8787', 11);
+    this.hits++;
+    const style: HurtStyle =
+      reason === 'busHit' || reason === 'brickHit'
+        ? 'splat'
+        : reason === 'bananaHit'
+          ? 'slip'
+          : reason === 'meetingHit' || reason === 'inviteHit'
+            ? 'tangle'
+            : 'normal';
+    const extra: Partial<Record<HurtStyle, StringKey>> = { splat: 'splat', slip: 'slip', tangle: 'tangled' };
+    this.fx.popup(p.cx, p.body.y - 12, t(extra[style] ?? reason), '#FF8787', 11);
     this.fx.burst(p.cx, p.cy, 0xff5c5c, 16);
     this.fx.addShake(FX.shakeHit);
+    this.freeze(5);
     sfx('hurt');
-    p.hurtKnockback(fromX);
+    p.hurtKnockback(fromX, style);
     if (this.run.hearts <= 0) this.gameOver();
   }
 
-  private gainCoin(): void {
+  private gainCoin(wx?: number, wy?: number): void {
     const r = this.run;
     r.coins++;
-    r.score += SCORE.coin;
+    r.score += SCORE.coin * this.mood.coinScore;
+    if (wx !== undefined && wy !== undefined && this.mode === 'play')
+      this.fx.fly(wx - this.camX, wy, 'coin', VIEW.width - 222, 18, () => this.events.emit('coinPulse'));
     const h = heartsAfterCoin(r.coins, r.hearts);
     if (h.gained) {
       r.hearts = h.hearts;
@@ -842,6 +913,26 @@ export class LevelScene extends Phaser.Scene {
       this.fx.step();
       return;
     }
+    if (this.irisT >= 0) this.stepIris();
+    if (this.hitStop > 0) {
+      this.hitStop--;
+      return;
+    }
+    // Game over: slow motion (half speed) while the camera zooms in.
+    if (this.dying > 0) {
+      this.dying--;
+      if (this.dying % 2 === 1) {
+        this.fx.step();
+        return;
+      }
+    }
+    if (this.state === 'intro') {
+      this.stepIntro();
+      this.ambient.step();
+      this.fx.step();
+      this.player.draw();
+      return;
+    }
     const r = this.run;
     if (this.state === 'play') r.frames++;
     for (const k of Object.keys(r.power) as PowerUpId[]) if (r.power[k] > 0) r.power[k]--;
@@ -856,6 +947,7 @@ export class LevelScene extends Phaser.Scene {
     this.stepHazards();
     this.stepItems();
     this.stepSystems();
+    this.ambient.step();
     this.fx.step();
     this.player.draw();
     for (const e of this.enemies) if (e.alive) e.draw();
@@ -864,6 +956,7 @@ export class LevelScene extends Phaser.Scene {
   }
 
   private stepAttract(): void {
+    this.ambient.step();
     for (const m of this.movers) m.step();
     for (const m of this.movers) m.draw();
     for (const c of this.conveyors) c.step();
@@ -949,6 +1042,12 @@ export class LevelScene extends Phaser.Scene {
       for (let i = 0; i < 2; i++)
         this.fx.trail(p.cx - b.facing * 20, p.cy + (Math.random() - 0.5) * 30, 0xffffff, 'px');
     if (inZone('updraft') && this.frame % 4 === 0) this.fx.trail(p.cx, b.y + b.h + 10, 0xe0f7ff, 'snow');
+    if (Math.abs(b.vx) >= b.maxRun * 0.95 && this.frame % 3 === 0 && !session.reducedMotion)
+      this.fx.speedLine(p.cx - b.facing * 34, b.y + 12 + Math.random() * 40, b.facing);
+    p.worried =
+      (r.doorFrames !== null && r.doorFrames < METRO.pulseUnder) ||
+      (LEVELS[r.level].officeClock && r.clock >= OFFICE.clockRedMin);
+    if (p.worried && this.frame % 40 === 0) this.fx.trail(p.cx + b.facing * 12, b.y + 4, 0x74c0fc, 'spark');
 
     // Pit fall.
     if (b.y > VIEW.height + 40 && this.state === 'play') this.pitFall();
@@ -957,6 +1056,8 @@ export class LevelScene extends Phaser.Scene {
   private pitFall(): void {
     const r = this.run;
     r.hearts--;
+    this.hits++;
+    if (++this.pitCount >= 2) this.sticker(STICKERS.pitTwice);
     sfx('pitfall');
     const p = this.player;
     p.respawn(this.safe.x, this.safe.y);
@@ -978,6 +1079,7 @@ export class LevelScene extends Phaser.Scene {
         if (e.vulnerable && overlaps(b, target) && isStomp(b.vy, p.prevBottom, target.y)) {
           b.vy = -11;
           b.y = target.y - b.h;
+          this.freeze(8);
           e.onStomp();
         }
         continue;
@@ -991,8 +1093,11 @@ export class LevelScene extends Phaser.Scene {
         b.vy = -(e.boss ? 11 : 9.5);
         r.combo++;
         if (r.combo >= 2) this.events.emit('combo', r.combo);
+        if (r.combo >= 4) this.sticker(STICKERS.combo4);
         this.fx.addShake(e.boss ? FX.shakeBoss : FX.shakeStomp);
+        this.freeze(e.boss ? 8 : 4);
         e.onStomp();
+        if (r.combo >= 2) sfx('coin', { rate: 1 + Math.min(8, r.combo) * 0.12, volume: 0.6 });
       } else e.onTouch();
     }
     // Boss HUD status.
@@ -1025,13 +1130,13 @@ export class LevelScene extends Phaser.Scene {
       it.destroy();
       switch (it.kind) {
         case 'coin':
-          this.gainCoin();
+          this.gainCoin(it.x + 10, it.y + 10);
           this.fx.burst(it.x + 10, it.y + 10, 0xffd43b, 5, { speed: 1.5 });
           break;
         case 'chai':
         case 'headphones':
         case 'coffee':
-          r.power[it.kind] = POWERUP_FRAMES[it.kind];
+          r.power[it.kind] = Math.round(POWERUP_FRAMES[it.kind] * this.mood.powerTime);
           r.score += SCORE.powerup;
           this.fx.popup(
             p.cx,
@@ -1179,12 +1284,14 @@ export class LevelScene extends Phaser.Scene {
       if (this.monkey && !this.monkey.active && p.cx > arena.x) {
         this.monkey.active = true;
         this.events.emit('bossBanner', 'bossMonkey');
+        events.emit('bossStart', { level: r.level });
         if (this.once('scareMonkey')) this.jumpscare('monkey', 0, 'scareMonkey');
         else sfx('ook');
       }
       if (this.manager && !this.manager.active && p.cx > arena.x) {
         this.manager.active = true;
         this.events.emit('bossBanner', 'bossManager');
+        events.emit('bossStart', { level: r.level });
         if (this.once('scareManager')) this.jumpscare('manager', 1, 'scareManager');
         this.fx.popup(this.manager.cx, this.manager.y - 20, t('quickCall'), '#FFFFFF', 12);
         sfx('manager');
@@ -1363,6 +1470,8 @@ export class LevelScene extends Phaser.Scene {
       r.level === 1
         ? (r.doorFrames ?? 0) / 60
         : Math.max(0, (OFFICE.clockLateMin - r.clock) * (OFFICE.framesPerMinute / 60));
+    if (this.hits === 0) this.sticker(STICKERS.noHit);
+    else if (secondsLeft < 4) this.sticker(STICKERS.closeCall);
     const bonus = clearBonus(r.hearts, secondsLeft);
     r.score += bonus;
     const stars = starsFor({
@@ -1392,6 +1501,10 @@ export class LevelScene extends Phaser.Scene {
     if (this.state === 'over') return;
     this.state = 'over';
     this.run.hearts = 0;
+    if (!session.reducedMotion) {
+      this.dying = 60;
+      this.cameras.main.zoomTo(1.7, 900, 'Sine.easeOut');
+    }
     audio.stopMusic();
     sfx('gameover');
     this.player.sinceHit = 0;
@@ -1412,7 +1525,101 @@ export class LevelScene extends Phaser.Scene {
     for (const h of this.hazards) if (!(h instanceof Laser)) h.destroy();
     this.hazards = this.hazards.filter((h) => h.alive);
     this.state = 'play';
+    this.dying = 0;
+    this.cameras.main.setZoom(1);
     audio.startMusic(LEVELS[r.level].music, true);
+  }
+
+  // ------------------------------------------------------------------ level start: iris + intro cutscene
+
+  private startIris(): void {
+    if (session.reducedMotion) return;
+    this.iris = this.make.graphics({}, false);
+    this.cameras.main.setMask(this.iris.createGeometryMask());
+    this.irisT = 0;
+    this.stepIris();
+  }
+
+  private stepIris(): void {
+    if (!this.iris) return;
+    this.irisT++;
+    const k = Math.min(1, this.irisT / 40);
+    const r = 8 + (1 - Math.pow(1 - k, 3)) * 620;
+    const p = this.player;
+    const sx = p ? p.cx - this.camX : VIEW.width / 2;
+    const sy = p ? p.cy : VIEW.height / 2;
+    this.iris.clear().fillStyle(0xffffff).fillCircle(sx, sy, r);
+    if (k >= 1) {
+      this.cameras.main.clearMask(true);
+      this.iris = null;
+      this.irisT = -1;
+    }
+  }
+
+  /** Level 1 intro: asleep on the bed, alarm rings, wakes up in shock and jumps out. Any jump skips. */
+  private startIntro(): void {
+    this.state = 'intro';
+    this.introT = 0;
+    const p = this.player;
+    const bed = this.add.image(100, this.map.groundY, 'bed').setOrigin(0.5, 1).setScale(0.85).setDepth(25);
+    const clock = this.add.image(150, 318, 'alarmClock').setDepth(26).setScale(0.8);
+    const hint = this.add
+      .text(VIEW.width / 2, VIEW.height - 40, t('introSkip'), {
+        fontFamily: FONT,
+        fontSize: '10px',
+        color: '#FFFFFF',
+        stroke: '#14121F',
+        strokeThickness: 4,
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(80);
+    this.introProps = [bed, clock, hint];
+    p.body.x = 140;
+    p.body.y = this.map.groundY - 138;
+    p.pose = { frame: 'blink', rot: -Math.PI / 2, dy: 0 };
+    p.body.facing = 1;
+  }
+
+  private stepIntro(): void {
+    const p = this.player;
+    const t0 = ++this.introT;
+    const clock = this.introProps[1] as Phaser.GameObjects.Image | undefined;
+    const skip = consumeJump() || input.left || input.right;
+    if (t0 > 20 && t0 < 100 && clock) {
+      clock.setRotation(Math.sin(t0 * 1.3) * 0.25).setX(150 + Math.sin(t0 * 2.1) * 3);
+      if (t0 % 16 === 0) sfx('beep', { rate: 1.2 });
+      if (t0 === 24) this.fx.popup(150, 280, t('introAlarm'), '#FFD43B', 12);
+    }
+    if (t0 > 20 && t0 < 100 && t0 % 20 === 0) this.fx.popup(64, 360, 'z', '#FFFFFF', 10);
+    if (t0 === 100) {
+      // Wake up in shock!
+      p.pose = { frame: 'shock', rot: 0, dy: 0 };
+      p.body.y = this.map.groundY - 110;
+      this.fx.popup(p.cx, p.body.y - 30, t('introWake'), '#FF8787', 14);
+      this.fx.addShake(6);
+      sfx('djump');
+    }
+    if (t0 > 100) {
+      const k = Math.min(1, (t0 - 100) / 30);
+      p.body.x = 140 - k * 60;
+      p.body.y = this.map.groundY - 110 - Math.sin(k * Math.PI) * 50 + k * 50;
+    }
+    if (t0 >= 135 || (skip && t0 > 5)) this.endIntro();
+  }
+
+  private endIntro(): void {
+    const p = this.player;
+    p.pose = null;
+    p.respawn(this.map.spawnX, this.map.spawnY);
+    p.invuln = 0;
+    for (const o of this.introProps) {
+      if (o instanceof Phaser.GameObjects.Text) o.destroy();
+      else this.tweens.add({ targets: o, alpha: 0, duration: 400, onComplete: () => o.destroy() });
+    }
+    this.introProps = [];
+    this.introT = -1;
+    this.state = 'play';
   }
 
   // ------------------------------------------------------------------ rendering
@@ -1429,7 +1636,14 @@ export class LevelScene extends Phaser.Scene {
       this.camX += (target - this.camX) * CAMERA.lerp;
       if (this.frame <= 2) this.camX = target;
     }
-    cam.setScroll(Math.round(this.camX + this.fx.shakeX), Math.round(this.fx.shakeY));
+    if (cam.zoom > 1.01) {
+      // Death zoom: centre the player (scroll is the view centre minus half the view).
+      cam.setBounds(-2000, -2000, this.map.worldWidth + 4000, VIEW.height + 4000);
+      cam.setScroll(p.cx - VIEW.width / 2, p.cy - VIEW.height / 2);
+    } else {
+      cam.setBounds(0, 0, this.map.worldWidth, VIEW.height);
+      cam.setScroll(Math.round(this.camX + this.fx.shakeX), Math.round(this.fx.shakeY));
+    }
     this.drawSky();
     for (const l of this.parallax) {
       if (l.obj instanceof Phaser.GameObjects.TileSprite) l.obj.tilePositionX = this.camX * l.factor;

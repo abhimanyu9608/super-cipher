@@ -78,7 +78,7 @@ export class Bug extends Enemy {
 
   step(): void {
     this.t++;
-    this.x += this.dir * ENEMY.bugSpeed;
+    this.x += this.dir * ENEMY.bugSpeed * this.L.mood.enemySpeed;
     if (this.x <= this.min) {
       this.x = this.min;
       this.dir = 1;
@@ -90,16 +90,22 @@ export class Bug extends Enemy {
 
   onStomp(): void {
     const L = this.L;
-    L.addScore(SCORE.bug);
-    L.fx.popup(this.cx, this.y - 6, t('bugFixed'), '#69DB7C');
+    L.addScore(SCORE.bug * L.mood.bugScore);
+    L.fx.popup(
+      this.cx,
+      this.y - 6,
+      t('bugFixed').replace('100', String(SCORE.bug * L.mood.bugScore)),
+      '#69DB7C',
+    );
     L.fx.burst(this.cx, this.y + 14, 0x40c057, 16);
+    L.fx.corpse('bugSquash', this.cx, this.y + this.h, this.dir > 0);
     sfx('stomp');
     this.kill();
   }
 
   draw(): void {
     super.draw();
-    this.sprite.setFrame(Math.floor(this.t / 8) % 2);
+    this.sprite.setFrame(Math.floor(this.t / 6) % 4);
     this.sprite.setFlipX(this.dir > 0);
     this.sprite.setRotation(Math.sin(this.t * 0.4) * 0.06);
   }
@@ -143,7 +149,7 @@ export class Dog extends Enemy {
       this.barkCd = 150;
     }
     this.chasing = near;
-    const speed = near ? this.chase : this.patrol;
+    const speed = (near ? this.chase : this.patrol) * this.L.mood.enemySpeed;
     if (near) this.dir = dx > 0 ? 1 : -1;
     this.x += this.dir * speed;
     if (this.x <= this.min) {
@@ -181,7 +187,7 @@ export class Dog extends Enemy {
   draw(): void {
     super.draw();
     const fast = this.fleeing || this.chasing;
-    this.sprite.setFrame(Math.floor(this.t / (fast ? 5 : 9)) % 2);
+    this.sprite.setFrame(Math.floor(this.t / (fast ? 4 : 7)) % 4);
     this.sprite.setFlipX(this.dir < 0);
     // Bouncy run.
     this.sprite.y -= Math.abs(Math.sin(this.t * (fast ? 0.35 : 0.2))) * 4;
@@ -224,6 +230,7 @@ export class Invite extends Enemy {
     L.addScore(SCORE.invite);
     L.fx.popup(this.cx, this.y - 6, t('meetingDeclined'), '#4DABF7');
     L.fx.burst(this.cx, this.y + 14, 0xffffff, 14);
+    L.fx.corpse('inviteTorn', this.cx, this.y + this.h, false, true);
     sfx('stomp');
     this.kill();
   }

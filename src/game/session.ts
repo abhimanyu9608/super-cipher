@@ -4,6 +4,8 @@ import { HEARTS, type PowerUpId } from '../config/game';
 import type { LevelId } from '../config/levels';
 import { load, save, loadInt, KEYS } from '../storage';
 import { newPlayerId, isPlayerId } from '../social/unlock';
+import { SKINS, skinUnlocked, type SkinId } from '../config/extras';
+import { LEVEL_IDS } from '../config/levels';
 
 export const profile = {
   get character(): CharacterId {
@@ -11,6 +13,17 @@ export const profile = {
   },
   set character(c: CharacterId) {
     save(KEYS.char, c);
+  },
+  /** Chosen cosmetic skin (falls back to none if it is no longer unlocked). */
+  get skin(): SkinId {
+    const s = (load(KEYS.skin) ?? 'none') as SkinId;
+    return SKINS.some((k) => k.id === s) && skinUnlocked(s, this.totalStars()) ? s : 'none';
+  },
+  set skin(s: SkinId) {
+    save(KEYS.skin, s);
+  },
+  totalStars(): number {
+    return LEVEL_IDS.reduce((sum, l) => sum + this.stars(l), 0);
   },
   get playerId(): string {
     let id = load(KEYS.pid) ?? '';

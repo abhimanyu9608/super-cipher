@@ -102,6 +102,7 @@ class AudioManager {
   private lastPlay = new Map<string, number>();
   enabled = load(KEYS.sound) !== 'off';
   private manifestBase = '';
+  private tap: MediaStreamAudioDestinationNode | null = null;
 
   /** Call once at boot; audio is created lazily on the first user gesture. */
   init(baseUrl: string): void {
@@ -187,7 +188,7 @@ class AudioManager {
     for (const k of Object.keys(SOUNDS)) this.buffer(k);
   }
 
-  play(ev: SfxEvent, opts: { volume?: number } = {}): void {
+  play(ev: SfxEvent, opts: { volume?: number; rate?: number } = {}): void {
     const c = this.ensure();
     if (!c || !this.enabled || c.state !== 'running') return;
     const now = performance.now();
@@ -206,6 +207,7 @@ class AudioManager {
     for (const b of sources) {
       const src = c.createBufferSource();
       src.buffer = b;
+      src.playbackRate.value = opts.rate ?? 1;
       const g = c.createGain();
       g.gain.value = opts.volume ?? 1;
       src.connect(g).connect(m.ch === 'voice' ? this.voiceGain : this.sfxGain);
@@ -256,6 +258,17 @@ class AudioManager {
     else void this.ctx.resume();
   }
 
+  /** Live mix of everything the game plays, for recording clips. Null before audio starts. */
+  stream(): MediaStream | null {
+    const c = this.ctx;
+    if (!c) return null;
+    if (!this.tap) {
+      this.tap = c.createMediaStreamDestination();
+      this.master.connect(this.tap);
+    }
+    return this.tap.stream;
+  }
+
   setEnabled(on: boolean): void {
     this.enabled = on;
     save(KEYS.sound, on ? 'on' : 'off');
@@ -264,4 +277,4 @@ class AudioManager {
 }
 
 export const audio = new AudioManager();
-export const sfx = (ev: SfxEvent, opts?: { volume?: number }): void => audio.play(ev, opts);
+export const sfx = (ev: SfxEvent, opts?: { volume?: number; rate?: number }): void => audio.play(ev, opts);

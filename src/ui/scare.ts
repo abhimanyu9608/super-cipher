@@ -28,4 +28,16 @@ export function initScare(): void {
     window.clearTimeout(timer);
     timer = window.setTimeout(() => el.remove(), 950);
   });
+
+  // Meme-style reaction stickers: slap onto the screen, wobble, peel away.
+  bus.on('sticker', ({ text }) => {
+    box.querySelector('.sticker')?.remove();
+    const el = document.createElement('p');
+    el.className = 'sticker';
+    el.setAttribute('role', 'status');
+    el.textContent = text;
+    el.style.setProperty('--tilt', `${(Math.random() < 0.5 ? -1 : 1) * (3 + Math.random() * 4)}deg`);
+    box.appendChild(el);
+    window.setTimeout(() => el.remove(), 1900);
+  });
 }

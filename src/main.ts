@@ -8,6 +8,7 @@ import { HudScene } from './scenes/HudScene';
 import { Flow } from './ui/screens';
 import { initShell } from './ui/shell';
 import { initScare } from './ui/scare';
+import { initClip } from './ui/clip';
 import { initKeyboard } from './ui/input';
 import { bus } from './game/events';
 import { audio } from './audio/sfx';
@@ -46,6 +47,7 @@ async function boot(): Promise<void> {
   const flow = new Flow(game);
   initShell(flow);
   initScare();
+  initClip();
   bus.on('ready', () => {
     document.getElementById('loading')?.classList.add('done');
     flow.toTitle();

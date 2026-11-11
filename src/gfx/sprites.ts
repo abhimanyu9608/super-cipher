@@ -3,7 +3,8 @@
  * replace any of them later via public/assets/sprites/manifest.json (see PreloadScene).
  */
 import { CHARACTERS, type CharacterId } from '../config/physics';
-import { CHAR_FRAMES, CHAR_H, CHAR_W, drawCharacter, drawHeadIcon } from './characters';
+import { CHAR_FRAMES, CHAR_H, CHAR_W, drawCharacter, drawHeadIcon, sheetKey } from './characters';
+import type { SkinId } from '../config/extras';
 import {
   OUTLINE,
   box,
@@ -187,7 +188,9 @@ def(
   44,
   32,
   (c, f) => {
-    const lp = f === 0 ? 2 : -2;
+    // 4-frame scuttle: legs alternate, body bobs.
+    const lp = [3, 0, -3, 0][f];
+    c.translate(0, [0, -1.5, 0, -1.5][f]);
     c.strokeStyle = OUTLINE;
     c.lineWidth = 3;
     c.lineCap = 'round';
@@ -215,28 +218,54 @@ def(
     c.lineWidth = 2;
     c.beginPath();
     c.moveTo(38, 10);
-    c.lineTo(42, 2 + (f === 0 ? 0 : 2));
+    c.lineTo(42, 2 + (f % 2 === 0 ? 0 : 2));
     c.moveTo(34, 10);
-    c.lineTo(34, 2 + (f === 0 ? 2 : 0));
+    c.lineTo(34, 2 + (f % 2 === 0 ? 2 : 0));
     c.stroke();
     text(c, '</>', 20, 20, 6, '#FFFFFF');
   },
-  2,
+  4,
 );
+// Stomped bug: flat as a pancake with spiral eyes.
+def('bugSquash', 48, 16, (c) => {
+  ellipse(c, 22, 10, 20, 5, '#7C3AED', 3);
+  ellipse(c, 40, 10, 7, 4, '#22C55E', 2.5);
+  c.strokeStyle = OUTLINE;
+  c.lineWidth = 1.5;
+  c.beginPath();
+  c.arc(41, 9, 2, 0, Math.PI * 1.6);
+  c.stroke();
+  c.lineWidth = 2;
+  for (const x of [8, 18, 28]) {
+    c.beginPath();
+    c.moveTo(x, 13);
+    c.lineTo(x - 5, 15);
+    c.stroke();
+  }
+});
+def('inviteTorn', 46, 32, (c) => {
+  poly(c, [2, 8, 20, 6, 16, 18, 22, 30, 2, 28], '#FFFFFF', 3);
+  poly(c, [26, 4, 44, 6, 42, 28, 24, 30, 30, 18], '#FFFFFF', 3);
+  c.fillStyle = '#4DABF7';
+  c.fillRect(5, 22, 12, 4);
+  c.fillRect(28, 22, 12, 4);
+});
 def(
   'dog',
   56,
   38,
   (c, f) => {
-    const s = f === 0 ? 1 : -1;
-    // Legs.
-    limb(c, 16, 26, 14 + s * 4, 36, 5, '#C08A4B', 2.5);
-    limb(c, 22, 26, 22 - s * 4, 36, 5, '#A0703A', 2.5);
-    limb(c, 36, 26, 34 - s * 4, 36, 5, '#C08A4B', 2.5);
-    limb(c, 42, 26, 42 + s * 4, 36, 5, '#A0703A', 2.5);
-    // Curly tail.
+    // 4-frame gallop: front and back legs out of phase, tail wags.
+    const s = Math.sin((f / 4) * Math.PI * 2);
+    const q = Math.cos((f / 4) * Math.PI * 2);
+    c.translate(0, -Math.abs(s) * 1.5);
+    limb(c, 16, 26, 14 + s * 5, 36, 5, '#C08A4B', 2.5);
+    limb(c, 22, 26, 22 - s * 5, 36, 5, '#A0703A', 2.5);
+    limb(c, 36, 26, 34 + q * 5, 36, 5, '#C08A4B', 2.5);
+    limb(c, 42, 26, 42 - q * 5, 36, 5, '#A0703A', 2.5);
+    // Curly tail (wagging).
     c.beginPath();
-    c.arc(8, 14, 6, Math.PI * 0.2, Math.PI * 1.6);
+    c.arc(8, 14 + q * 2, 6, Math.PI * 0.2, Math.PI * 1.6);
     c.lineWidth = 7;
     c.strokeStyle = OUTLINE;
     c.stroke();
@@ -257,8 +286,13 @@ def(
     // Red collar.
     c.fillStyle = '#FF5C5C';
     c.fillRect(38, 18, 7, 3);
+    // Tongue out on the stride.
+    if (f % 2 === 1) {
+      c.fillStyle = '#FF8FA3';
+      c.fillRect(52, 19, 4, 5);
+    }
   },
-  2,
+  4,
 );
 def('invite', 46, 32, (c) => {
   box(c, 2, 4, 40, 26, '#FFFFFF', 3, 3);
@@ -788,6 +822,159 @@ def('dpad', 4, 4, (c) => {
   c.fillRect(0, 0, 4, 4);
 });
 
+// ------------------------------------------------------------------ ambient life
+def(
+  'bird',
+  24,
+  14,
+  (c, f) => {
+    c.strokeStyle = '#2B2235';
+    c.lineWidth = 3;
+    c.lineCap = 'round';
+    c.beginPath();
+    const up = f === 0 ? -5 : 4;
+    c.moveTo(2, 7 + up);
+    c.quadraticCurveTo(7, 5, 12, 8);
+    c.quadraticCurveTo(17, 5, 22, 7 + up);
+    c.stroke();
+  },
+  2,
+);
+def('kite', 40, 70, (c) => {
+  poly(c, [20, 2, 37, 22, 20, 44, 3, 22], '#F06595', 3);
+  poly(c, [20, 2, 37, 22, 20, 22], '#FFD43B', 0);
+  c.strokeStyle = OUTLINE;
+  c.lineWidth = 2;
+  c.beginPath();
+  c.moveTo(20, 2);
+  c.lineTo(20, 44);
+  c.moveTo(3, 22);
+  c.lineTo(37, 22);
+  c.stroke();
+  c.strokeStyle = '#FFFFFF';
+  c.beginPath();
+  c.moveTo(20, 44);
+  c.quadraticCurveTo(28, 56, 18, 68);
+  c.stroke();
+});
+for (let look = 0; look < 3; look++) {
+  const shirt = ['#4DABF7', '#F783AC', '#FFA94D'][look];
+  def(
+    `walker${look}`,
+    30,
+    56,
+    (c, f) => {
+      const s = f === 0 ? 4 : -4;
+      limb(c, 12, 36, 12 + s, 54, 6, '#343A40', 2.5);
+      limb(c, 18, 36, 18 - s, 54, 6, '#495057', 2.5);
+      box(c, 7, 18, 16, 22, shirt, 2.5, 5);
+      circle(c, 15, 10, 8, ['#C98B5B', '#8D5524', '#E0AC69'][look], 2.5);
+      c.fillStyle = '#2B2235';
+      c.beginPath();
+      c.arc(15, 7, 8, Math.PI, 0);
+      c.fill();
+      if (look === 1) {
+        // Tiffin box.
+        box(c, 20, 30, 8, 10, '#ADB5BD', 2, 1);
+      }
+    },
+    2,
+  );
+}
+def('steam', 20, 20, (c) => {
+  const g = c.createRadialGradient(10, 10, 1, 10, 10, 10);
+  g.addColorStop(0, 'rgba(255,255,255,0.8)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  c.fillStyle = g;
+  c.fillRect(0, 0, 20, 20);
+});
+def('raindrop', 4, 18, (c) => {
+  c.fillStyle = 'rgba(200,230,255,0.75)';
+  c.fillRect(1, 0, 2, 18);
+});
+def('heartPiece', 12, 12, (c) => poly(c, [1, 1, 11, 3, 6, 11], '#FF5C5C', 2));
+def('glow', 128, 128, (c) => {
+  const g = c.createRadialGradient(64, 64, 4, 64, 64, 64);
+  g.addColorStop(0, 'rgba(255,214,140,0.75)');
+  g.addColorStop(0.5, 'rgba(255,170,80,0.25)');
+  g.addColorStop(1, 'rgba(255,170,80,0)');
+  c.fillStyle = g;
+  c.fillRect(0, 0, 128, 128);
+});
+def('sunrays', 480, 540, (c) => {
+  for (let i = 0; i < 5; i++) {
+    const g = c.createLinearGradient(0, 0, 0, 540);
+    g.addColorStop(0, 'rgba(255,236,170,0.32)');
+    g.addColorStop(1, 'rgba(255,236,170,0)');
+    c.fillStyle = g;
+    c.beginPath();
+    const x = 60 + i * 90;
+    c.moveTo(x, 0);
+    c.lineTo(x + 40, 0);
+    c.lineTo(x - 80 + 40, 540);
+    c.lineTo(x - 140, 540);
+    c.closePath();
+    c.fill();
+  }
+});
+// Foreground silhouettes (parallax layer in front of the player).
+def('fgPole', 60, 540, (c) => {
+  c.fillStyle = '#1A1530';
+  c.fillRect(24, 0, 12, 540);
+  c.fillRect(0, 60, 60, 8);
+  c.fillRect(6, 90, 48, 6);
+});
+def('fgPlant', 120, 140, (c) => {
+  c.fillStyle = '#1A1530';
+  for (let i = 0; i < 7; i++) {
+    c.save();
+    c.translate(60, 140);
+    c.rotate(-1.2 + i * 0.4);
+    c.beginPath();
+    c.ellipse(0, -60, 14, 60, 0, 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+  }
+});
+def('fgDesk', 200, 120, (c) => {
+  c.fillStyle = '#1A1530';
+  c.fillRect(0, 20, 200, 16);
+  c.fillRect(10, 36, 12, 84);
+  c.fillRect(178, 36, 12, 84);
+  c.fillRect(60, 0, 70, 22);
+});
+def('alarmClock', 60, 64, (c) => {
+  circle(c, 12, 12, 10, '#FFD43B', 3);
+  circle(c, 48, 12, 10, '#FFD43B', 3);
+  circle(c, 30, 36, 24, '#FF5C5C', 4);
+  circle(c, 30, 36, 17, '#FFFFFF', 3);
+  c.strokeStyle = OUTLINE;
+  c.lineWidth = 3;
+  c.beginPath();
+  c.moveTo(30, 36);
+  c.lineTo(30, 24);
+  c.moveTo(30, 36);
+  c.lineTo(38, 40);
+  c.stroke();
+  limb(c, 14, 56, 10, 62, 4, '#343A40', 2);
+  limb(c, 46, 56, 50, 62, 4, '#343A40', 2);
+});
+def('bed', 200, 80, (c) => {
+  box(c, 4, 30, 192, 34, '#8B5A2B', 4, 6);
+  box(c, 4, 4, 22, 72, '#6E4520', 4, 4);
+  box(c, 12, 22, 180, 16, '#F8F9FA', 3, 6);
+  box(c, 22, 14, 46, 20, '#A5D8FF', 3, 8);
+  box(c, 70, 18, 120, 18, '#7C3AED', 3, 6);
+  limb(c, 180, 64, 180, 78, 6, '#6E4520', 2);
+});
+def('speedline', 60, 4, (c) => {
+  const g = c.createLinearGradient(0, 0, 60, 0);
+  g.addColorStop(0, 'rgba(255,255,255,0)');
+  g.addColorStop(1, 'rgba(255,255,255,0.9)');
+  c.fillStyle = g;
+  c.fillRect(0, 0, 60, 4);
+});
+
 function heartPath(c: Ctx, fill: string): void {
   c.beginPath();
   c.moveTo(12, 20);
@@ -803,7 +990,7 @@ function heartPath(c: Ctx, fill: string): void {
 
 // ------------------------------------------------------------------ registration
 
-interface TextureHost {
+export interface TextureHost {
   exists(key: string): boolean;
   addCanvas(
     key: string,
@@ -829,33 +1016,42 @@ export function registerSprites(textures: TextureHost): void {
     if (tex && frames > 1) for (let f = 0; f < frames; f++) tex.add(f, 0, f * d.w, 0, d.w, d.h);
   }
   for (const id of Object.keys(CHARACTERS) as CharacterId[]) {
-    const key = `player-${id}`;
-    if (!textures.exists(key)) {
-      const { canvas, ctx } = makeCanvas(CHAR_W * CHAR_FRAMES.length, CHAR_H);
-      CHAR_FRAMES.forEach((_, i) => drawCharacter(ctx, id, CHAR_FRAMES[i], i * CHAR_W, 0));
-      const tex = textures.addCanvas(key, canvas);
-      CHAR_FRAMES.forEach((name, i) => tex?.add(name, 0, i * CHAR_W, 0, CHAR_W, CHAR_H));
-    }
-    const headKey = `head-${id}`;
-    if (!textures.exists(headKey)) {
-      const { canvas, ctx } = makeCanvas(64, 64);
-      drawHeadIcon(ctx, id, 64);
-      textures.addCanvas(headKey, canvas);
-    }
+    ensureCharacter(textures, id, 'none');
+  }
+}
+
+/** Build (once) the sprite sheet and head icon for a character + skin. */
+export function ensureCharacter(textures: TextureHost, id: CharacterId, skin: SkinId): void {
+  const key = sheetKey(id, skin);
+  if (!textures.exists(key)) {
+    const { canvas, ctx } = makeCanvas(CHAR_W * CHAR_FRAMES.length, CHAR_H);
+    CHAR_FRAMES.forEach((_, i) => drawCharacter(ctx, id, CHAR_FRAMES[i], i * CHAR_W, 0, skin));
+    const tex = textures.addCanvas(key, canvas);
+    CHAR_FRAMES.forEach((name, i) => tex?.add(name, 0, i * CHAR_W, 0, CHAR_W, CHAR_H));
+  }
+  const headKey = skin === 'none' ? `head-${id}` : `head-${id}-${skin}`;
+  if (!textures.exists(headKey)) {
+    const { canvas, ctx } = makeCanvas(64, 64);
+    drawHeadIcon(ctx, id, 64, skin);
+    textures.addCanvas(headKey, canvas);
   }
 }
 
 /** Head icon as a data URL for DOM use (header, character cards). */
-export function headDataUrl(id: CharacterId, size = 64): string {
+export function headDataUrl(id: CharacterId, size = 64, skin: SkinId = 'none'): string {
   const { canvas, ctx } = makeCanvas(size, size);
-  drawHeadIcon(ctx, id, size);
+  drawHeadIcon(ctx, id, size, skin);
   return canvas.toDataURL();
 }
 
-/** Full-body portrait as a data URL (character select cards). */
-export function portraitDataUrl(id: CharacterId, frame: (typeof CHAR_FRAMES)[number] = 'idle0'): string {
+/** Full-body portrait as a data URL (character select cards, promotion screen). */
+export function portraitDataUrl(
+  id: CharacterId,
+  frame: (typeof CHAR_FRAMES)[number] = 'idle0',
+  skin: SkinId = 'none',
+): string {
   const { canvas, ctx } = makeCanvas(CHAR_W, CHAR_H);
-  drawCharacter(ctx, id, frame);
+  drawCharacter(ctx, id, frame, 0, 0, skin);
   return canvas.toDataURL();
 }
 

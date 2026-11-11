@@ -44,6 +44,7 @@ export const KEYS = {
   lang: 'sc-lang',
   sound: 'sc-sound',
   char: 'sc-char',
+  skin: 'sc-skin',
   pid: 'sc-pid',
   unlocked: 'sc-unlocked',
   best: (level: number) => `sc-best-L${level}`,

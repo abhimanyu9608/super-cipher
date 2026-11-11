@@ -80,7 +80,7 @@ export function initShell(flow: Flow): void {
 
   const updateHead = () => {
     const img = $<HTMLImageElement>('#brand-head');
-    img.src = headDataUrl(profile.character, 88);
+    img.src = headDataUrl(profile.character, 88, profile.skin);
   };
 
   flow.onScreen(() => {

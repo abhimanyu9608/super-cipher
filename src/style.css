@@ -399,7 +399,7 @@ body.pseudo-full-on {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   gap: 1.4cqw;
   padding: 3cqw;
   text-align: center;
@@ -414,6 +414,25 @@ body.pseudo-full-on {
 
 .overlay.title {
   background: linear-gradient(180deg, rgba(14, 11, 31, 0.15), rgba(14, 11, 31, 0.6));
+  gap: 0.8cqw;
+  padding: 1.6cqw 3cqw;
+}
+
+/* Keep the busier title screen (mood chip + skins) inside the 16:9 stage. */
+.overlay.title .big-logo {
+  font-size: max(18px, 4.6cqw);
+}
+
+.overlay.title .lead {
+  font-size: max(12px, 1.6cqw);
+}
+
+.overlay.title .char-card img {
+  width: max(40px, 5.6cqw);
+}
+
+.overlay.title .btn-big {
+  min-height: max(44px, 5cqw);
 }
 
 .eyebrow {
@@ -644,8 +663,10 @@ body.pseudo-full-on {
 }
 
 .stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(max(64px, 9cqw), auto));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 90cqw;
   gap: 0.6cqw 2.4cqw;
   margin: 0;
   padding: 1.2cqw 2cqw;
@@ -1088,5 +1109,263 @@ body.pseudo-full-on {
   .stars .s.on,
   .stars .s.off {
     animation-duration: 0.01s;
+  }
+}
+
+/* ---------------- title: letter-by-letter logo, mood chip, skins, dancing hero */
+.big-logo i {
+  display: inline-block;
+  font-style: normal;
+  animation: letter-in 0.55s cubic-bezier(0.3, 1.8, 0.5, 1) both;
+  animation-delay: calc(var(--i) * 45ms);
+}
+
+@keyframes letter-in {
+  from {
+    transform: translateY(-120%) scale(0.4);
+    opacity: 0;
+  }
+}
+
+.mood-chip {
+  margin: 0;
+  padding: 0.5cqw 1.4cqw;
+  border-radius: 999px;
+  background: rgba(240, 101, 149, 0.92);
+  border: 2px solid var(--outline);
+  color: #fff;
+  font-size: max(11px, 1.35cqw);
+  font-weight: 700;
+}
+
+.skins {
+  display: flex;
+  gap: 0.8cqw;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.skin {
+  display: flex;
+  align-items: center;
+  gap: 0.5cqw;
+  min-height: 44px;
+  padding: 0.3cqw 1cqw 0.3cqw 0.4cqw;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: rgba(27, 22, 54, 0.92);
+  font-size: max(10px, 1.15cqw);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.skin img {
+  width: max(28px, 3.4cqw);
+  height: auto;
+}
+
+.skin[aria-pressed='true'] {
+  border-color: var(--gold);
+  background: #3a2f6b;
+}
+
+.skin.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.skin.locked img {
+  filter: grayscale(1) brightness(0.6);
+}
+
+.char-card[aria-pressed='true'] img {
+  animation: dance 0.7s ease-in-out infinite;
+}
+
+@keyframes dance {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  25% {
+    transform: translateY(-10%) rotate(-8deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0) scaleY(0.94);
+  }
+  75% {
+    transform: translateY(-10%) rotate(8deg);
+  }
+}
+
+/* ---------------- overworld career map */
+.overworld {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 3cqw 2cqw 1.5cqw;
+  scroll-snap-type: x proximity;
+}
+
+.node {
+  position: relative;
+  flex: none;
+  width: max(110px, 14cqw);
+  min-height: 44px;
+  padding: 1cqw;
+  border-radius: 1.4cqw;
+  border: 3px solid var(--line);
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3cqw;
+  text-align: center;
+  scroll-snap-align: center;
+}
+
+button.node {
+  cursor: pointer;
+}
+
+.node.open {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px #ffd43b33;
+}
+
+.node.open:hover {
+  transform: translateY(-4px);
+}
+
+.node.locked {
+  background: repeating-linear-gradient(135deg, var(--panel) 0 10px, var(--panel-2) 10px 20px);
+}
+
+.node.soon {
+  opacity: 0.55;
+}
+
+.node-ico {
+  font-size: max(22px, 3.4cqw);
+  line-height: 1.1;
+}
+
+.node-name {
+  font-weight: 800;
+  font-size: max(12px, 1.5cqw);
+}
+
+.node-meta {
+  font-size: max(10px, 1.1cqw);
+  color: var(--muted);
+}
+
+.node-cta {
+  font-family: var(--pixel);
+  font-size: max(8px, 0.95cqw);
+  color: var(--gold);
+}
+
+.node-me {
+  position: absolute;
+  top: calc(-1 * max(26px, 3.4cqw));
+  width: max(36px, 4.4cqw);
+  height: auto;
+  border-radius: 50%;
+  border: 3px solid var(--gold);
+  background: var(--panel-2);
+  animation: bob 0.9s ease-in-out infinite;
+}
+
+.road {
+  flex: none;
+  width: max(18px, 3cqw);
+  height: 6px;
+  background: repeating-linear-gradient(90deg, var(--gold) 0 8px, transparent 8px 14px);
+}
+
+/* ---------------- promotion moment */
+.promo {
+  display: flex;
+  align-items: center;
+  gap: 1cqw;
+}
+
+.promo img {
+  height: max(56px, 8cqw);
+  width: auto;
+}
+
+.promo-new {
+  animation: promo-pop 0.6s 0.6s cubic-bezier(0.3, 1.8, 0.5, 1) both;
+  filter: drop-shadow(0 0 1cqw #ffd43b);
+}
+
+.promo-arrow {
+  font-size: max(18px, 2.6cqw);
+  color: var(--gold);
+}
+
+.promo .title-badge {
+  text-align: left;
+  line-height: 1.25;
+}
+
+@keyframes promo-pop {
+  from {
+    transform: scale(0.2) rotate(-20deg);
+    opacity: 0;
+  }
+}
+
+/* ---------------- reaction stickers */
+.sticker {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  z-index: 23;
+  margin: 0;
+  padding: 0.8cqw 2cqw;
+  transform: translateX(-50%) rotate(var(--tilt, -4deg));
+  background: #fff;
+  color: var(--outline);
+  border: 0.45cqw solid var(--outline);
+  border-radius: 1.2cqw;
+  box-shadow: 0.6cqw 0.6cqw 0 var(--pink);
+  font-weight: 800;
+  font-size: max(14px, 2.6cqw);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: sticker 1.9s cubic-bezier(0.3, 1.6, 0.5, 1) forwards;
+}
+
+@keyframes sticker {
+  0% {
+    transform: translateX(-50%) rotate(var(--tilt)) scale(2.4);
+    opacity: 0;
+  }
+  12% {
+    transform: translateX(-50%) rotate(var(--tilt)) scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: translateX(-50%) rotate(var(--tilt)) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(-30%) rotate(calc(var(--tilt) * -1)) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .big-logo i,
+  .char-card[aria-pressed='true'] img,
+  .node-me,
+  .promo-new,
+  .sticker {
+    animation: none;
   }
 }

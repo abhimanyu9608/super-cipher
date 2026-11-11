@@ -1,0 +1,58 @@
+<!doctype html>
+<!-- Reel preview. With the dev server running open /super-cipher/scripts/reel/reel.html (?t=8.6 to jump to a time).
+     scripts/reel/render.mjs drives this page headlessly to export the MP4. -->
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Super Cipher reel</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #000;
+      }
+      canvas {
+        display: block;
+        height: 100vh;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c" width="1080" height="1920"></canvas>
+    <script type="module">
+      import { drawFrame, renderAudio, wavBase64, DURATION, FPS } from './reel.ts';
+      await Promise.all([
+        document.fonts.load('40px "Press Start 2P"'),
+        document.fonts.load('800 40px "Baloo 2"'),
+        document.fonts.load('700 40px "Baloo 2"'),
+      ]);
+      const canvas = document.getElementById('c');
+      const ctx = canvas.getContext('2d');
+      window.reel = {
+        duration: DURATION,
+        fps: FPS,
+        frame(i, quality = 0.92) {
+          drawFrame(ctx, i / FPS);
+          return canvas.toDataURL('image/jpeg', quality);
+        },
+        audio: () => wavBase64(renderAudio()),
+      };
+      const fixed = new URLSearchParams(location.search).get('t');
+      if (fixed !== null) drawFrame(ctx, Number(fixed));
+      else {
+        const start = performance.now();
+        const loop = () => {
+          drawFrame(ctx, ((performance.now() - start) / 1000) % DURATION);
+          requestAnimationFrame(loop);
+        };
+        loop();
+      }
+      document.title = 'ready';
+    </script>
+  </body>
+</html>

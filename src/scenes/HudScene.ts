@@ -55,6 +55,13 @@ export class HudScene extends Phaser.Scene {
   private comboShadow!: Phaser.GameObjects.Text;
   private comboT = 0;
   private tick = 0;
+  /** Displayed score counts up towards the real score. */
+  private shownScore = 0;
+  private prevHearts = -1;
+  private heartBounce: number[] = [];
+  private pieces: { img: Phaser.GameObjects.Image; vx: number; vy: number; life: number }[] = [];
+  private coinIcon!: Phaser.GameObjects.Image;
+  private coinPulse = 0;
   private readonly barX = VIEW.width / 2 - 150;
 
   constructor() {
@@ -92,7 +99,11 @@ export class HudScene extends Phaser.Scene {
     this.progHead = this.add.image(this.barX, 38, `head-${run.character}`).setScale(0.36);
 
     // Right: coins, score, time or office clock, Appraisal Points.
-    this.add.image(VIEW.width - 222, 18, 'coin').setScale(0.8);
+    this.coinIcon = this.add.image(VIEW.width - 222, 18, 'coin').setScale(0.8);
+    this.shownScore = run.score;
+    this.prevHearts = run.hearts;
+    this.heartBounce = new Array(HEARTS.max).fill(0);
+    this.pieces = [];
     this.coins = label(this, VIEW.width - 208, 12, 11);
     this.score = label(this, VIEW.width - 16, 12, 11).setOrigin(1, 0);
     this.timeText = label(this, VIEW.width - 16, 34, 10, '#BDB5E0').setOrigin(1, 0);
@@ -150,17 +161,26 @@ export class HudScene extends Phaser.Scene {
     const onZone = (key: string) => this.showBanner(key as StringKey, false);
     const onBoss = (key: string) => this.showBanner(key as StringKey, true);
     const onCombo = (n: number) => {
-      this.combo.setText(t('combo', { n }));
-      this.comboShadow.setText(t('combo', { n }));
+      // Bigger and hotter with each stomp; ON FIRE from x4.
+      const label = n >= 4 ? `${t('combo', { n })} ${t('onFire')}` : t('combo', { n });
+      const size = Math.min(40, 22 + n * 4);
+      this.combo
+        .setText(label)
+        .setFontSize(size)
+        .setColor(n >= 4 ? '#FFD43B' : '#FFFFFF');
+      this.comboShadow.setText(label).setFontSize(size);
       this.comboT = 60;
     };
+    const onCoin = () => (this.coinPulse = 1);
     level.events.on('zone', onZone);
     level.events.on('bossBanner', onBoss);
     level.events.on('combo', onCombo);
+    level.events.on('coinPulse', onCoin);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       level.events.off('zone', onZone);
       level.events.off('bossBanner', onBoss);
       level.events.off('combo', onCombo);
+      level.events.off('coinPulse', onCoin);
     });
   }
 
@@ -213,10 +233,49 @@ export class HudScene extends Phaser.Scene {
 
     // Hearts: at least 3 slots; lost ones at 20% opacity.
     const slots = Math.max(HEARTS.start, run.hearts);
+    if (this.prevHearts >= 0 && run.hearts !== this.prevHearts) {
+      if (run.hearts > this.prevHearts) this.heartBounce[run.hearts - 1] = 1;
+      else
+        for (let i = run.hearts; i < this.prevHearts; i++) {
+          // Shatter the lost heart into pieces.
+          const h = this.hearts[i];
+          for (let k = 0; k < 6; k++) {
+            const img = this.add.image(h.x, h.y, 'heartPiece').setDepth(12).setRotation(k);
+            this.pieces.push({ img, vx: (Math.random() - 0.5) * 5, vy: -2 - Math.random() * 3, life: 40 });
+          }
+          this.heartBounce[i] = -1;
+        }
+    }
+    this.prevHearts = run.hearts;
     this.hearts.forEach((h, i) => {
       h.setVisible(i < slots);
       h.setTexture(i < run.hearts ? 'heart' : 'heartEmpty').setAlpha(i < run.hearts ? 1 : 0.2);
+      const b = this.heartBounce[i];
+      if (b > 0) {
+        h.setScale(1 + Math.sin(b * Math.PI) * 0.6);
+        this.heartBounce[i] = Math.max(0, b - 0.06 * f);
+      } else if (b < 0) {
+        h.setScale(0.6);
+        this.heartBounce[i] = Math.min(0, b + 0.04 * f);
+      } else h.setScale(1);
     });
+    for (let i = this.pieces.length - 1; i >= 0; i--) {
+      const pc = this.pieces[i];
+      pc.vy += 0.3 * f;
+      pc.img.x += pc.vx * f;
+      pc.img.y += pc.vy * f;
+      pc.img.rotation += 0.2 * f;
+      pc.life -= f;
+      pc.img.setAlpha(Math.max(0, pc.life / 40));
+      if (pc.life <= 0) {
+        pc.img.destroy();
+        this.pieces.splice(i, 1);
+      }
+    }
+    if (this.coinPulse > 0) {
+      this.coinIcon.setScale(0.8 + this.coinPulse * 0.5);
+      this.coinPulse = Math.max(0, this.coinPulse - 0.1 * f);
+    }
     let px = 70;
     for (const p of this.powers) {
       const left = run.power[p.id];
@@ -238,7 +297,10 @@ export class HudScene extends Phaser.Scene {
     this.zone.setText(run.zoneKey ? t(run.zoneKey as StringKey).toUpperCase() : '');
     this.progHead.x = this.barX + run.progress * 300;
     this.coins.setText(`x${run.coins}`);
-    this.score.setText(padScore(run.score));
+    // Score rolls up instead of jumping.
+    if (this.shownScore > run.score) this.shownScore = run.score;
+    this.shownScore += Math.ceil((run.score - this.shownScore) * Math.min(1, 0.18 * f));
+    this.score.setText(padScore(this.shownScore));
     if (LEVELS[run.level].officeClock) {
       this.timeText.setText(formatClock(run.clock));
       this.timeText.setColor(run.clock >= OFFICE.clockRedMin ? '#FF5C5C' : '#BDB5E0');

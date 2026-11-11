@@ -22,6 +22,10 @@ export interface GameEvents {
   levelReady: { level: LevelId };
   /** Full-screen jumpscare: a face image (data URL) and a caption. */
   jumpscare: { image: string; text: string };
+  /** Meme-style reaction sticker. */
+  sticker: { text: string };
+  /** A boss fight began (starts the shareable clip recording). */
+  bossStart: { level: LevelId };
 }
 
 type Handler<T> = (payload: T) => void;
