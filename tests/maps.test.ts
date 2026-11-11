@@ -86,3 +86,21 @@ describe('Level 3 map: Lunch Break', () => {
       expect(STRINGS).toHaveProperty(String(o.props.hurt));
   });
 });
+
+describe('Level 4 map: Deadline Night', () => {
+  const m = load(4);
+  it('has 7 translated sections, the Prod Bug boss and a deploy finish', () => {
+    const secs = objectsOf(m, 'section');
+    expect(secs).toHaveLength(7);
+    for (const s of secs) expect(STRINGS).toHaveProperty(String(s.props.key));
+    expect(objectsOf(m, 'prodBug')).toHaveLength(1);
+    expect(objectsOf(m, 'finish')).toHaveLength(1);
+  });
+  it('has a bug swarm with flying bugs, a power-cut zone and server hazards', () => {
+    expect(objectsOf(m, 'bug').length).toBeGreaterThanOrEqual(6);
+    expect(objectsOf(m, 'invite').filter((o) => o.props.kind === 'flybug').length).toBeGreaterThanOrEqual(3);
+    expect(num(objectsOf(m, 'dark')[0], 'cycle')).toBeGreaterThan(0);
+    expect(objectsOf(m, 'laser').length).toBeGreaterThanOrEqual(2);
+    expect(objectsOf(m, 'updraft')).toHaveLength(1);
+  });
+});

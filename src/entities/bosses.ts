@@ -1,9 +1,9 @@
 /** Bosses: Monkey mini-boss (Level 1) and the Manager (Level 2). PRD sections 6 and 7. */
 import Phaser from 'phaser';
-import { MANAGER, MONKEY, SCORE, FX } from '../config/game';
+import { MANAGER, MONKEY, PROD_BUG, SCORE, FX } from '../config/game';
 import { t, type StringKey } from '../i18n/strings';
 import { sfx } from '../audio/sfx';
-import { Enemy } from './enemies';
+import { Enemy, Bug } from './enemies';
 import { Projectile, RingWave } from './hazards';
 import type { LevelScene } from '../scenes/LevelScene';
 
@@ -412,5 +412,181 @@ export class Manager extends Enemy {
       this.laptop.setScale(carried ? 0.8 : 1 + Math.sin(this.t * 0.15) * 0.04);
     }
     if (this.leaving > 0) s.setAlpha(Math.min(1, this.leaving / 60));
+  }
+}
+
+/**
+ * Giant Prod Bug (Level 4): walks after you across the war room and hops.
+ * Phase 1 spawns mini bugs, phase 2 adds "500" error arcs, phase 3 adds a stack-overflow rain.
+ * Stomp it 3 times.
+ */
+export class GiantBug extends Enemy {
+  hurtKey: StringKey = 'bugHit';
+  boss = true;
+  hp: number = PROD_BUG.hp;
+  active = false;
+  defeated = false;
+  private vy = 0;
+  private floorY: number;
+  private hopIn = 120;
+  private spawnIn = 90;
+  private errorIn = 60;
+  private rainIn = 30;
+  private inv = 0;
+  private dir = -1;
+  private gone = 0;
+  private minions: Bug[] = [];
+  /** Shell label drawn separately so it never mirrors when the bug turns around. */
+  private tag: Phaser.GameObjects.Text;
+
+  constructor(
+    L: LevelScene,
+    x: number,
+    y: number,
+    private min: number,
+    private max: number,
+  ) {
+    super(L, x, y, PROD_BUG.w, PROD_BUG.h, 'prodBug');
+    this.floorY = y + PROD_BUG.h;
+    this.tag = L.add
+      .text(0, 0, 'PROD', {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '9px',
+        color: '#FFFFFF',
+        stroke: '#14121F',
+        strokeThickness: 3,
+      })
+      .setOrigin(0.5)
+      .setDepth(21);
+  }
+
+  activeNear(): boolean {
+    return this.active || this.gone > 0;
+  }
+
+  get phaseKey(): StringKey {
+    return this.hp >= 3 ? 'prodP1' : this.hp === 2 ? 'prodP2' : 'prodP3';
+  }
+
+  step(): void {
+    this.t++;
+    const L = this.L;
+    if (this.defeated) {
+      // Shrinks away into a harmless little bug.
+      if (--this.gone <= 0) {
+        this.tag.destroy();
+        this.kill();
+      }
+      return;
+    }
+    if (this.inv > 0) this.inv--;
+    const p = L.player;
+    const dx = p.cx - this.cx;
+    this.dir = dx > 0 ? 1 : -1;
+    if (Math.abs(dx) > 40) this.x += this.dir * PROD_BUG.speed[Math.max(0, this.hp - 1)] * L.mood.enemySpeed;
+    this.x = Phaser.Math.Clamp(this.x, this.min, this.max - this.w);
+    // Hop.
+    const onFloor = this.y + this.h >= this.floorY;
+    if (--this.hopIn <= 0 && onFloor) {
+      this.vy = PROD_BUG.hopVy;
+      this.hopIn = Phaser.Math.Between(PROD_BUG.hopMin, PROD_BUG.hopMax);
+    }
+    this.vy += PROD_BUG.gravity;
+    this.y += this.vy;
+    if (this.y + this.h > this.floorY) {
+      if (this.vy > 6) {
+        L.fx.addShake(5);
+        L.fx.dust(this.cx, this.floorY);
+      }
+      this.y = this.floorY - this.h;
+      this.vy = 0;
+    }
+    // Phase 1+: spawn mini bugs (capped).
+    this.minions = this.minions.filter((m) => m.alive);
+    if (--this.spawnIn <= 0) {
+      this.spawnIn = PROD_BUG.spawnEvery[Math.max(0, this.hp - 1)];
+      if (this.minions.length < PROD_BUG.maxMinions) {
+        const bug = new Bug(L, this.cx - 140, this.floorY - 28, this.min, this.max);
+        bug.x = this.cx - 18;
+        this.minions.push(bug);
+        L.addEnemy(bug);
+        L.fx.burst(this.cx, this.floorY - 20, 0x7c3aed, 10, { speed: 2 });
+      }
+    }
+    // Phase 2+: "500" error arcs at the player.
+    if (this.hp <= 2 && --this.errorIn <= 0) {
+      this.errorIn = PROD_BUG.errorEvery;
+      const T = PROD_BUG.errorFlight;
+      const sx = this.cx;
+      const sy = this.y + 10;
+      const vx = (p.cx - sx) / T;
+      const vy = (p.cy - sy - 0.5 * PROD_BUG.errorGravity * T * T) / T;
+      L.addHazard(
+        new Projectile(L, 'errorCode', sx - 22, sy, 40, 24, vx, vy, PROD_BUG.errorGravity, 'errorHit', {
+          spin: 0.05,
+        }),
+      );
+    }
+    // Phase 3: stack traces rain down.
+    if (this.hp <= 1 && --this.rainIn <= 0) {
+      this.rainIn = PROD_BUG.rainEvery;
+      const px = Phaser.Math.Between(this.min + 20, this.max - 40);
+      L.addHazard(new Projectile(L, 'stackTrace', px, -30, 18, 24, 0, 2.4, 0.06, 'stackHit', { wobble: 6 }));
+    }
+  }
+
+  onStomp(): void {
+    const L = this.L;
+    if (this.inv > 0 || this.defeated) return;
+    this.hp--;
+    this.inv = PROD_BUG.invuln;
+    L.addScore(SCORE.bossHit);
+    L.fx.popup(this.cx, this.y - 16, t('prodBugHit'), '#69DB7C', 12);
+    L.fx.burst(this.cx, this.y + 20, 0x40c057, 22);
+    L.fx.addShake(FX.shakeBoss);
+    sfx('bossHit');
+    this.x += (this.cx < L.player.cx ? -1 : 1) * 70;
+    this.x = Phaser.Math.Clamp(this.x, this.min, this.max - this.w);
+    this.vy = -7;
+    if (this.hp <= 0) {
+      this.defeated = true;
+      this.passive = true;
+      this.gone = 80;
+      L.addScore(SCORE.managerDefeat);
+      L.fx.popup(this.cx, this.y - 40, t('prodBugBye'), '#69DB7C', 14);
+      L.fx.burst(this.cx, this.y + 30, 0x40c057, 30, { speed: 5 });
+      for (const m of this.minions) if (m.alive) m.onMute();
+      sfx('monkeyGone');
+      L.onManagerDefeated();
+    } else {
+      L.fx.popup(this.cx, this.y - 40, t('prodBugRoar'), '#FF8787', 11);
+      sfx('manager');
+    }
+  }
+
+  onTouch(): void {
+    if (this.inv > 0 || this.defeated) return;
+    super.onTouch();
+  }
+
+  /** Headphones don't clear bosses. */
+  onMute(): void {}
+
+  draw(): void {
+    super.draw();
+    const s = this.sprite;
+    s.setFrame(Math.floor(this.t / 7) % 4);
+    s.setFlipX(this.dir < 0);
+    s.setAlpha(this.inv > 0 && Math.floor(this.inv / 4) % 2 === 1 ? 0.45 : 1);
+    // The shell is the back half of the sprite (behind the head).
+    const back = this.dir < 0 ? 1 : -1;
+    this.tag.setPosition(s.x + back * 4 * s.scaleX, s.y - 34 * s.scaleY).setAlpha(s.alpha);
+    if (this.defeated) {
+      const k = Math.max(0, this.gone / 80);
+      s.setScale(k)
+        .setAlpha(k)
+        .setRotation((1 - k) * 6);
+      this.tag.setAlpha(k).setScale(k);
+    }
   }
 }

@@ -814,6 +814,115 @@ const PAINTERS: Record<string, Painter> = {
     box(c, 7020, 160, 120, 40, '#14121F', 3, 4);
   },
 
+  // ---------------- Level 4: deadline night
+  z4_1(c, inp) {
+    nightWall(c, inp, '#1B1F3B', '#232850');
+    nightWindows(c, inp, 60, 220);
+    // Wall clock at 11:42.
+    circle(c, inp.x0 + 520, 270, 34, '#F8F9FA', 4);
+    limb(c, inp.x0 + 520, 270, inp.x0 + 520, 246, 3, '#14121F', 0);
+    limb(c, inp.x0 + 520, 270, inp.x0 + 540, 262, 3, '#14121F', 0);
+    box(c, inp.x0 + 760, 250, 180, 80, '#14121F', 3, 4);
+    text(c, 'SHIP IT', inp.x0 + 850, 278, 12, '#FFD43B', {});
+    text(c, 'TONIGHT 🌙', inp.x0 + 850, 306, 11, '#FFFFFF', { font: 'sans-serif' });
+  },
+  z4_2(c, inp) {
+    nightWall(c, inp, '#241B3B', '#2E2350');
+    // Whiteboard drowning in bug sticky notes.
+    box(c, inp.x0 + 200, 110, 420, 180, '#F8F9FA', 4, 6);
+    text(c, 'OPEN BUGS: 404', inp.x0 + 410, 140, 13, '#C92A2A', {});
+    const r = seeded(44);
+    for (let i = 0; i < 26; i++) {
+      const x = inp.x0 + 215 + r() * 380;
+      const y = 160 + r() * 110;
+      box(c, x, y, 26, 22, ['#FFD43B', '#F783AC', '#74C0FC', '#8CE99A'][i % 4], 2, 2);
+    }
+    // Tangled cables on the wall.
+    c.strokeStyle = '#14121F';
+    c.lineWidth = 4;
+    for (let i = 0; i < 4; i++) {
+      c.beginPath();
+      c.moveTo(inp.x0 + 700 + i * 40, 60);
+      c.bezierCurveTo(inp.x0 + 760 + i * 30, 200, inp.x0 + 640, 260, inp.x0 + 820 + i * 50, 440);
+      c.stroke();
+    }
+  },
+  z4_cp(c, inp) {
+    nightWall(c, inp, '#1B2B3B', '#223850');
+    // Glowing chai vending machine.
+    const x = inp.x0 + 60;
+    const g = c.createRadialGradient(x + 70, 330, 10, x + 70, 330, 170);
+    g.addColorStop(0, 'rgba(255,212,59,0.35)');
+    g.addColorStop(1, 'rgba(255,212,59,0)');
+    c.fillStyle = g;
+    c.fillRect(x - 100, 160, 340, 300);
+    box(c, x, 220, 140, 240, '#C92A2A', 4, 8);
+    box(c, x + 14, 236, 112, 80, '#FFF3BF', 3, 4);
+    text(c, 'CHAI', x + 70, 262, 14, '#C92A2A', {});
+    text(c, '24x7', x + 70, 292, 10, '#14121F', {});
+    box(c, x + 40, 360, 60, 50, '#212529', 3, 4);
+    limb(c, inp.x0 + 300, 300, inp.x0 + 300, 460, 5, '#DEE2E6', 2.5);
+    circle(c, inp.x0 + 300, 298, 5, '#FFD43B', 2);
+  },
+  z4_3(c, inp) {
+    nightWall(c, inp, '#15182B', '#1C2038');
+    nightWindows(c, inp, 160, 180);
+    // Green emergency exit signs + a sparking fuse box.
+    for (const x of [inp.x0 + 120, inp.x0 + inp.w - 200]) {
+      box(c, x, 70, 110, 34, '#2F9E44', 3, 4);
+      text(c, 'EXIT 🏃', x + 55, 87, 10, '#FFFFFF', { font: 'sans-serif' });
+    }
+    box(c, inp.x0 + 560, 160, 90, 120, '#495057', 4, 4);
+    poly(c, [inp.x0 + 600, 170, inp.x0 + 590, 200, inp.x0 + 608, 200, inp.x0 + 596, 232], '#FFD43B', 2);
+    text(c, '⚡ DANGER', inp.x0 + 605, 260, 9, '#FFD43B', { font: 'sans-serif' });
+  },
+  z4_4(c, inp) {
+    c.fillStyle = '#0B0D17';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    for (let x = inp.x0 + 10; x < inp.x0 + inp.w; x += 90) {
+      box(c, x, 140, 70, 320, '#1F2433', 3, 3);
+      for (let y = 152; y < 450; y += 22) {
+        c.fillStyle = '#2B3245';
+        c.fillRect(x + 6, y, 58, 16);
+        c.fillStyle = (x + y) % 3 === 0 ? '#FF2D55' : '#40C057';
+        c.fillRect(x + 50, y + 5, 5, 5);
+      }
+    }
+    // Overheat warning.
+    box(c, inp.x0 + 380, 60, 300, 56, '#FF2D55', 4, 6);
+    text(c, '🔥 CPU 99% 🔥', inp.x0 + 530, 88, 14, '#FFFFFF', { font: 'sans-serif' });
+  },
+  z4_boss(c, inp) {
+    c.fillStyle = '#2A0B12';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    // Red alert stripes.
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 80) {
+      c.fillStyle = 'rgba(255,45,85,0.12)';
+      c.fillRect(x, 0, 40, 460);
+    }
+    // Giant dashboard screen.
+    box(c, inp.x0 + 240, 70, 520, 220, '#14121F', 6, 8);
+    c.fillStyle = '#1A0006';
+    c.fillRect(inp.x0 + 256, 86, 488, 188);
+    text(c, 'PROD DOWN 🔥', inp.x0 + 500, 130, 24, '#FF2D55', { font: 'sans-serif' });
+    text(c, 'HTTP 500 · 500 · 500', inp.x0 + 500, 180, 14, '#FF8787', {});
+    c.strokeStyle = '#FF2D55';
+    c.lineWidth = 4;
+    c.beginPath();
+    c.moveTo(inp.x0 + 270, 250);
+    c.lineTo(inp.x0 + 400, 240);
+    c.lineTo(inp.x0 + 470, 210);
+    c.lineTo(inp.x0 + 560, 255);
+    c.lineTo(inp.x0 + 720, 262);
+    c.stroke();
+  },
+  z4_fin(c, inp) {
+    nightWall(c, inp, '#0E2A1B', '#16402A');
+    box(c, inp.x0 + 30, 120, 260, 120, '#14121F', 5, 8);
+    text(c, '$ npm run deploy', inp.x0 + 160, 160, 11, '#40C057', {});
+    text(c, '▌', inp.x0 + 160, 200, 14, '#40C057', {});
+  },
+
   // ---------------- Level 3: lunch break
   z3_1(c, inp) {
     c.fillStyle = '#FFF3E0';
@@ -942,6 +1051,31 @@ const PAINTERS: Record<string, Painter> = {
     box(c, inp.x0 + 40, 160, 160, 40, '#14121F', 3, 4);
   },
 };
+
+/** Night office wall with vertical panels. */
+function nightWall(c: Ctx, inp: BackdropInput, a: string, b: string): void {
+  c.fillStyle = a;
+  c.fillRect(inp.x0, 0, inp.w, 460);
+  c.fillStyle = b;
+  for (let x = inp.x0; x < inp.x0 + inp.w; x += 70) c.fillRect(x, 0, 35, 460);
+}
+
+/** Big windows onto the night city, with a moon. */
+function nightWindows(c: Ctx, inp: BackdropInput, top: number, h: number): void {
+  const r = seeded(inp.x0);
+  for (let x = inp.x0 + 20; x < inp.x0 + inp.w - 200; x += 420) {
+    box(c, x, top, 200, h, '#0B1026', 4, 3);
+    for (let b = 0; b < 6; b++) {
+      const bh = 30 + r() * (h - 50);
+      c.fillStyle = '#1E2547';
+      c.fillRect(x + 8 + b * 32, top + h - bh, 26, bh - 4);
+      c.fillStyle = '#FFE8A3';
+      for (let y = top + h - bh + 6; y < top + h - 10; y += 12)
+        if (r() > 0.55) c.fillRect(x + 12 + b * 32, y, 5, 6);
+    }
+  }
+  circle(c, inp.x0 + 90, top + 40, 18, '#FFF9DB', 0);
+}
 
 /** Distant city skyline strip, tileable horizontally (parallax layer 4). */
 export function paintSkyline(w = 960, h = 260): HTMLCanvasElement {

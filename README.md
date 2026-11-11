@@ -1,7 +1,7 @@
 # Super Cipher: Office Run
 
 A free, browser-based retro 2D platformer about Indian office life, by [@cipherboy.dev](https://www.instagram.com/cipherboy.dev/).
-It's 9:12 AM, the meeting is at 9:30: run from your 1RK flat to the metro (Level 1), from the office lobby to the biometric machine (Level 2), then survive the lunch rush and the Canteen Aunty to get back to your desk by 1:30 (Level 3).
+It's 9:12 AM, the meeting is at 9:30: run from your 1RK flat to the metro (Level 1), from the office lobby to the biometric machine (Level 2), then survive the lunch rush and the Canteen Aunty to get back to your desk by 1:30 (Level 3), then fight a bug swarm and the Giant Prod Bug to deploy before midnight (Level 4).
 
 Built with Phaser 3 + TypeScript + Vite. See [PRD.md](PRD.md) for the full spec.
 

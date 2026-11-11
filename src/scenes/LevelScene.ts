@@ -42,7 +42,7 @@ import { clearBonus, starsFor, heartsAfterCoin, formatClock } from '../systems/s
 import { Fx, FONT } from '../systems/fx';
 import { Player } from '../entities/Player';
 import { Enemy, Bug, Dog, Invite, Coworker } from '../entities/enemies';
-import { Monkey, Manager, AUNTY_STYLE } from '../entities/bosses';
+import { Monkey, Manager, GiantBug, AUNTY_STYLE } from '../entities/bosses';
 import { Bus, FallingBrick, Laser, Projectile, type Hazard } from '../entities/hazards';
 import {
   Coin,
@@ -129,6 +129,7 @@ export class LevelScene extends Phaser.Scene {
   private gateGfx: Phaser.GameObjects.Container | null = null;
   private signal: Phaser.GameObjects.Arc | null = null;
   private monkey: Monkey | null = null;
+  private prodBug: GiantBug | null = null;
   private doors: { l: Phaser.GameObjects.Image; r: Phaser.GameObjects.Image; x: number } | null = null;
   private cowSolid: Solid | null = null;
   private cowNear = false;
@@ -214,6 +215,7 @@ export class LevelScene extends Phaser.Scene {
     this.gateGfx = null;
     this.signal = null;
     this.monkey = null;
+    this.prodBug = null;
     this.doors = null;
     this.cowSolid = null;
     this.manager = null;
@@ -641,10 +643,23 @@ export class LevelScene extends Phaser.Scene {
           );
           break;
         case 'invite':
-          this.enemies.push(new Invite(this, o.x, o.y, num(o, 'speed', 1.6)));
+          this.enemies.push(
+            new Invite(
+              this,
+              o.x,
+              o.y,
+              num(o, 'speed', 1.6),
+              'meetingHit',
+              str(o, 'kind') === 'flybug' ? 'flybug' : 'invite',
+            ),
+          );
           break;
         case 'coworker':
-          this.enemies.push(new Coworker(this, o.x, o.y));
+          this.enemies.push(new Coworker(this, o.x, o.y, (str(o, 'line') || 'coworkerAsk') as StringKey));
+          break;
+        case 'prodBug':
+          this.prodBug = new GiantBug(this, o.x, o.y, num(o, 'min', o.x - 400), num(o, 'max', o.x + 400));
+          this.enemies.push(this.prodBug);
           break;
         case 'monkey':
           this.monkey = new Monkey(this, o.x, o.y, o.x, o.x + o.w);
@@ -717,7 +732,7 @@ export class LevelScene extends Phaser.Scene {
     const fin = (z.finish ?? [])[0];
     if (fin && LEVELS[this.run.level].finish === 'punch') {
       const img = this.add
-        .image(fin.x + fin.w / 2, fin.y + fin.h, 'biometric')
+        .image(fin.x + fin.w / 2, fin.y + fin.h, LEVELS[this.run.level].punch?.tex ?? 'biometric')
         .setOrigin(0.5, 1)
         .setDepth(3);
       const lock = this.add.image(fin.x + fin.w / 2, fin.y - 20, 'padlock').setDepth(4);
@@ -803,6 +818,11 @@ export class LevelScene extends Phaser.Scene {
   hitsSolid(r: Rect): boolean {
     for (const s of this.solids) if (s.active && overlaps(r, s)) return true;
     return false;
+  }
+
+  /** Add an enemy mid-level (e.g. bugs spawned by the Prod Bug). */
+  addEnemy(e: Enemy): void {
+    this.enemies.push(e);
   }
 
   addHazard(h: Hazard): void {
@@ -1138,6 +1158,8 @@ export class LevelScene extends Phaser.Scene {
         max: 3,
         phase: this.manager.phaseKey,
       };
+    else if (this.prodBug && this.prodBug.active && !this.prodBug.defeated)
+      r.boss = { name: 'prodBugName', hp: this.prodBug.hp, max: 3, phase: this.prodBug.phaseKey };
     else r.boss = null;
   }
 
@@ -1329,6 +1351,13 @@ export class LevelScene extends Phaser.Scene {
         if (this.once('scareMonkey')) this.jumpscare('monkey', 0, 'scareMonkey');
         else sfx('ook');
       }
+      if (this.prodBug && !this.prodBug.active && p.cx > arena.x) {
+        this.prodBug.active = true;
+        this.events.emit('bossBanner', 'bossProdBug');
+        events.emit('bossStart', { level: r.level });
+        if (this.once('scareProdBug')) this.jumpscare('prodBug', 0, 'scareProdBug');
+        this.fx.popup(this.prodBug.cx, this.prodBug.y - 30, t('prodBugRoar'), '#FF8787', 12);
+      }
       if (this.manager && !this.manager.active && p.cx > arena.x) {
         this.manager.active = true;
         const aunty = this.manager.style === AUNTY_STYLE;
@@ -1379,8 +1408,20 @@ export class LevelScene extends Phaser.Scene {
 
     // ---------------- Jumpscare deep inside the dark server room
     const dark = (z.dark ?? [])[0];
-    if (dark && this.state === 'play' && p.cx > dark.x + 360 && this.once('scareBug'))
+    if (dark && !num(dark, 'cycle') && this.state === 'play' && p.cx > dark.x + 360 && this.once('scareBug'))
       this.jumpscare('bug', 0, 'scareBug');
+
+    // ---------------- Power cuts: darkness that cycles on and off
+    for (const d of z.dark ?? []) {
+      const cycle = num(d, 'cycle');
+      if (!cycle || p.cx < d.x || p.cx > d.x + d.w || this.state !== 'play') continue;
+      const phase = this.frame % (cycle * 2);
+      if (phase === cycle) {
+        this.fx.popup(p.cx, b.y - 30, t('powerCut'), '#FFD43B', 13);
+        this.fx.addShake(4);
+        sfx('thud');
+      } else if (phase === 0) this.fx.popup(p.cx, b.y - 30, t('powerBack'), '#69DB7C', 11);
+    }
 
     // ---------------- Level 2: office clock
     const clk = LEVELS[r.level].clock;
@@ -1390,7 +1431,7 @@ export class LevelScene extends Phaser.Scene {
         r.hearts--;
         r.clock = clk.reset;
         sfx('late');
-        this.fx.popup(p.cx, b.y - 24, t(r.level === 3 ? 'lunchOver' : 'late'), '#FF5C5C', 14);
+        this.fx.popup(p.cx, b.y - 24, t(clk.lateKey), '#FF5C5C', 14);
         this.fx.addShake(FX.shakeHit);
         if (r.hearts <= 0) this.gameOver();
       }
@@ -1483,7 +1524,13 @@ export class LevelScene extends Phaser.Scene {
       if (finish === 'punch' && this.biometric && overlaps(b, fin)) {
         if (this.biometric.unlocked) this.startFinish();
         else if (this.frame % 60 === 0)
-          this.fx.popup(fin.x + fin.w / 2, fin.y - 30, t('bioLocked'), '#FF8787', 9);
+          this.fx.popup(
+            fin.x + fin.w / 2,
+            fin.y - 30,
+            t(LEVELS[r.level].punch?.lockedKey ?? 'bioLocked'),
+            '#FF8787',
+            9,
+          );
       }
     }
     if (this.state === 'finishing') this.stepFinish();
@@ -1497,7 +1544,13 @@ export class LevelScene extends Phaser.Scene {
       this.scanFrames = 60;
       this.player.body.vx = 0;
       sfx('scan');
-      this.fx.popup(this.player.cx, this.player.body.y - 30, t('scanning'), '#22D3EE', 10);
+      this.fx.popup(
+        this.player.cx,
+        this.player.body.y - 30,
+        t(LEVELS[r.level].punch?.scanKey ?? 'scanning'),
+        '#22D3EE',
+        10,
+      );
     }
   }
 
@@ -1507,7 +1560,13 @@ export class LevelScene extends Phaser.Scene {
     if (LEVELS[r.level].finish === 'punch' && this.scanFrames > 0) {
       this.scanFrames--;
       if (this.scanFrames === 0) {
-        this.fx.popup(p.cx, p.body.y - 40, t('present', { time: formatClock(r.clock) }), '#69DB7C', 13);
+        this.fx.popup(
+          p.cx,
+          p.body.y - 40,
+          t(LEVELS[r.level].punch?.doneKey ?? 'present', { time: formatClock(r.clock) }),
+          '#69DB7C',
+          13,
+        );
         sfx('victory');
       }
       return;
@@ -1744,7 +1803,11 @@ export class LevelScene extends Phaser.Scene {
     if (!this.darkness || !this.leds) return;
     const p = this.player;
     const dark = (this.zones.dark ?? []).find((o) => p.cx > o.x - 60 && p.cx < o.x + o.w + 60);
-    this.darkness.setVisible(!!dark && this.mode === 'play');
+    // Power-cut zones go dark for half of each cycle, with a flicker warning first.
+    const cycle = dark ? num(dark, 'cycle') : 0;
+    const phase = cycle ? this.frame % (cycle * 2) : 0;
+    const lightsOut = !cycle || phase >= cycle || (phase >= cycle - 45 && Math.floor(phase / 4) % 2 === 0);
+    this.darkness.setVisible(!!dark && lightsOut && this.mode === 'play');
     this.leds.clear();
     if (!dark) return;
     const edge = Math.min(p.cx - dark.x, dark.x + dark.w - p.cx);

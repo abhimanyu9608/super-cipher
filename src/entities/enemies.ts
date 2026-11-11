@@ -205,10 +205,12 @@ export class Invite extends Enemy {
     y: number,
     private speed: number,
     hurtKey: StringKey = 'meetingHit',
+    /** 'invite' (meeting email) or 'flybug' (flying bug). */
+    private kind: 'invite' | 'flybug' = 'invite',
   ) {
-    super(L, x - 22, y - 15, 42, 28, 'invite');
+    super(L, x - 22, y - 15, 42, 28, kind);
     this.y0 = this.y;
-    this.hurtKey = hurtKey;
+    this.hurtKey = kind === 'flybug' ? 'bugHit' : hurtKey;
   }
 
   activeNear(px: number): boolean {
@@ -227,10 +229,11 @@ export class Invite extends Enemy {
 
   onStomp(): void {
     const L = this.L;
-    L.addScore(SCORE.invite);
-    L.fx.popup(this.cx, this.y - 6, t('meetingDeclined'), '#4DABF7');
-    L.fx.burst(this.cx, this.y + 14, 0xffffff, 14);
-    L.fx.corpse('inviteTorn', this.cx, this.y + this.h, false, true);
+    const bug = this.kind === 'flybug';
+    L.addScore(bug ? SCORE.bug * L.mood.bugScore : SCORE.invite);
+    L.fx.popup(this.cx, this.y - 6, bug ? t('bugFixed') : t('meetingDeclined'), bug ? '#69DB7C' : '#4DABF7');
+    L.fx.burst(this.cx, this.y + 14, bug ? 0x40c057 : 0xffffff, 14);
+    L.fx.corpse(bug ? 'bugSquash' : 'inviteTorn', this.cx, this.y + this.h, false, true);
     sfx('stomp');
     this.kill();
   }
@@ -238,6 +241,7 @@ export class Invite extends Enemy {
   draw(): void {
     this.sprite.setPosition(this.x + this.w / 2, this.y + this.h);
     this.sprite.setRotation(Math.sin(this.t * ENEMY.inviteWaveSpeed + Math.PI / 2) * 0.18);
+    if (this.kind === 'flybug') this.sprite.setFrame(Math.floor(this.t / 4) % 2).setFlipX(true);
   }
 }
 
@@ -246,7 +250,12 @@ export class Coworker extends Enemy {
   private cooldown = 0;
   private leaving = 0;
 
-  constructor(L: LevelScene, x: number, y: number) {
+  constructor(
+    L: LevelScene,
+    x: number,
+    y: number,
+    private line: StringKey = 'coworkerAsk',
+  ) {
     super(L, x, y, 36, 60, 'coworker');
   }
 
@@ -267,7 +276,7 @@ export class Coworker extends Enemy {
     const L = this.L;
     L.player.grabbed = OFFICE.grabFrames;
     this.cooldown = OFFICE.grabFrames + 30;
-    L.fx.popup(this.cx, this.y - 16, t('coworkerAsk'), '#FFFFFF', 10);
+    L.fx.popup(this.cx, this.y - 16, t(this.line), '#FFFFFF', 10);
     sfx('coworker');
   }
 

@@ -17,10 +17,11 @@ describe('level definitions', () => {
     }
   });
 
-  it('chains levels 1 → 2 → 3 and unlocks in order', () => {
+  it('chains levels 1 → 2 → 3 → 4 and unlocks in order', () => {
     expect(nextLevel(1)).toBe(2);
     expect(nextLevel(2)).toBe(3);
-    expect(nextLevel(3)).toBeNull();
+    expect(nextLevel(3)).toBe(4);
+    expect(nextLevel(4)).toBeNull();
     expect(isUnlocked(3, 2)).toBe(false);
     expect(isUnlocked(3, 3)).toBe(true);
   });

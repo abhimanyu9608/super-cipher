@@ -150,11 +150,26 @@ export class Ambient {
         ['z3_cp', 1],
         ['z3_3', 2],
         ['z3_4', 1],
+        ['z4_1', 1],
       ] as const) {
         const s = sec(key);
         if (s) for (let i = 0; i < n; i++) this.addWalker(s.x0 + 40, s.x1 - 40, i + 3);
       }
       // Flickering ceiling lights in the open office.
+      // Night office: a few desk lamps that flicker more nervously.
+      for (const key of ['z4_1', 'z4_2']) {
+        const sec4 = sec(key);
+        if (!sec4) continue;
+        for (let x = sec4.x0 + 200; x < sec4.x1; x += 340) {
+          const img = L.add
+            .image(x, 150, 'glow')
+            .setScale(1.2)
+            .setDepth(-44)
+            .setBlendMode(Phaser.BlendModes.ADD)
+            .setTint(0x9bd1ff);
+          this.flickers.push({ img, base: 0.4, t: Math.floor(Math.random() * 200) });
+        }
+      }
       // Cafeteria hanging lamps glow warmly.
       const cafe = sec('z3_1');
       if (cafe)

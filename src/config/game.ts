@@ -90,6 +90,26 @@ export const OFFICE = {
   lightRadius: 180,
 } as const;
 
+/** Level 4 boss: the Giant Prod Bug roams the war room floor. */
+export const PROD_BUG = {
+  w: 110,
+  h: 80,
+  hp: 3,
+  /** Walk speed by HP (index = hp - 1): faster as it gets angrier. */
+  speed: [2.4, 1.8, 1.3] as readonly number[],
+  hopMin: 100,
+  hopMax: 160,
+  hopVy: -11,
+  gravity: 0.62,
+  spawnEvery: [150, 175, 200] as readonly number[],
+  errorEvery: 95,
+  errorGravity: 0.35,
+  errorFlight: 55,
+  rainEvery: 45,
+  invuln: 70,
+  maxMinions: 4,
+} as const;
+
 export const MANAGER = {
   hp: 3,
   w: 120,

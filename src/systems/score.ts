@@ -44,6 +44,6 @@ export function formatTime(frames: number): string {
 
 /** 9:12 style clock from minutes since midnight. */
 export const formatClock = (minutes: number): string =>
-  `${Math.floor(minutes / 60)}:${String(Math.floor(minutes) % 60).padStart(2, '0')}`;
+  `${Math.floor(minutes / 60) % 24}:${String(Math.floor(minutes) % 60).padStart(2, '0')}`;
 
 export const padScore = (n: number): string => String(Math.max(0, Math.floor(n))).padStart(6, '0');

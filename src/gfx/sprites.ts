@@ -956,6 +956,102 @@ def('plateStack', 60, 120, (c) => {
   for (let i = 0; i < 9; i++) ellipse(c, 30, 112 - i * 12, 26, 6, i % 2 ? '#F1F3F5' : '#FFFFFF', 2.5);
 });
 
+// ------------------------------------------------------------------ Level 4: deadline night
+def(
+  'prodBug',
+  124,
+  92,
+  (c, f) => {
+    // Giant angry production bug: 6 stomping legs, cracked shell, fire on its back.
+    const lp = [5, 0, -5, 0][f];
+    c.translate(0, [0, -2, 0, -2][f]);
+    c.strokeStyle = OUTLINE;
+    c.lineCap = 'round';
+    for (let i = 0; i < 3; i++) {
+      const x = 34 + i * 24;
+      limb(c, x, 66, x + (i % 2 === 0 ? lp : -lp) - 8, 88, 7, '#2B2235', 2.5);
+    }
+    ellipse(c, 60, 52, 46, 30, '#C92A2A', 4);
+    c.fillStyle = '#FF6B6B';
+    c.beginPath();
+    c.ellipse(52, 40, 22, 10, -0.3, 0, Math.PI * 2);
+    c.fill();
+    // Shell split + crack.
+    c.strokeStyle = OUTLINE;
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(60, 24);
+    c.lineTo(60, 80);
+    c.moveTo(36, 44);
+    c.lineTo(44, 52);
+    c.lineTo(38, 60);
+    c.stroke();
+    // Flames.
+    for (let i = 0; i < 3; i++) {
+      const fx = 42 + i * 18;
+      const h = 14 + ((f + i) % 2) * 6;
+      poly(c, [fx - 7, 26, fx, 26 - h, fx + 7, 26], i % 2 ? '#FFD43B' : '#FF922B', 2);
+    }
+    // Head.
+    circle(c, 102, 50, 18, '#862E2E', 4);
+    circle(c, 98, 44, 6, '#FFFFFF', 2);
+    circle(c, 110, 44, 6, '#FFFFFF', 2);
+    c.fillStyle = OUTLINE;
+    c.fillRect(99, 44, 3, 3);
+    c.fillRect(111, 44, 3, 3);
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(92, 36);
+    c.lineTo(102, 40);
+    c.moveTo(118, 36);
+    c.lineTo(108, 40);
+    c.stroke();
+    // Fangs.
+    poly(c, [100, 60, 104, 70, 106, 60], '#FFFFFF', 2);
+    // Antennae.
+    c.beginPath();
+    c.moveTo(98, 34);
+    c.lineTo(92, 16 + (f % 2) * 4);
+    c.moveTo(108, 34);
+    c.lineTo(116, 16 + ((f + 1) % 2) * 4);
+    c.stroke();
+  },
+  4,
+);
+def(
+  'flybug',
+  42,
+  32,
+  (c, f) => {
+    // Flying bug: wings flap between frames.
+    const up = f === 0;
+    ellipse(c, 14, up ? 8 : 16, 10, 6, 'rgba(220,240,255,0.85)', 2, up ? -0.5 : 0.3);
+    ellipse(c, 26, up ? 8 : 16, 10, 6, 'rgba(220,240,255,0.85)', 2, up ? 0.5 : -0.3);
+    ellipse(c, 20, 20, 12, 8, '#7C3AED', 3);
+    circle(c, 33, 19, 6, '#22C55E', 2.5);
+    circle(c, 35, 17, 2, '#FFFFFF', 1);
+  },
+  2,
+);
+def('errorCode', 46, 28, (c) => {
+  box(c, 2, 2, 42, 24, '#FF2D55', 3, 4);
+  text(c, '500', 23, 15, 11, '#FFFFFF', { stroke: 3 });
+});
+def('stackTrace', 22, 28, (c) => {
+  box(c, 2, 2, 18, 24, '#F8F9FA', 2.5, 1);
+  c.fillStyle = '#FF2D55';
+  for (const y of [7, 11, 15, 19]) c.fillRect(5, y, y % 8 === 3 ? 12 : 9, 2);
+});
+def('deployButton', 64, 94, (c) => {
+  box(c, 14, 40, 36, 52, '#495057', 3, 4);
+  box(c, 4, 30, 56, 14, '#343A40', 3, 4);
+  ellipse(c, 32, 26, 22, 12, '#C92A2A', 4);
+  ellipse(c, 32, 22, 22, 12, '#FF2D55', 4);
+  c.fillStyle = 'rgba(255,255,255,0.5)';
+  c.fillRect(20, 16, 10, 3);
+  text(c, 'DEPLOY', 32, 66, 7, '#FFD43B', { stroke: 2 });
+});
+
 // ------------------------------------------------------------------ ambient life
 def(
   'bird',
