@@ -34,7 +34,7 @@ Paste the player's ID (`CB-XXXXXX`), pick the level, press **Generate**, then **
 | `src/entities/`                 | Player, enemies, bosses, hazards, items, platforms                                             |
 | `src/systems/physics.ts`        | Pure platformer physics (unit tested)                                                          |
 | `src/gfx/`                      | Procedural art for every sprite, tile and backdrop                                             |
-| `src/audio/`                    | 8-bit synth + event → sound map and mixer                                                      |
+| `src/audio/`                    | 8-bit synth, event → sound map and mixer, boss voice lines (text-to-speech)                    |
 | `src/social/`                   | Story card renderer, Player ID + unlock codes                                                  |
 | `src/ui/`                       | HTML overlays, toolbar, touch controls, `#admin`                                               |
 

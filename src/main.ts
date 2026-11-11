@@ -12,6 +12,7 @@ import { initClip } from './ui/clip';
 import { initKeyboard } from './ui/input';
 import { bus } from './game/events';
 import { audio } from './audio/sfx';
+import { voice } from './audio/voice';
 
 async function loadFonts(): Promise<void> {
   if (!document.fonts) return;
@@ -43,6 +44,7 @@ async function boot(): Promise<void> {
   // Dev-only handle for debugging in the browser console (stripped from production builds).
   if (import.meta.env.DEV) (window as unknown as { __sc: unknown }).__sc = { game };
   audio.init(import.meta.env.BASE_URL);
+  voice.init();
   initKeyboard();
   const flow = new Flow(game);
   initShell(flow);

@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import { MANAGER, MONKEY, PROD_BUG, SCORE, FX } from '../config/game';
 import { t, type StringKey } from '../i18n/strings';
 import { sfx } from '../audio/sfx';
+import { voice, voiceFor } from '../audio/voice';
 import { Enemy, Bug } from './enemies';
 import { Projectile, RingWave } from './hazards';
 import type { LevelScene } from '../scenes/LevelScene';
@@ -95,7 +96,7 @@ export class Monkey extends Enemy {
     );
     if (Math.random() < 0.35) {
       L.fx.popup(this.cx, this.y - 10, t('ook'), '#FFD43B', 10);
-      sfx('ook');
+      voice.say('ook', 'monkey');
     }
   }
 
@@ -119,11 +120,11 @@ export class Monkey extends Enemy {
       this.vy = -10;
       L.addScore(SCORE.monkeyDefeat);
       L.fx.popup(this.cx, this.y - 30, t('monkeyGone'), '#FFD43B', 12);
-      sfx('monkeyGone');
+      voice.say('monkeyGone', 'monkey');
       L.dropIdCard(this.cx - 14, this.y + 10);
     } else {
       L.fx.popup(this.cx, this.y - 26, t('ook'), '#FFFFFF', 10);
-      sfx('ook');
+      voice.say('ook', 'monkey');
     }
   }
 
@@ -505,6 +506,7 @@ export class Manager extends Enemy {
     this.hp--;
     L.addScore(SCORE.bossHit);
     L.fx.popup(this.cx, this.tableY - 50, t(this.style.hitLine), '#FFD43B', 12);
+    voice.say(this.style.hitLine, voiceFor(this.style.body));
     L.fx.burst(this.cx, this.tableY - 15, 0xffd43b, 18);
     L.fx.addShake(FX.shakeBoss);
     sfx('bossHit');
@@ -514,7 +516,7 @@ export class Manager extends Enemy {
       this.leaving = 160;
       L.addScore(SCORE.managerDefeat);
       L.fx.popup(this.cx, this.y - 20, t(this.style.byeLine), '#FFFFFF', 11);
-      sfx('manager');
+      voice.say(this.style.byeLine, voiceFor(this.style.body));
       L.onManagerDefeated();
       this.laptop.destroy();
       return;
@@ -526,7 +528,7 @@ export class Manager extends Enemy {
     this.walkTo = this.cx < mid ? this.tableX1 - this.w - 10 : this.tableX0 + 10;
     const line: StringKey = this.style.phaseLines[this.hp === 2 ? 0 : 1];
     L.fx.popup(this.cx, this.y - 20, t(line), '#FF8787', 11);
-    sfx('manager');
+    voice.say(line, voiceFor(this.style.body));
   }
 
   /** Body sits behind the table: no contact damage, only his attacks hurt. */
@@ -691,11 +693,11 @@ export class GiantBug extends Enemy {
       L.fx.popup(this.cx, this.y - 40, t('prodBugBye'), '#69DB7C', 14);
       L.fx.burst(this.cx, this.y + 30, 0x40c057, 30, { speed: 5 });
       for (const m of this.minions) if (m.alive) m.onMute();
-      sfx('monkeyGone');
+      voice.say('prodBugBye', 'prodBug');
       L.onManagerDefeated();
     } else {
       L.fx.popup(this.cx, this.y - 40, t('prodBugRoar'), '#FF8787', 11);
-      sfx('manager');
+      voice.say('prodBugRoar', 'prodBug');
     }
   }
 

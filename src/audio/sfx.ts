@@ -87,6 +87,11 @@ const MAP: Record<SfxEvent, { ch: Channel; gen: string[] }> = {
   jumpscare: { ch: 'sfx', gen: ['jumpscare'] },
 };
 
+/** Silence any boss line being spoken by the browser's speech engine. */
+function stopSpeech(): void {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
 class AudioManager {
   private ctx: AudioContext | null = null;
   private master!: GainNode;
@@ -217,6 +222,27 @@ class AudioManager {
     if (m.ch === 'voice') this.duck(longest);
   }
 
+  /**
+   * Play an owner recording by manifest key (e.g. "voice-quickCall") on the voice channel.
+   * Returns false when no such file is loaded, so the caller can fall back.
+   */
+  playNamed(key: string): boolean {
+    const c = this.ensure();
+    const b = this.files.get(key);
+    if (!c || !b || !this.enabled || c.state !== 'running') return false;
+    const src = c.createBufferSource();
+    src.buffer = b;
+    src.connect(this.voiceGain);
+    src.start();
+    this.duck(b.duration);
+    return true;
+  }
+
+  /** Lower the music for a voice line that does not go through Web Audio (speech). */
+  duckFor(seconds: number): void {
+    this.duck(seconds);
+  }
+
   private duck(seconds: number): void {
     if (!this.ctx) return;
     const t = this.ctx.currentTime;
@@ -254,8 +280,10 @@ class AudioManager {
   /** Pause/resume everything (tab hidden, pause screen). */
   suspend(on: boolean): void {
     if (!this.ctx) return;
-    if (on) void this.ctx.suspend();
-    else void this.ctx.resume();
+    if (on) {
+      void this.ctx.suspend();
+      stopSpeech();
+    } else void this.ctx.resume();
   }
 
   /** Live mix of everything the game plays, for recording clips. Null before audio starts. */
@@ -272,6 +300,7 @@ class AudioManager {
   setEnabled(on: boolean): void {
     this.enabled = on;
     save(KEYS.sound, on ? 'on' : 'off');
+    if (!on) stopSpeech();
     if (this.ctx) this.master.gain.setTargetAtTime(on ? AUDIO_MIX.master : 0, this.ctx.currentTime, 0.02);
   }
 }

@@ -63,6 +63,7 @@ import { session, newRun, type RunState } from '../game/session';
 import { bus as events } from '../game/events';
 import { input, consumeJump, consumeDash } from '../ui/input';
 import { sfx, audio } from '../audio/sfx';
+import { voice, voiceFor } from '../audio/voice';
 import { moodFor, STICKERS, type Mood, type SkinId } from '../config/extras';
 import { Ambient } from '../systems/ambient';
 import { ensureCharacter } from '../gfx/sprites';
@@ -1430,7 +1431,7 @@ export class LevelScene extends Phaser.Scene {
         this.events.emit('bossBanner', 'bossMonkey');
         events.emit('bossStart', { level: r.level });
         if (this.once('scareMonkey')) this.jumpscare('monkey', 0, 'scareMonkey');
-        else sfx('ook');
+        voice.say('ook', 'monkey');
       }
       if (this.prodBug && !this.prodBug.active && p.cx > arena.x) {
         this.prodBug.active = true;
@@ -1438,6 +1439,7 @@ export class LevelScene extends Phaser.Scene {
         events.emit('bossStart', { level: r.level });
         if (this.once('scareProdBug')) this.jumpscare('prodBug', 0, 'scareProdBug');
         this.fx.popup(this.prodBug.cx, this.prodBug.y - 30, t('prodBugRoar'), '#FF8787', 12);
+        voice.say('prodBugRoar', 'prodBug');
       }
       if (this.manager && !this.manager.active && p.cx > arena.x) {
         this.manager.active = true;
@@ -1446,7 +1448,7 @@ export class LevelScene extends Phaser.Scene {
         events.emit('bossStart', { level: r.level });
         if (this.once('scareManager')) this.jumpscare(style.body, 1, style.scareKey);
         this.fx.popup(this.manager.cx, this.manager.y - 20, t(style.greetKey), '#FFFFFF', 12);
-        sfx('manager');
+        voice.say(style.greetKey, voiceFor(style.body));
       }
     }
     if (this.gate && this.gate.active && this.gateGfx) {
@@ -1593,8 +1595,9 @@ export class LevelScene extends Phaser.Scene {
     // ---------------- Finale: cameo lines + the RESIGN door
     for (const d of m.layers.decor ?? []) {
       if (d.type !== 'cameo' || Math.abs(p.cx - d.x) > 170 || !this.once(`cameo-${d.id}`)) continue;
-      this.fx.popup(d.x, this.map.groundY - 130, t(str(d, 'line', 'quickCall') as StringKey), '#FFFFFF', 10);
-      sfx('manager', { rate: 1.2 });
+      const line = str(d, 'line', 'quickCall') as StringKey;
+      this.fx.popup(d.x, this.map.groundY - 130, t(line), '#FFFFFF', 10);
+      voice.say(line, voiceFor(str(d, 'tex', 'manager')));
     }
     for (const o of z.resignDoor ?? []) {
       if (this.state !== 'play' || !overlaps(b, o) || this.frame - this.resignAt < 90) continue;
