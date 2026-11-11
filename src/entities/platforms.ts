@@ -7,7 +7,7 @@ import { makeSolid, pushOut, overlaps, type Solid } from '../systems/physics';
 import { sfx } from '../audio/sfx';
 import type { LevelScene } from '../scenes/LevelScene';
 
-export type MoverStyle = 'beam' | 'auto' | 'lift' | 'liftFull' | 'tray';
+export type MoverStyle = 'beam' | 'auto' | 'lift' | 'liftFull' | 'tray' | 'coach' | 'float';
 
 export class Mover {
   solid: Solid;
@@ -30,7 +30,7 @@ export class Mover {
     private pause: number,
     phase: number,
   ) {
-    this.solid = makeSolid({ x, y, w, h }, style === 'auto' ? 'solid' : 'oneway', {
+    this.solid = makeSolid({ x, y, w, h }, style === 'auto' || style === 'coach' ? 'solid' : 'oneway', {
       safe: false,
       tag: style,
     });
@@ -47,6 +47,8 @@ export class Mover {
         .setOrigin(0, 0)
         .setDepth(-5);
     else if (style === 'tray') this.sprite = L.add.image(0, 0, 'tray').setOrigin(0, 0).setDepth(6);
+    else if (style === 'coach') this.sprite = L.add.image(0, 0, 'coach').setOrigin(0, 0).setDepth(6);
+    else if (style === 'float') this.sprite = L.add.image(0, 0, 'floatie').setOrigin(0, 0).setDepth(6);
     else this.sprite = L.add.tileSprite(0, 0, w, h, 'stripe').setOrigin(0, 0).setDepth(6);
     if (style === 'liftFull') {
       this.solid.onStand = () => this.shove();
@@ -79,7 +81,7 @@ export class Mover {
     s.dx = dx;
     s.dy = dy;
     // The auto is a full solid: shove the player sideways if it drives into them.
-    if (this.style === 'auto') {
+    if (this.style === 'auto' || this.style === 'coach') {
       const p = this.L.player.body;
       if (p.ground !== s && overlaps(p, s)) pushOut(p, s);
     }
@@ -104,6 +106,9 @@ export class Mover {
   draw(): void {
     const s = this.solid;
     if (this.style === 'auto') this.sprite.setPosition(s.x - 2, s.y - 4);
+    else if (this.style === 'coach') this.sprite.setPosition(s.x - 4, s.y - 6);
+    else if (this.style === 'float')
+      this.sprite.setPosition(s.x - 4, s.y - 4).setRotation(Math.sin(this.L.frame * 0.05 + s.x) * 0.04);
     else if (this.style === 'lift' || this.style === 'liftFull') this.sprite.setPosition(s.x - 5, s.y - 100);
     else this.sprite.setPosition(s.x, s.y);
   }

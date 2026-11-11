@@ -206,11 +206,11 @@ export class Invite extends Enemy {
     private speed: number,
     hurtKey: StringKey = 'meetingHit',
     /** 'invite' (meeting email) or 'flybug' (flying bug). */
-    private kind: 'invite' | 'flybug' = 'invite',
+    private kind: 'invite' | 'flybug' | 'mosquito' = 'invite',
   ) {
     super(L, x - 22, y - 15, 42, 28, kind);
     this.y0 = this.y;
-    this.hurtKey = kind === 'flybug' ? 'bugHit' : hurtKey;
+    this.hurtKey = kind === 'flybug' ? 'bugHit' : kind === 'mosquito' ? 'mosquitoHit' : hurtKey;
   }
 
   activeNear(px: number): boolean {
@@ -229,9 +229,10 @@ export class Invite extends Enemy {
 
   onStomp(): void {
     const L = this.L;
-    const bug = this.kind === 'flybug';
+    const bug = this.kind !== 'invite';
     L.addScore(bug ? SCORE.bug * L.mood.bugScore : SCORE.invite);
-    L.fx.popup(this.cx, this.y - 6, bug ? t('bugFixed') : t('meetingDeclined'), bug ? '#69DB7C' : '#4DABF7');
+    const label = this.kind === 'mosquito' ? t('mosquitoSwat') : bug ? t('bugFixed') : t('meetingDeclined');
+    L.fx.popup(this.cx, this.y - 6, label, bug ? '#69DB7C' : '#4DABF7');
     L.fx.burst(this.cx, this.y + 14, bug ? 0x40c057 : 0xffffff, 14);
     L.fx.corpse(bug ? 'bugSquash' : 'inviteTorn', this.cx, this.y + this.h, false, true);
     sfx('stomp');
@@ -241,7 +242,8 @@ export class Invite extends Enemy {
   draw(): void {
     this.sprite.setPosition(this.x + this.w / 2, this.y + this.h);
     this.sprite.setRotation(Math.sin(this.t * ENEMY.inviteWaveSpeed + Math.PI / 2) * 0.18);
-    if (this.kind === 'flybug') this.sprite.setFrame(Math.floor(this.t / 4) % 2).setFlipX(true);
+    if (this.kind !== 'invite')
+      this.sprite.setFrame(Math.floor(this.t / (this.kind === 'mosquito' ? 2 : 4)) % 2).setFlipX(true);
   }
 }
 

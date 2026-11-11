@@ -1163,6 +1163,186 @@ def('contract', 64, 94, (c) => {
   limb(c, 46, 30, 58, 6, 3, '#FAB005', 1.5);
 });
 
+// ------------------------------------------------------------------ Level 6: offsite trip
+def('coach', 308, 116, (c) => {
+  // The company offsite bus.
+  box(c, 4, 8, 300, 88, '#FAB005', 4, 14);
+  c.fillStyle = '#E67700';
+  c.fillRect(6, 62, 296, 10);
+  for (let i = 0; i < 7; i++) box(c, 20 + i * 38, 20, 32, 30, '#A5D8FF', 3, 4);
+  box(c, 276, 20, 24, 50, '#74C0FC', 3, 4);
+  text(c, 'TEAM OFFSITE 🌴', 140, 82, 11, '#FFFFFF', { stroke: 4, font: '"Press Start 2P", sans-serif' });
+  for (const x of [60, 240]) {
+    circle(c, x, 100, 14, '#343A40', 4);
+    circle(c, x, 100, 5, '#ADB5BD', 0);
+  }
+  circle(c, 300, 74, 4, '#FFE066', 2);
+});
+def('floatie', 118, 34, (c) => {
+  // Inflatable ring with stripes.
+  ellipse(c, 59, 17, 55, 13, '#FF6B6B', 4);
+  c.fillStyle = '#FFFFFF';
+  for (const x of [20, 50, 80]) c.fillRect(x, 6, 12, 22);
+  ellipse(c, 59, 17, 30, 6, '#22B8CF', 3);
+  c.fillStyle = 'rgba(255,255,255,0.5)';
+  c.fillRect(24, 8, 20, 3);
+});
+def('trampoline', 84, 30, (c) => {
+  limb(c, 10, 14, 6, 30, 5, '#495057', 2);
+  limb(c, 74, 14, 78, 30, 5, '#495057', 2);
+  box(c, 2, 8, 80, 10, '#1C7ED6', 3, 5);
+  c.fillStyle = '#212529';
+  c.fillRect(10, 11, 64, 4);
+});
+def('coconut', 22, 22, (c) => {
+  circle(c, 11, 11, 9, '#8B5A2B', 3);
+  c.fillStyle = '#5C3A1E';
+  for (const [x, y] of [
+    [8, 8],
+    [13, 7],
+    [11, 12],
+  ] as const)
+    c.fillRect(x, y, 2, 2);
+});
+def(
+  'mosquito',
+  34,
+  26,
+  (c, f) => {
+    const up = f === 0;
+    ellipse(c, 12, up ? 6 : 12, 8, 4, 'rgba(230,245,255,0.85)', 1.5, up ? -0.6 : 0.2);
+    ellipse(c, 20, up ? 6 : 12, 8, 4, 'rgba(230,245,255,0.85)', 1.5, up ? 0.6 : -0.2);
+    ellipse(c, 15, 15, 9, 4, '#495057', 2.5);
+    circle(c, 25, 13, 4, '#343A40', 2);
+    limb(c, 28, 14, 33, 16, 1.5, '#343A40', 0);
+    c.strokeStyle = '#343A40';
+    c.lineWidth = 1.5;
+    for (const x of [10, 15, 20]) {
+      c.beginPath();
+      c.moveTo(x, 18);
+      c.lineTo(x - 3, 25);
+      c.stroke();
+    }
+  },
+  2,
+);
+def('volleyball', 22, 22, (c) => {
+  circle(c, 11, 11, 9, '#FFFFFF', 2.5);
+  c.strokeStyle = '#FAB005';
+  c.lineWidth = 2;
+  c.beginPath();
+  c.arc(11, 11, 6, 0.3, 2.6);
+  c.moveTo(4, 8);
+  c.quadraticCurveTo(11, 14, 18, 7);
+  c.stroke();
+});
+def('ballCart', 64, 40, (c) => {
+  box(c, 4, 12, 56, 22, '#495057', 3, 4);
+  for (let i = 0; i < 4; i++) circle(c, 14 + i * 12, 10, 6, '#FFFFFF', 2);
+  circle(c, 14, 36, 4, '#212529', 2);
+  circle(c, 50, 36, 4, '#212529', 2);
+});
+def(
+  'hr',
+  124,
+  134,
+  (c, f) => {
+    // Cheerful HR with a lanyard, clipboard and a big smile.
+    limb(c, 46, 102, 44, 130, 14, '#5F3DC4', 4);
+    limb(c, 78, 102, 80, 130, 14, '#5F3DC4', 4);
+    rr(c, 24, 56, 76, 62, 24);
+    fillStroke(c, '#F06595', 4);
+    c.strokeStyle = '#22B8CF';
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(48, 58);
+    c.lineTo(62, 82);
+    c.lineTo(76, 58);
+    c.stroke();
+    box(c, 54, 80, 16, 18, '#FFFFFF', 2.5, 2);
+    limb(c, 28, 66, 16, 98, 12, '#E0AC69', 4);
+    box(c, 4, 86, 26, 32, '#C98A4B', 3, 3);
+    c.fillStyle = '#FFFFFF';
+    c.fillRect(8, 92, 18, 22);
+    if (f === 0) limb(c, 96, 66, 110, 92, 12, '#E0AC69', 4);
+    else {
+      // Waving the mic around.
+      limb(c, 96, 66, 108, 32, 12, '#E0AC69', 4);
+      box(c, 102, 16, 12, 18, '#343A40', 3, 4);
+    }
+    circle(c, 62, 32, 25, '#E0AC69', 4);
+    // Curly hair.
+    c.fillStyle = '#5C3A1E';
+    for (let i = 0; i < 7; i++) {
+      c.beginPath();
+      c.arc(40 + i * 7.5, 12 + (i % 2) * 4, 8, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.fillStyle = OUTLINE;
+    c.fillRect(51, 30, 4, 4);
+    c.fillRect(69, 30, 4, 4);
+    c.strokeStyle = OUTLINE;
+    c.lineWidth = 3;
+    c.beginPath();
+    c.arc(62, 36, 12, 0.1 * Math.PI, 0.9 * Math.PI);
+    c.stroke();
+    c.fillStyle = 'rgba(255,120,150,0.5)';
+    c.fillRect(42, 38, 8, 5);
+    c.fillRect(74, 38, 8, 5);
+  },
+  2,
+);
+def('mic', 64, 44, (c) => {
+  const g = c.createRadialGradient(32, 22, 4, 32, 22, 32);
+  g.addColorStop(0, 'rgba(255,212,59,0.65)');
+  g.addColorStop(1, 'rgba(255,212,59,0)');
+  c.fillStyle = g;
+  c.fillRect(0, 0, 64, 44);
+  limb(c, 32, 22, 32, 42, 4, '#495057', 2);
+  box(c, 18, 38, 28, 5, '#495057', 2, 2);
+  ellipse(c, 32, 14, 10, 12, '#343A40', 3);
+  c.fillStyle = '#868E96';
+  for (let y = 8; y < 22; y += 4) c.fillRect(25, y, 14, 1.5);
+});
+def('iceCard', 30, 24, (c) => {
+  box(c, 2, 2, 26, 20, '#E7F5FF', 2.5, 3);
+  text(c, '?', 15, 12, 10, '#1C7ED6');
+});
+def('songWave', 30, 22, (c) => {
+  // Musical notes rolling along the floor (antakshari).
+  circle(c, 9, 17, 5, '#F06595', 2);
+  limb(c, 13, 17, 13, 3, 2, '#F06595', 1);
+  circle(c, 22, 15, 5, '#F06595', 2);
+  limb(c, 26, 15, 26, 2, 2, '#F06595', 1);
+  limb(c, 13, 3, 26, 2, 3, '#F06595', 1);
+});
+def('feedbackForm', 22, 28, (c) => {
+  box(c, 2, 2, 18, 24, '#FFFFFF', 2.5, 1);
+  c.fillStyle = '#7048E8';
+  c.fillRect(5, 5, 12, 3);
+  for (const y of [11, 15, 19]) {
+    c.strokeStyle = '#ADB5BD';
+    c.strokeRect(5, y, 3, 3);
+    c.fillStyle = '#ADB5BD';
+    c.fillRect(10, y + 1, 8, 1.5);
+  }
+});
+def('busStop', 64, 94, (c) => {
+  limb(c, 32, 40, 32, 92, 5, '#868E96', 2);
+  circle(c, 32, 24, 22, '#1C7ED6', 4);
+  text(c, '🚌', 32, 25, 18, '#000', { font: 'sans-serif' });
+  box(c, 14, 86, 36, 8, '#495057', 3, 2);
+});
+def('waves', 40, 12, (c) => {
+  c.strokeStyle = 'rgba(255,255,255,0.8)';
+  c.lineWidth = 3;
+  c.beginPath();
+  c.moveTo(0, 8);
+  c.quadraticCurveTo(10, 0, 20, 8);
+  c.quadraticCurveTo(30, 16, 40, 8);
+  c.stroke();
+});
+
 // ------------------------------------------------------------------ ambient life
 def(
   'bird',

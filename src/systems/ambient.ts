@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import { VIEW } from '../config/physics';
 import { session } from '../game/session';
+import { LEVELS } from '../config/levels';
 import type { LevelScene } from '../scenes/LevelScene';
 
 interface Walker {
@@ -138,6 +139,38 @@ export class Ambient {
           .setDepth(70)
           .setAlpha(0.85);
       }
+      if (L.mood.rain) this.buildRain();
+    } else if (!LEVELS[level].indoor) {
+      // Outdoor offsite: colleagues strolling, birds, palm silhouettes in front, rain on monsoon days.
+      for (const [key, n] of [
+        ['z6_2', 3],
+        ['z6_cp', 2],
+        ['z6_3', 1],
+        ['z6_4', 2],
+      ] as const) {
+        const s6 = sec(key);
+        if (s6) for (let i = 0; i < n; i++) this.addWalker(s6.x0 + 60, s6.x1 - 60, i);
+      }
+      for (let i = 0; i < 5; i++) {
+        const img = L.add.sprite(0, 0, 'bird', 0).setDepth(-55).setScrollFactor(0.5);
+        this.flyers.push({
+          img,
+          x: 200 + i * 800,
+          y: 50 + (i % 3) * 40,
+          vx: 1 + (i % 2) * 0.4,
+          phase: i,
+          bob: 10,
+          span: 4200,
+        });
+      }
+      for (let x = 700; x < 9400; x += 1150)
+        L.add
+          .image(x, VIEW.height + 10, 'fgPlant')
+          .setOrigin(0.5, 1)
+          .setScrollFactor(1.25)
+          .setDepth(70)
+          .setAlpha(0.85);
+      for (const s6 of L.sections) this.outdoor.push([s6.x0, s6.x1]);
       if (L.mood.rain) this.buildRain();
     } else {
       // Office people walking about.

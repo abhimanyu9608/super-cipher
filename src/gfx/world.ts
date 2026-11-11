@@ -32,6 +32,8 @@ export type GroundTex =
   | 'boardroom'
   | 'cafe'
   | 'kitchen'
+  | 'sand'
+  | 'pooltile'
   | 'fridge';
 
 /** Paint a ground solid of the given size. */
@@ -261,6 +263,27 @@ export function paintGround(tex: string, w: number, h: number, seed = 1): HTMLCa
           c.fillRect(x, y, 26, 26);
         }
       c.fillStyle = '#8B5A2B';
+      c.fillRect(0, 0, w, 7);
+      break;
+    }
+    case 'sand': {
+      c.fillStyle = '#F4D58D';
+      c.fillRect(0, 0, w, h);
+      for (let i = 0; i < (w * h) / 160; i++) {
+        c.fillStyle = r() > 0.5 ? '#E9C46A' : '#FFF3BF';
+        c.fillRect(r() * w, 6 + r() * h, 2, 2);
+      }
+      c.fillStyle = '#E9C46A';
+      c.fillRect(0, 0, w, 6);
+      break;
+    }
+    case 'pooltile': {
+      for (let y = 0; y < h; y += 20)
+        for (let x = 0; x < w; x += 20) {
+          c.fillStyle = (x / 20 + y / 20) % 2 === 0 ? '#E3FAFC' : '#C5F6FA';
+          c.fillRect(x, y, 20, 20);
+        }
+      c.fillStyle = '#1098AD';
       c.fillRect(0, 0, w, 7);
       break;
     }
@@ -814,6 +837,104 @@ const PAINTERS: Record<string, Painter> = {
     box(c, 7020, 160, 120, 40, '#14121F', 3, 4);
   },
 
+  // ---------------- Level 6: offsite trip (outdoors: the sky shows through)
+  z6_1(c, inp) {
+    // Office gate on the left, highway sign over the gap.
+    box(c, inp.x0 + 20, 170, 300, 290, '#ADB5BD', 4, 4);
+    for (let y = 190; y < 420; y += 50)
+      for (let x = inp.x0 + 40; x < inp.x0 + 300; x += 60) box(c, x, y, 40, 30, '#74C0FC', 2.5, 2);
+    box(c, inp.x0 + 60, 120, 220, 40, '#14121F', 3, 4);
+    text(c, 'CIPHER TECH', inp.x0 + 170, 140, 12, '#FFD43B', {});
+    limb(c, inp.x0 + 700, 200, inp.x0 + 700, 460, 6, '#868E96', 2);
+    box(c, inp.x0 + 600, 150, 200, 56, '#2F9E44', 4, 6);
+    text(c, 'RESORT 12 km ➜', inp.x0 + 700, 178, 11, '#FFFFFF', { font: 'sans-serif' });
+  },
+  z6_2(c, inp) {
+    for (let x = inp.x0 + 80; x < inp.x0 + inp.w; x += 360) cottage(c, x, 460);
+    for (let x = inp.x0 + 260; x < inp.x0 + inp.w; x += 360) palm(c, x, 460, 1);
+  },
+  z6_cp(c, inp) {
+    box(c, inp.x0 + 30, 330, 220, 130, '#8B5A2B', 4, 6);
+    // Striped awning + banner.
+    for (let i = 0; i < 8; i++) {
+      c.fillStyle = i % 2 === 0 ? '#FF922B' : '#FFFFFF';
+      c.fillRect(inp.x0 + 20 + i * 30, 290, 30, 34);
+    }
+    box(c, inp.x0 + 40, 240, 200, 40, '#22B8CF', 3, 6);
+    text(c, 'WELCOME TEAM! 🍹', inp.x0 + 140, 260, 10, '#FFFFFF', { font: 'sans-serif' });
+    for (let i = 0; i < 4; i++)
+      poly(
+        c,
+        [
+          inp.x0 + 60 + i * 44,
+          310,
+          inp.x0 + 80 + i * 44,
+          310,
+          inp.x0 + 76 + i * 44,
+          330,
+          inp.x0 + 64 + i * 44,
+          330,
+        ],
+        '#FFD43B',
+        2,
+      );
+    palm(c, inp.x0 + 360, 460, 0.9);
+    limb(c, inp.x0 + 300, 300, inp.x0 + 300, 460, 5, '#DEE2E6', 2.5);
+    circle(c, inp.x0 + 300, 298, 5, '#FFD43B', 2);
+  },
+  z6_3(c, inp) {
+    // Loungers and umbrellas around the pool.
+    for (const x of [inp.x0 + 60, inp.x0 + inp.w - 220]) {
+      limb(c, x + 60, 300, x + 60, 440, 4, '#868E96', 1.5);
+      c.beginPath();
+      c.moveTo(x, 310);
+      c.quadraticCurveTo(x + 60, 240, x + 120, 310);
+      c.closePath();
+      fillStroke(c, '#FF6B6B', 3);
+      box(c, x + 10, 430, 110, 10, '#FFFFFF', 3, 4);
+    }
+    palm(c, inp.x0 + 240, 460, 1.1);
+    palm(c, inp.x0 + inp.w - 340, 460, 1);
+  },
+  z6_4(c, inp) {
+    // Team-building banner and cones.
+    limb(c, inp.x0 + 100, 120, inp.x0 + 100, 460, 5, '#868E96', 2);
+    limb(c, inp.x0 + 700, 120, inp.x0 + 700, 460, 5, '#868E96', 2);
+    box(c, inp.x0 + 110, 110, 580, 60, '#7048E8', 4, 6);
+    text(c, 'TEAM BUILDING 2026 💪', inp.x0 + 400, 140, 14, '#FFFFFF', { font: 'sans-serif' });
+    for (let x = inp.x0 + 150; x < inp.x0 + inp.w; x += 220)
+      poly(c, [x, 460, x + 14, 420, x + 28, 460], '#FF922B', 3);
+    palm(c, inp.x0 + inp.w - 120, 460, 0.9);
+  },
+  z6_boss(c, inp) {
+    // Sunset stage with fairy lights and a bonfire.
+    box(c, inp.x0 + 200, 150, 700, 40, '#C2255C', 4, 6);
+    text(c, 'FUN ACTIVITY 🎉', inp.x0 + 550, 170, 14, '#FFFFFF', {});
+    c.strokeStyle = '#14121F';
+    c.lineWidth = 2;
+    c.beginPath();
+    c.moveTo(inp.x0, 90);
+    c.quadraticCurveTo(inp.x0 + inp.w / 2, 140, inp.x0 + inp.w, 90);
+    c.stroke();
+    for (let i = 0; i < 24; i++) {
+      const x = inp.x0 + (i + 0.5) * (inp.w / 24);
+      const t = (x - inp.x0) / inp.w;
+      const y = 90 + 4 * 50 * t * (1 - t) * 0.5;
+      circle(c, x, y + 4, 4, ['#FFD43B', '#FF6B6B', '#69DB7C', '#74C0FC'][i % 4], 1.5);
+    }
+    // Bonfire at the side.
+    for (let i = 0; i < 4; i++)
+      limb(c, inp.x0 + 90 + i * 12, 460, inp.x0 + 130 - i * 8, 430, 6, '#8B5A2B', 2);
+    poly(c, [inp.x0 + 90, 440, inp.x0 + 112, 380, inp.x0 + 136, 440], '#FF922B', 3);
+    poly(c, [inp.x0 + 100, 440, inp.x0 + 112, 405, inp.x0 + 126, 440], '#FFD43B', 2);
+  },
+  z6_fin(c, inp) {
+    box(c, inp.x0 + 40, 300, 240, 160, '#ADB5BD', 4, 6);
+    box(c, inp.x0 + 30, 280, 260, 24, '#495057', 3, 4);
+    text(c, 'BUS STOP', inp.x0 + 160, 292, 10, '#FFFFFF', {});
+    palm(c, inp.x0 + 420, 460, 1);
+  },
+
   // ---------------- Level 5: client visit
   z5_1(c, inp) {
     c.fillStyle = '#F1F3F5';
@@ -1142,6 +1263,43 @@ const PAINTERS: Record<string, Painter> = {
     box(c, inp.x0 + 40, 160, 160, 40, '#14121F', 3, 4);
   },
 };
+
+/** A palm tree with its base at (x, y). */
+function palm(c: Ctx, x: number, y: number, s: number): void {
+  c.strokeStyle = OUTLINE;
+  c.lineWidth = 16 * s + 6;
+  c.beginPath();
+  c.moveTo(x, y);
+  c.quadraticCurveTo(x + 20 * s, y - 120 * s, x + 6 * s, y - 230 * s);
+  c.stroke();
+  c.strokeStyle = '#A0703A';
+  c.lineWidth = 16 * s;
+  c.stroke();
+  for (let i = 0; i < 6; i++) {
+    const a = -Math.PI / 2 + (i - 2.5) * 0.55;
+    ellipse(
+      c,
+      x + 6 * s + Math.cos(a) * 46 * s,
+      y - 230 * s + Math.sin(a) * 26 * s + 18 * s,
+      50 * s,
+      12 * s,
+      '#2F9E44',
+      3,
+      a,
+    );
+  }
+  circle(c, x + 2 * s, y - 214 * s, 8 * s, '#8B5A2B', 2);
+  circle(c, x + 16 * s, y - 212 * s, 8 * s, '#8B5A2B', 2);
+}
+
+/** A little resort cottage with its base at (x, y). */
+function cottage(c: Ctx, x: number, y: number): void {
+  box(c, x, y - 130, 170, 130, '#FFE8CC', 4, 4);
+  poly(c, [x - 16, y - 130, x + 85, y - 210, x + 186, y - 130], '#C2622D', 4);
+  box(c, x + 66, y - 76, 40, 76, '#8B5A2B', 3, 3);
+  windowFrame(c, x + 14, y - 112, 40, 40, '#A5D8FF');
+  windowFrame(c, x + 118, y - 112, 40, 40, '#A5D8FF');
+}
 
 /** Night office wall with vertical panels. */
 function nightWall(c: Ctx, inp: BackdropInput, a: string, b: string): void {

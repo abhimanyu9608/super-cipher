@@ -123,3 +123,25 @@ describe('Level 5 map: Client Visit', () => {
     expect(objectsOf(m, 'laser').every((l) => l.props.style === 'projector')).toBe(true);
   });
 });
+
+describe('Level 6 map: Offsite Trip', () => {
+  const m = load(6);
+  it('has 7 translated sections, the HR boss and a bus-stop finish', () => {
+    const secs = objectsOf(m, 'section');
+    expect(secs).toHaveLength(7);
+    for (const s of secs) expect(STRINGS).toHaveProperty(String(s.props.key));
+    expect(objectsOf(m, 'hr')).toHaveLength(1);
+    expect(objectsOf(m, 'finish')).toHaveLength(1);
+  });
+  it('has the offsite mechanics: bus, floaties over water, trampolines, coconuts, mosquitoes', () => {
+    const movers = objectsOf(m, 'mover');
+    expect(movers.some((o) => o.props.style === 'coach')).toBe(true);
+    expect(movers.filter((o) => o.props.style === 'float').length).toBeGreaterThanOrEqual(3);
+    expect(objectsOf(m, 'water')).toHaveLength(1);
+    expect(objectsOf(m, 'trampoline').length).toBeGreaterThanOrEqual(2);
+    expect(objectsOf(m, 'brickRain')[0].props.tex).toBe('coconut');
+    expect(objectsOf(m, 'invite').filter((o) => o.props.kind === 'mosquito').length).toBeGreaterThanOrEqual(
+      3,
+    );
+  });
+});

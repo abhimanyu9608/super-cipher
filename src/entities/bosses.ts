@@ -233,11 +233,32 @@ export const CLIENT_STYLE: DeskBossStyle = {
   scareKey: 'scareClient',
 };
 
+export const HR_STYLE: DeskBossStyle = {
+  body: 'hr',
+  weak: 'mic',
+  arcTex: 'iceCard',
+  arcHurt: 'iceHit',
+  arcLine: 'hrArc',
+  waveTex: 'songWave',
+  waveHurt: 'songHit',
+  rainTex: 'feedbackForm',
+  rainHurt: 'formHit',
+  hitLine: 'micHit',
+  phaseLines: ['hrLine2', 'hrLine3'],
+  byeLine: 'hrBye',
+  phases: ['hrP1', 'hrP2', 'hrP3'],
+  bannerKey: 'bossHR',
+  nameKey: 'hrName',
+  greetKey: 'hrHi',
+  scareKey: 'scareHR',
+};
+
 /** Map object type → desk boss style. */
 export const DESK_BOSSES: Record<string, DeskBossStyle> = {
   manager: MANAGER_STYLE,
   aunty: AUNTY_STYLE,
   client: CLIENT_STYLE,
+  hr: HR_STYLE,
 };
 
 /** Desk boss: stomp the glowing weak spot (laptop / pressure cooker) on the table. */

@@ -1,7 +1,7 @@
 import type { SkinId } from './extras';
 import type { StringKey } from '../i18n/strings';
 
-export type LevelId = 1 | 2 | 3 | 4 | 5;
+export type LevelId = 1 | 2 | 3 | 4 | 5 | 6;
 
 /** In-game clock (minutes since midnight). Reaching `late` costs a heart and resets to `reset`. */
 export interface LevelClock {
@@ -25,13 +25,13 @@ export interface LevelDef {
   id: LevelId;
   /** World map file in public/assets/maps. */
   map: string;
-  nameKey: 'level1Name' | 'level2Name' | 'level3Name' | 'level4Name' | 'level5Name';
+  nameKey: 'level1Name' | 'level2Name' | 'level3Name' | 'level4Name' | 'level5Name' | 'level6Name';
   /** i18n key of the eyebrow on the title screen and level card. */
-  worldKey: 'world1' | 'world2' | 'world3' | 'world4' | 'world5';
-  mapTitleKey: 'mapTitle1' | 'mapTitle2' | 'mapTitle3' | 'mapTitle4' | 'mapTitle5';
-  mapGoalKey: 'mapGoal1' | 'mapGoal2' | 'mapGoal3' | 'mapGoal4' | 'mapGoal5';
+  worldKey: 'world1' | 'world2' | 'world3' | 'world4' | 'world5' | 'world6';
+  mapTitleKey: 'mapTitle1' | 'mapTitle2' | 'mapTitle3' | 'mapTitle4' | 'mapTitle5' | 'mapTitle6';
+  mapGoalKey: 'mapGoal1' | 'mapGoal2' | 'mapGoal3' | 'mapGoal4' | 'mapGoal5' | 'mapGoal6';
   /** Big headline on Level Clear. */
-  clearKey: 'clearBig' | 'clearBig2' | 'clearBig3' | 'clearBig4' | 'clearBig5';
+  clearKey: 'clearBig' | 'clearBig2' | 'clearBig3' | 'clearBig4' | 'clearBig5' | 'clearBig6';
   indoor: boolean;
   /** Levels with a clock show it instead of the elapsed time (Level 2: office clock, Level 3: lunch). */
   clock?: LevelClock;
@@ -153,9 +153,28 @@ export const LEVELS: Record<LevelId, LevelDef> = {
     promoSkin: 'goldPhones',
     music: 'office',
   },
+  6: {
+    id: 6,
+    map: 'level6.tmj',
+    nameKey: 'level6Name',
+    worldKey: 'world6',
+    mapTitleKey: 'mapTitle6',
+    mapGoalKey: 'mapGoal6',
+    clearKey: 'clearBig6',
+    indoor: false,
+    // The bus back leaves at 6 PM.
+    clock: { start: hm(17, 42), red: hm(17, 57), late: hm(18, 0), reset: hm(17, 58), lateKey: 'busLeft' },
+    finish: 'punch',
+    punch: { tex: 'busStop', scanKey: 'boarding', doneKey: 'boarded', lockedKey: 'hrLocked' },
+    intro: false,
+    thirdStar: 'time',
+    promotion: { from: 'Tech Lead', to: 'Engineering Manager' },
+    promoSkin: 'shades',
+    music: 'commute',
+  },
 };
 
-export const LEVEL_IDS: LevelId[] = [1, 2, 3, 4, 5];
+export const LEVEL_IDS: LevelId[] = [1, 2, 3, 4, 5, 6];
 /** Total levels planned (PRD section 15); levels beyond the built ones show as "coming soon". */
 export const PLANNED_LEVELS = 8;
 

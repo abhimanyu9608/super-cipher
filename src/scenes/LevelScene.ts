@@ -36,6 +36,7 @@ import {
   safeSpot,
   type Solid,
   type Rect,
+  springLaunch,
   type PlayerInput,
 } from '../systems/physics';
 import { clearBonus, starsFor, heartsAfterCoin, formatClock } from '../systems/score';
@@ -107,6 +108,7 @@ export class LevelScene extends Phaser.Scene {
   private chairs: Chair[] = [];
   private conveyors: Conveyor[] = [];
   private slides: SlidePlatform[] = [];
+  private waterWaves: Phaser.GameObjects.TileSprite[] = [];
   private lasers: Laser[] = [];
   private zones: Record<string, MapObject[]> = {};
   private sky!: Phaser.GameObjects.Graphics;
@@ -200,6 +202,7 @@ export class LevelScene extends Phaser.Scene {
       'chairs',
       'conveyors',
       'slides',
+      'waterWaves',
       'lasers',
       'parallax',
       'checkpoints',
@@ -487,6 +490,22 @@ export class LevelScene extends Phaser.Scene {
           this.bossDoor = { solid, gfx };
           break;
         }
+        case 'trampoline': {
+          const img = this.add
+            .image(o.x + o.w / 2, o.y + o.h, 'trampoline')
+            .setOrigin(0.5, 1)
+            .setDepth(5);
+          const solid = makeSolid(o, 'solid', { safe: false, tag: 'trampoline' });
+          solid.onStand = () => {
+            springLaunch(this.player.body, num(o, 'power', 16));
+            this.fx.popup(o.x + o.w / 2, o.y - 20, t('boing'), '#FFD43B', 12);
+            this.fx.burst(o.x + o.w / 2, o.y, 0xffffff, 8, { speed: 2, up: true });
+            this.tweens.add({ targets: img, scaleY: 0.6, duration: 80, yoyo: true });
+            sfx('stomp', { rate: 1.3 });
+          };
+          this.addSolid(solid);
+          break;
+        }
         case 'plateStack':
           this.add
             .image(o.x + o.w / 2, o.y + o.h, 'plateStack')
@@ -668,7 +687,7 @@ export class LevelScene extends Phaser.Scene {
               o.y,
               num(o, 'speed', 1.6),
               'meetingHit',
-              str(o, 'kind') === 'flybug' ? 'flybug' : 'invite',
+              (str(o, 'kind') || 'invite') as 'invite' | 'flybug' | 'mosquito',
             ),
           );
           break;
@@ -685,6 +704,7 @@ export class LevelScene extends Phaser.Scene {
           break;
         case 'aunty':
         case 'client':
+        case 'hr':
         case 'manager': {
           const table = (this.map.layers.platforms ?? []).find((p) => p.type === 'table');
           const arena = (this.zones.bossArena ?? [])[0];
@@ -812,6 +832,14 @@ export class LevelScene extends Phaser.Scene {
     }
     for (const o of z.updraft ?? []) {
       this.add.rectangle(o.x, o.y, o.w, o.h, 0x9be7ff, 0.08).setOrigin(0, 0).setDepth(-8);
+    }
+    for (const o of z.water ?? []) {
+      this.add.rectangle(o.x, o.y, o.w, o.h, 0x22b8cf, 0.85).setOrigin(0, 0).setDepth(3);
+      const waves = this.add
+        .tileSprite(o.x, o.y - 6, o.w, 12, 'waves')
+        .setOrigin(0, 0)
+        .setDepth(3);
+      this.waterWaves.push(waves);
     }
     for (const o of z.wet ?? []) {
       const dal = str(o, 'style') === 'dal';
@@ -1009,6 +1037,7 @@ export class LevelScene extends Phaser.Scene {
     for (const m of this.movers) m.step();
     for (const c of this.chairs) c.step();
     for (const sl of this.slides) sl.step();
+    for (const w of this.waterWaves) w.tilePositionX += 0.6;
     for (const c of this.conveyors) c.step();
     for (const b of this.blocks) b.step();
 
@@ -1121,9 +1150,18 @@ export class LevelScene extends Phaser.Scene {
 
     // Pit fall.
     if (b.y > VIEW.height + 40 && this.state === 'play') this.pitFall();
+    // Pool water: a splash costs a heart, like a pit.
+    for (const w of z.water ?? []) {
+      if (this.state === 'play' && overlaps(b, { x: w.x, y: w.y + 10, w: w.w, h: w.h })) {
+        this.fx.burst(p.cx, w.y, 0x74c0fc, 20, { speed: 4, up: true });
+        sfx('thud');
+        this.pitFall('splash');
+        break;
+      }
+    }
   }
 
-  private pitFall(): void {
+  private pitFall(reason: StringKey = 'fell'): void {
     const r = this.run;
     r.hearts--;
     this.hits++;
@@ -1131,7 +1169,7 @@ export class LevelScene extends Phaser.Scene {
     sfx('pitfall');
     const p = this.player;
     p.respawn(this.safe.x, this.safe.y);
-    this.fx.popup(p.cx, p.body.y - 20, t('fell'), '#FF8787', 12);
+    this.fx.popup(p.cx, p.body.y - 20, t(reason), '#FF8787', 12);
     this.fx.addShake(FX.shakeHit);
     if (r.hearts <= 0) this.gameOver();
   }

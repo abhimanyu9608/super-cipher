@@ -59,6 +59,15 @@ const ZONES: Record<LevelId, { key: string; icon: string; stars: number }[]> = {
     { key: 'z5_boss', icon: '🤝', stars: 5 },
     { key: 'z5_fin', icon: '✍️', stars: 0 },
   ],
+  6: [
+    { key: 'z6_1', icon: '🚌', stars: 2 },
+    { key: 'z6_2', icon: '🌴', stars: 3 },
+    { key: 'z6_cp', icon: '🍹', stars: 0 },
+    { key: 'z6_3', icon: '🏊', stars: 4 },
+    { key: 'z6_4', icon: '🤸', stars: 4 },
+    { key: 'z6_boss', icon: '🎤', stars: 5 },
+    { key: 'z6_fin', icon: '🚏', stars: 0 },
+  ],
 };
 
 export function initShell(flow: Flow): void {

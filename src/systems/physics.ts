@@ -67,6 +67,8 @@ export interface PlayerBody extends Rect {
   jump: number;
   dashFrames: number;
   dashCooldown: number;
+  /** Frames during which a spring launch ignores the variable-jump cut (trampolines). */
+  spring: number;
 }
 
 export interface PhysicsEnv {
@@ -108,6 +110,7 @@ export function createPlayerBody(character: CharacterId, x: number, y: number): 
     jump: c.jump,
     dashFrames: 0,
     dashCooldown: 0,
+    spring: 0,
   };
 }
 
@@ -131,6 +134,7 @@ export function stepPlayer(p: PlayerBody, input: PlayerInput, solids: Solid[], e
 
   // Dash (Level 2 coffee).
   if (p.dashCooldown > 0) p.dashCooldown--;
+  if (p.spring > 0) p.spring--;
   if (p.dashFrames > 0) p.dashFrames--;
   if (env.canDash && inp.dashPressed && p.dashCooldown === 0) {
     p.dashFrames = OFFICE_PHYSICS.dashFrames;
@@ -182,7 +186,7 @@ export function stepPlayer(p: PlayerBody, input: PlayerInput, solids: Solid[], e
   }
 
   // Variable jump height: releasing jump caps upward speed.
-  if (!inp.jumpHeld && p.vy < -PHYSICS.jumpCut) p.vy = -PHYSICS.jumpCut;
+  if (!inp.jumpHeld && p.vy < -PHYSICS.jumpCut && p.spring === 0) p.vy = -PHYSICS.jumpCut;
 
   // Gravity or AC updraft.
   if (env.updraft) {
@@ -260,6 +264,15 @@ function land(p: PlayerBody, s: Solid): void {
  * Stomp rule (PRD section 4): the player is falling and the player's previous bottom edge
  * was at or above the enemy's top + 12 px.
  */
+/** Launch the player upward off a trampoline; the bounce is not cut by releasing jump. */
+export function springLaunch(p: PlayerBody, speed: number): void {
+  p.vy = -speed;
+  p.spring = 30;
+  p.onGround = false;
+  p.ground = null;
+  p.doubleUsed = false;
+}
+
 export function isStomp(playerVy: number, prevPlayerBottom: number, enemyTop: number): boolean {
   return playerVy > 0 && prevPlayerBottom <= enemyTop + PHYSICS.stompTolerance;
 }

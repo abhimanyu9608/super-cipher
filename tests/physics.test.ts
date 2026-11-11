@@ -213,3 +213,15 @@ describe('safe respawn spot', () => {
     expect(safeSpot({ x: 1149, y: 400, w: 30, h: 60 }, s)).toEqual({ x: 1112, y: 400 });
   });
 });
+
+describe('trampoline spring', () => {
+  it('keeps the full bounce even when jump is not held', async () => {
+    const { springLaunch } = await import('../src/systems/physics');
+    const p = createPlayerBody('boy', 100, 300);
+    springLaunch(p, 16);
+    stepPlayer(p, idle, [], env);
+    expect(p.vy).toBeCloseTo(-16 + PHYSICS.gravity);
+    for (let i = 0; i < 40; i++) stepPlayer(p, idle, [], env);
+    expect(p.spring).toBe(0);
+  });
+});
