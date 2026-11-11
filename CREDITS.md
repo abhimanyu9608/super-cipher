@@ -22,10 +22,11 @@ If Twemoji images are added later (e.g. from the prototype's `img/` folder), lis
 
 ## Audio
 
-| Sound                                  | Source                                                                                                       | Licence       |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------- |
-| All sound effects and both music loops | Generated in code by `src/audio/synth.ts`                                                                    | Original      |
-| Boss voice lines (speech)              | Spoken live by the player's own browser/device text-to-speech (`src/audio/voice.ts`); no audio files shipped | Original text |
+| Sound                                  | Source                                                                                                               | Licence       |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------- |
+| All sound effects and both music loops | Generated in code by `src/audio/synth.ts`                                                                            | Original      |
+| Boss voice lines (speech)              | Spoken live by the player's own browser/device text-to-speech (`src/audio/voice.ts`); no audio files shipped         | Original text |
+| Reel #4 boss voices (MP4 only)         | Windows built-in speech voices (Microsoft David / Zira), pitched and processed with ffmpeg by `scripts/reel/tts.mjs` | Generated     |
 
 Owner voice lines and Pixabay effects are not added yet. When you add one:
 

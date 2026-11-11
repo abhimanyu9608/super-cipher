@@ -3,11 +3,15 @@
 // Needs: the dev server running (npm run dev), a Chromium browser, ffmpeg, and puppeteer-core.
 //   TOOLS=<folder with node_modules/puppeteer-core>  FFMPEG=<path to ffmpeg>  BROWSER=<path to chrome/msedge>
 //   node scripts/reel/render.mjs [out.mp4]
+// Spoken boss lines: set REEL_LINES=scripts/reel/reel4-lines.mjs — voices are rendered with tts.mjs, their
+// lengths passed to the page as ?d=..., and the clips mixed over the soundtrack at window.reel.voices.
 import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
 import { writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { makeVoices, mixVoices } from './tts.mjs';
 
 const require = createRequire(resolve(process.env.TOOLS ?? '.', 'package.json'));
 const puppeteer = require('puppeteer-core');
@@ -15,6 +19,16 @@ const FFMPEG = process.env.FFMPEG ?? 'ffmpeg';
 const BROWSER = process.env.BROWSER ?? 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 const URL = process.env.REEL_URL ?? 'http://localhost:5173/super-cipher/scripts/reel/reel.html?t=0';
 const out = resolve(process.argv[2] ?? 'super-cipher-reel.mp4');
+const dir = mkdtempSync(join(tmpdir(), 'reel-'));
+
+let voiceFiles = null;
+let pageUrl = URL;
+if (process.env.REEL_LINES) {
+  const { LINES } = await import(pathToFileURL(resolve(process.env.REEL_LINES)).href);
+  voiceFiles = makeVoices(LINES, join(dir, 'voices'));
+  for (const v of voiceFiles) console.log(`voice ${v.id}: ${v.dur.toFixed(2)} s (${v.voice})`);
+  pageUrl += (URL.includes('?') ? '&' : '?') + 'd=' + voiceFiles.map((v) => v.dur.toFixed(3)).join(',');
+}
 
 const browser = await puppeteer.launch({
   executablePath: BROWSER,
@@ -23,7 +37,7 @@ const browser = await puppeteer.launch({
   defaultViewport: { width: 540, height: 960 },
 });
 const page = await browser.newPage();
-await page.goto(URL, { waitUntil: 'networkidle0' });
+await page.goto(pageUrl, { waitUntil: 'networkidle0' });
 await page.waitForFunction(() => document.title === 'ready', { timeout: 60000 });
 const { duration, fps } = await page.evaluate(() => ({
   duration: window.reel.duration,
@@ -32,9 +46,13 @@ const { duration, fps } = await page.evaluate(() => ({
 const total = Math.round(duration * fps);
 
 // Soundtrack rendered by the game's own synth.
-const dir = mkdtempSync(join(tmpdir(), 'reel-'));
-const wav = join(dir, 'audio.wav');
+let wav = join(dir, 'audio.wav');
 writeFileSync(wav, Buffer.from(await page.evaluate(() => window.reel.audio()), 'base64'));
+if (voiceFiles) {
+  const track = await page.evaluate(() => window.reel.voices ?? []);
+  const clips = track.map((c) => ({ ...c, file: voiceFiles.find((v) => v.id === c.id).file }));
+  wav = mixVoices(wav, clips, join(dir, 'mixed.wav'));
+}
 
 const ff = spawn(
   FFMPEG,
