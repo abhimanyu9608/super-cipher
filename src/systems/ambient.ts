@@ -187,6 +187,8 @@ export class Ambient {
         ['z5_1', 3],
         ['z5_cp', 1],
         ['z5_4', 1],
+        ['z7_1', 2],
+        ['z7_cp', 1],
       ] as const) {
         const s = sec(key);
         if (s) for (let i = 0; i < n; i++) this.addWalker(s.x0 + 40, s.x1 - 40, i + 3);

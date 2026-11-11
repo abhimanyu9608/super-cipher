@@ -11,6 +11,8 @@ export interface ClearInput {
   totalCoins: number;
   frames: number;
   appraisal: number;
+  /** Third-star rule from the level config; defaults to appraisal for Level 2, time otherwise. */
+  thirdStar?: 'time' | 'appraisal';
 }
 
 export const clearBonus = (hearts: number, secondsLeft: number): number =>
@@ -19,7 +21,8 @@ export const clearBonus = (hearts: number, secondsLeft: number): number =>
 export function starsFor(r: ClearInput): number {
   let stars = 1;
   if (r.totalCoins > 0 && r.coins / r.totalCoins >= STARS.coinFraction) stars++;
-  if (r.level === 2) {
+  const rule = r.thirdStar ?? (r.level === 2 ? 'appraisal' : 'time');
+  if (rule === 'appraisal') {
     if (r.appraisal >= STARS.appraisalTotal) stars++;
   } else if (r.frames < STARS.fastFrames) stars++;
   return stars;

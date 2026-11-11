@@ -837,6 +837,106 @@ const PAINTERS: Record<string, Painter> = {
     box(c, 7020, 160, 120, 40, '#14121F', 3, 4);
   },
 
+  // ---------------- Level 7: appraisal season
+  z7_1(c, inp) {
+    c.fillStyle = '#F3F0FF';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#E5DBFF';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 80) c.fillRect(x, 0, 40, 460);
+    box(c, inp.x0 + 220, 70, 360, 80, '#7048E8', 4, 8);
+    text(c, 'APPRAISAL SEASON 📈', inp.x0 + 400, 110, 16, '#FFFFFF', { font: 'sans-serif' });
+    box(c, inp.x0 + 660, 180, 200, 120, '#FFFFFF', 3, 4);
+    text(c, 'SELF-REVIEW', inp.x0 + 760, 210, 11, '#C92A2A', {});
+    text(c, 'DUE TODAY!', inp.x0 + 760, 240, 11, '#C92A2A', {});
+    text(c, '⏰', inp.x0 + 760, 275, 20, '#000', { font: 'sans-serif' });
+  },
+  z7_2(c, inp) {
+    // A giant chart grid behind the moving bars.
+    c.fillStyle = '#F8F9FA';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.strokeStyle = '#DEE2E6';
+    c.lineWidth = 2;
+    for (let y = 40; y < 460; y += 40) {
+      c.beginPath();
+      c.moveTo(inp.x0, y);
+      c.lineTo(inp.x0 + inp.w, y);
+      c.stroke();
+    }
+    c.strokeStyle = '#14121F';
+    c.lineWidth = 6;
+    c.beginPath();
+    c.moveTo(inp.x0 + 60, 40);
+    c.lineTo(inp.x0 + 60, 460);
+    c.stroke();
+    text(c, 'Q1   Q2   Q3   Q4   Q5?!', inp.x0 + 600, 70, 16, '#868E96', {});
+    text(c, 'PERFORMANCE 📊', inp.x0 + 220, 70, 14, '#7048E8', {});
+  },
+  z7_cp(c, inp) {
+    c.fillStyle = '#FFF4E6';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    box(c, inp.x0 + 40, 330, 180, 130, '#8B5A2B', 4, 6);
+    box(c, inp.x0 + 60, 250, 140, 60, '#FFFFFF', 3, 4);
+    text(c, '"Patience, beta"', inp.x0 + 130, 274, 11, '#495057', { font: '"Baloo 2", sans-serif' });
+    text(c, '- Mentor 🧘', inp.x0 + 130, 296, 10, '#868E96', { font: 'sans-serif' });
+    limb(c, inp.x0 + 300, 300, inp.x0 + 300, 460, 5, '#DEE2E6', 2.5);
+    circle(c, inp.x0 + 300, 298, 5, '#FFD43B', 2);
+  },
+  z7_3(c, inp) {
+    c.fillStyle = '#E9ECEF';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    // Archive shelves full of files.
+    const cols = ['#FAB005', '#4DABF7', '#F06595', '#40C057'];
+    for (let x = inp.x0 + 20; x < inp.x0 + inp.w; x += 220) {
+      box(c, x, 60, 190, 380, '#ADB5BD', 4, 4);
+      for (let y = 80; y < 430; y += 70) {
+        c.fillStyle = '#868E96';
+        c.fillRect(x + 6, y + 50, 178, 6);
+        for (let k = 0; k < 9; k++) {
+          c.fillStyle = cols[(k + y) % 4];
+          c.fillRect(x + 12 + k * 19, y + 6, 14, 44);
+        }
+      }
+    }
+  },
+  z7_4(c, inp) {
+    c.fillStyle = '#2B0B12';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 100) {
+      c.fillStyle = 'rgba(255,45,85,0.15)';
+      c.fillRect(x, 0, 50, 460);
+    }
+    for (const x of [inp.x0 + 200, inp.x0 + 700]) {
+      box(c, x, 90, 200, 70, '#FF2D55', 4, 6);
+      text(c, '⚠ PIP ZONE ⚠', x + 100, 125, 13, '#FFFFFF', { font: 'sans-serif' });
+    }
+  },
+  z7_boss(c, inp) {
+    c.fillStyle = '#4A2C17';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#5C3A1E';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 80) c.fillRect(x, 0, 40, 460);
+    // Huge bell curve on the screen.
+    box(c, inp.x0 + 260, 60, 500, 230, '#14121F', 6, 8);
+    c.fillStyle = '#0B1A33';
+    c.fillRect(inp.x0 + 274, 74, 472, 202);
+    c.strokeStyle = '#FAB005';
+    c.lineWidth = 5;
+    c.beginPath();
+    c.moveTo(inp.x0 + 290, 260);
+    c.bezierCurveTo(inp.x0 + 430, 260, inp.x0 + 450, 100, inp.x0 + 510, 100);
+    c.bezierCurveTo(inp.x0 + 570, 100, inp.x0 + 590, 260, inp.x0 + 730, 260);
+    c.stroke();
+    text(c, 'YOU ARE HERE ➜', inp.x0 + 380, 230, 9, '#FF8787', {});
+  },
+  z7_fin(c, inp) {
+    c.fillStyle = '#FFF3BF';
+    c.fillRect(inp.x0, 0, inp.w, 460);
+    c.fillStyle = '#FFE066';
+    for (let x = inp.x0; x < inp.x0 + inp.w; x += 60) c.fillRect(x, 0, 30, 460);
+    box(c, inp.x0 + 40, 100, 300, 80, '#14121F', 4, 6);
+    text(c, '🎉 CONGRATS, DIRECTOR!', inp.x0 + 190, 140, 13, '#FFD43B', { font: 'sans-serif' });
+  },
+
   // ---------------- Level 6: offsite trip (outdoors: the sky shows through)
   z6_1(c, inp) {
     // Office gate on the left, highway sign over the gap.

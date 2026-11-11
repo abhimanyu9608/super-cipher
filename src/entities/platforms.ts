@@ -7,7 +7,7 @@ import { makeSolid, pushOut, overlaps, type Solid } from '../systems/physics';
 import { sfx } from '../audio/sfx';
 import type { LevelScene } from '../scenes/LevelScene';
 
-export type MoverStyle = 'beam' | 'auto' | 'lift' | 'liftFull' | 'tray' | 'coach' | 'float';
+export type MoverStyle = 'beam' | 'auto' | 'lift' | 'liftFull' | 'tray' | 'coach' | 'float' | 'bar';
 
 export class Mover {
   solid: Solid;
@@ -49,7 +49,15 @@ export class Mover {
     else if (style === 'tray') this.sprite = L.add.image(0, 0, 'tray').setOrigin(0, 0).setDepth(6);
     else if (style === 'coach') this.sprite = L.add.image(0, 0, 'coach').setOrigin(0, 0).setDepth(6);
     else if (style === 'float') this.sprite = L.add.image(0, 0, 'floatie').setOrigin(0, 0).setDepth(6);
-    else this.sprite = L.add.tileSprite(0, 0, w, h, 'stripe').setOrigin(0, 0).setDepth(6);
+    else if (style === 'bar') {
+      // A tall graph bar; colour cycles along the chart.
+      const colors = [0x40c057, 0x4dabf7, 0xfab005, 0xf06595, 0x7048e8];
+      this.sprite = L.add
+        .tileSprite(0, 0, w, 560, 'barCol')
+        .setOrigin(0, 0)
+        .setDepth(5)
+        .setTint(colors[Math.floor(x / 160) % colors.length]);
+    } else this.sprite = L.add.tileSprite(0, 0, w, h, 'stripe').setOrigin(0, 0).setDepth(6);
     if (style === 'liftFull') {
       this.solid.onStand = () => this.shove();
     }
@@ -107,6 +115,7 @@ export class Mover {
     const s = this.solid;
     if (this.style === 'auto') this.sprite.setPosition(s.x - 2, s.y - 4);
     else if (this.style === 'coach') this.sprite.setPosition(s.x - 4, s.y - 6);
+    else if (this.style === 'bar') this.sprite.setPosition(s.x, s.y);
     else if (this.style === 'float')
       this.sprite.setPosition(s.x - 4, s.y - 4).setRotation(Math.sin(this.L.frame * 0.05 + s.x) * 0.04);
     else if (this.style === 'lift' || this.style === 'liftFull') this.sprite.setPosition(s.x - 5, s.y - 100);

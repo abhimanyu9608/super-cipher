@@ -55,3 +55,12 @@ describe('scoring', () => {
     expect(padScore(4321)).toBe('004321');
   });
 });
+
+describe('third-star rule from the level config', () => {
+  it('uses Appraisal Points (KPI stars) on any level configured for it', () => {
+    const fast = { ...base, level: 7, frames: 60, coins: 40 };
+    expect(starsFor({ ...fast, thirdStar: 'appraisal', appraisal: 0 })).toBe(2);
+    expect(starsFor({ ...fast, thirdStar: 'appraisal', appraisal: 5 })).toBe(3);
+    expect(starsFor({ ...fast, thirdStar: 'time', appraisal: 0 })).toBe(3);
+  });
+});

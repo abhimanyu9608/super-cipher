@@ -145,3 +145,21 @@ describe('Level 6 map: Offsite Trip', () => {
     );
   });
 });
+
+describe('Level 7 map: Appraisal Season', () => {
+  const m = load(7);
+  it('has 7 translated sections, the Committee boss, a letter finish and 5 KPI stars', () => {
+    const secs = objectsOf(m, 'section');
+    expect(secs).toHaveLength(7);
+    for (const s of secs) expect(STRINGS).toHaveProperty(String(s.props.key));
+    expect(objectsOf(m, 'committee')).toHaveLength(1);
+    expect(objectsOf(m, 'finish')).toHaveLength(1);
+    expect(objectsOf(m, 'appraisal')).toHaveLength(5);
+  });
+  it('has graph bars, file mountains, falling files and PIP lasers', () => {
+    expect(objectsOf(m, 'mover').filter((o) => o.props.style === 'bar').length).toBeGreaterThanOrEqual(5);
+    expect(objectsOf(m, 'fileStack').length).toBeGreaterThanOrEqual(5);
+    expect(objectsOf(m, 'brickRain')[0].props.tex).toBe('file');
+    expect(objectsOf(m, 'laser').every((l) => l.props.style === 'pip')).toBe(true);
+  });
+});

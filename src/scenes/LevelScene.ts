@@ -506,11 +506,12 @@ export class LevelScene extends Phaser.Scene {
           this.addSolid(solid);
           break;
         }
+        case 'fileStack':
         case 'plateStack':
           this.add
-            .image(o.x + o.w / 2, o.y + o.h, 'plateStack')
+            .image(o.x + o.w / 2, o.y + o.h, o.type)
             .setOrigin(0.5, 1)
-            .setScale(1, o.h / 120)
+            .setScale(o.w / 60, o.h / 120)
             .setDepth(4);
           this.addSolid(makeSolid(o, 'solid', { safe: true, tag: 'plates' }));
           break;
@@ -670,7 +671,8 @@ export class LevelScene extends Phaser.Scene {
 
   private buildEnemies(): void {
     for (const o of this.map.layers.enemies ?? []) {
-      switch (o.type) {
+      // Every registered desk boss (manager, aunty, client, hr, committee...) shares one builder.
+      switch (DESK_BOSSES[o.type] ? 'deskBoss' : o.type) {
         case 'bug':
           this.enemies.push(new Bug(this, o.x, o.y, o.x, o.x + o.w));
           break;
@@ -702,10 +704,7 @@ export class LevelScene extends Phaser.Scene {
           this.monkey = new Monkey(this, o.x, o.y, o.x, o.x + o.w);
           this.enemies.push(this.monkey);
           break;
-        case 'aunty':
-        case 'client':
-        case 'hr':
-        case 'manager': {
+        case 'deskBoss': {
           const table = (this.map.layers.platforms ?? []).find((p) => p.type === 'table');
           const arena = (this.zones.bossArena ?? [])[0];
           const tx0 = table?.x ?? o.x - 140;
@@ -790,7 +789,7 @@ export class LevelScene extends Phaser.Scene {
         OFFICE.laserOff,
         OFFICE.laserWarn,
         str(o, 'style') === 'projector' ? 0x74c0fc : 0xff2d55,
-        str(o, 'style') === 'projector' ? 'projectorHit' : 'laserHit',
+        str(o, 'style') === 'projector' ? 'projectorHit' : str(o, 'style') === 'pip' ? 'pipHit' : 'laserHit',
       );
       this.lasers.push(l);
       this.hazards.push(l);
@@ -1266,7 +1265,13 @@ export class LevelScene extends Phaser.Scene {
         case 'appraisal':
           r.appraisal++;
           r.score += SCORE.appraisal;
-          this.fx.popup(p.cx, p.body.y - 20, t('appraisalGot', { n: r.appraisal }), '#FFD43B', 11);
+          this.fx.popup(
+            p.cx,
+            p.body.y - 20,
+            t(r.level === 7 ? 'kpiStar' : 'appraisalGot', { n: r.appraisal }),
+            '#FFD43B',
+            11,
+          );
           this.fx.burst(it.x + 13, it.y + 13, 0xffd43b, 18);
           sfx('powerup');
           break;
@@ -1652,6 +1657,7 @@ export class LevelScene extends Phaser.Scene {
       totalCoins: r.totalCoins,
       frames: r.frames,
       appraisal: r.appraisal,
+      thirdStar: LEVELS[r.level].thirdStar,
     });
     events.emit('levelClear', {
       level: r.level,

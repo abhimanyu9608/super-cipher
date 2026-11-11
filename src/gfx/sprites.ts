@@ -1343,6 +1343,114 @@ def('waves', 40, 12, (c) => {
   c.stroke();
 });
 
+// ------------------------------------------------------------------ Level 7: appraisal season
+def(
+  'committee',
+  124,
+  134,
+  (c, f) => {
+    // Three stern reviewers squeezed together, the middle one holds a clipboard.
+    const people: [number, number, string, string][] = [
+      [24, 46, '#495057', '#C98B5B'],
+      [62, 36, '#212529', '#A86E44'],
+      [100, 46, '#5C7CFA', '#E0AC69'],
+    ];
+    for (const [x, hy, suit, skin] of people) {
+      rr(c, x - 22, hy + 22, 44, 70, 14);
+      fillStroke(c, suit, 3.5);
+      poly(c, [x - 6, hy + 24, x + 6, hy + 24, x + 3, hy + 56, x - 3, hy + 56], '#FFFFFF', 2);
+      circle(c, x, hy, 18, skin, 3.5);
+      // Glasses + unimpressed mouths.
+      c.strokeStyle = OUTLINE;
+      c.lineWidth = 2;
+      c.strokeRect(x - 12, hy - 4, 9, 7);
+      c.strokeRect(x + 3, hy - 4, 9, 7);
+      c.lineWidth = 3;
+      c.beginPath();
+      c.moveTo(x - 6, hy + 10);
+      c.lineTo(x + 6, hy + 10);
+      c.stroke();
+      c.fillStyle = '#2B2235';
+      c.beginPath();
+      c.arc(x, hy - 8, 18, Math.PI * 1.05, Math.PI * 1.95);
+      c.fill();
+    }
+    // Clipboard (raised on frame 1).
+    const cy = f === 0 ? 92 : 70;
+    box(c, 50, cy, 26, 32, '#C98A4B', 3, 3);
+    c.fillStyle = '#FFFFFF';
+    c.fillRect(54, cy + 6, 18, 22);
+    text(c, '2/5', 63, cy + 17, 6, '#C92A2A');
+  },
+  2,
+);
+def('stamp', 64, 44, (c) => {
+  const g = c.createRadialGradient(32, 22, 4, 32, 22, 32);
+  g.addColorStop(0, 'rgba(255,212,59,0.7)');
+  g.addColorStop(1, 'rgba(255,212,59,0)');
+  c.fillStyle = g;
+  c.fillRect(0, 0, 64, 44);
+  limb(c, 32, 6, 32, 22, 8, '#8B5A2B', 3);
+  circle(c, 32, 6, 6, '#8B5A2B', 3);
+  box(c, 14, 22, 36, 16, '#C92A2A', 3, 3);
+  text(c, '5★', 32, 31, 7, '#FFFFFF');
+});
+def('ratingStar', 30, 30, (c) => {
+  star(c, 15, 16, 13, '#ADB5BD', 3);
+  text(c, '2', 15, 17, 8, '#C92A2A');
+});
+def('bellCurve', 34, 20, (c) => {
+  c.beginPath();
+  c.moveTo(0, 20);
+  c.bezierCurveTo(10, 20, 12, 0, 17, 0);
+  c.bezierCurveTo(22, 0, 24, 20, 34, 20);
+  c.closePath();
+  fillStroke(c, '#7048E8', 2.5);
+  c.fillStyle = 'rgba(255,255,255,0.5)';
+  c.fillRect(15, 6, 4, 10);
+});
+def('kpiSheet', 22, 28, (c) => {
+  box(c, 2, 2, 18, 24, '#FFF3BF', 2.5, 1);
+  text(c, 'KPI', 11, 9, 5, '#C92A2A');
+  c.fillStyle = '#868E96';
+  for (const y of [15, 19]) c.fillRect(5, y, 12, 2);
+});
+def('barCol', 80, 32, (c) => {
+  // Tileable vertical bar (tinted per bar); a bright cap at the top of the tile.
+  c.fillStyle = '#FFFFFF';
+  c.fillRect(0, 0, 80, 32);
+  c.fillStyle = 'rgba(0,0,0,0.12)';
+  c.fillRect(60, 0, 20, 32);
+  c.fillStyle = 'rgba(255,255,255,0.35)';
+  c.fillRect(8, 0, 10, 32);
+  c.fillStyle = OUTLINE;
+  c.fillRect(0, 0, 3, 32);
+  c.fillRect(77, 0, 3, 32);
+});
+def('fileStack', 60, 120, (c) => {
+  const cols = ['#FAB005', '#4DABF7', '#F06595', '#40C057', '#FF922B'];
+  for (let i = 0; i < 10; i++) {
+    const y = 108 - i * 12;
+    box(c, 3 + (i % 2) * 3, y, 52, 12, cols[i % cols.length], 2.5, 2);
+    c.fillStyle = '#FFFFFF';
+    c.fillRect(10 + (i % 2) * 3, y + 4, 14, 3);
+  }
+});
+def('file', 28, 18, (c) => {
+  box(c, 2, 4, 24, 13, '#FAB005', 2.5, 2);
+  box(c, 2, 2, 10, 5, '#FAB005', 2, 1);
+  c.fillStyle = '#FFFFFF';
+  c.fillRect(6, 9, 12, 2);
+});
+def('promoLetter', 64, 94, (c) => {
+  box(c, 26, 46, 12, 46, '#868E96', 3, 2);
+  box(c, 8, 86, 48, 8, '#495057', 3, 2);
+  box(c, 6, 12, 52, 36, '#FFF3BF', 3, 3);
+  poly(c, [6, 12, 32, 34, 58, 12], '#FFE066', 3);
+  circle(c, 32, 34, 7, '#C92A2A', 2.5);
+  text(c, '★', 32, 35, 6, '#FFD43B');
+});
+
 // ------------------------------------------------------------------ ambient life
 def(
   'bird',

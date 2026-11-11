@@ -253,8 +253,29 @@ export const HR_STYLE: DeskBossStyle = {
   scareKey: 'scareHR',
 };
 
+export const COMMITTEE_STYLE: DeskBossStyle = {
+  body: 'committee',
+  weak: 'stamp',
+  arcTex: 'ratingStar',
+  arcHurt: 'ratingHit',
+  arcLine: 'committeeArc',
+  waveTex: 'bellCurve',
+  waveHurt: 'curveHit',
+  rainTex: 'kpiSheet',
+  rainHurt: 'kpiHit',
+  hitLine: 'stampHit',
+  phaseLines: ['committeeLine2', 'committeeLine3'],
+  byeLine: 'committeeBye',
+  phases: ['committeeP1', 'committeeP2', 'committeeP3'],
+  bannerKey: 'bossCommittee',
+  nameKey: 'committeeName',
+  greetKey: 'committeeHi',
+  scareKey: 'scareCommittee',
+};
+
 /** Map object type → desk boss style. */
 export const DESK_BOSSES: Record<string, DeskBossStyle> = {
+  committee: COMMITTEE_STYLE,
   manager: MANAGER_STYLE,
   aunty: AUNTY_STYLE,
   client: CLIENT_STYLE,

@@ -1,7 +1,7 @@
 import type { SkinId } from './extras';
 import type { StringKey } from '../i18n/strings';
 
-export type LevelId = 1 | 2 | 3 | 4 | 5 | 6;
+export type LevelId = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 /** In-game clock (minutes since midnight). Reaching `late` costs a heart and resets to `reset`. */
 export interface LevelClock {
@@ -25,13 +25,15 @@ export interface LevelDef {
   id: LevelId;
   /** World map file in public/assets/maps. */
   map: string;
-  nameKey: 'level1Name' | 'level2Name' | 'level3Name' | 'level4Name' | 'level5Name' | 'level6Name';
+  nameKey:
+    'level1Name' | 'level2Name' | 'level3Name' | 'level4Name' | 'level5Name' | 'level6Name' | 'level7Name';
   /** i18n key of the eyebrow on the title screen and level card. */
-  worldKey: 'world1' | 'world2' | 'world3' | 'world4' | 'world5' | 'world6';
-  mapTitleKey: 'mapTitle1' | 'mapTitle2' | 'mapTitle3' | 'mapTitle4' | 'mapTitle5' | 'mapTitle6';
-  mapGoalKey: 'mapGoal1' | 'mapGoal2' | 'mapGoal3' | 'mapGoal4' | 'mapGoal5' | 'mapGoal6';
+  worldKey: 'world1' | 'world2' | 'world3' | 'world4' | 'world5' | 'world6' | 'world7';
+  mapTitleKey:
+    'mapTitle1' | 'mapTitle2' | 'mapTitle3' | 'mapTitle4' | 'mapTitle5' | 'mapTitle6' | 'mapTitle7';
+  mapGoalKey: 'mapGoal1' | 'mapGoal2' | 'mapGoal3' | 'mapGoal4' | 'mapGoal5' | 'mapGoal6' | 'mapGoal7';
   /** Big headline on Level Clear. */
-  clearKey: 'clearBig' | 'clearBig2' | 'clearBig3' | 'clearBig4' | 'clearBig5' | 'clearBig6';
+  clearKey: 'clearBig' | 'clearBig2' | 'clearBig3' | 'clearBig4' | 'clearBig5' | 'clearBig6' | 'clearBig7';
   indoor: boolean;
   /** Levels with a clock show it instead of the elapsed time (Level 2: office clock, Level 3: lunch). */
   clock?: LevelClock;
@@ -172,9 +174,34 @@ export const LEVELS: Record<LevelId, LevelDef> = {
     promoSkin: 'shades',
     music: 'commute',
   },
+  7: {
+    id: 7,
+    map: 'level7.tmj',
+    nameKey: 'level7Name',
+    worldKey: 'world7',
+    mapTitleKey: 'mapTitle7',
+    mapGoalKey: 'mapGoal7',
+    clearKey: 'clearBig7',
+    indoor: true,
+    // The appraisal review is at 11 AM.
+    clock: { start: hm(10, 42), red: hm(10, 57), late: hm(11, 0), reset: hm(10, 58), lateKey: 'reviewLate' },
+    finish: 'punch',
+    punch: {
+      tex: 'promoLetter',
+      scanKey: 'opening',
+      doneKey: 'promotedLetter',
+      lockedKey: 'committeeLocked',
+    },
+    intro: false,
+    // Third star: collect all 5 KPI stars (Appraisal Points).
+    thirdStar: 'appraisal',
+    promotion: { from: 'Engineering Manager', to: 'Director' },
+    promoSkin: 'lanyard',
+    music: 'office',
+  },
 };
 
-export const LEVEL_IDS: LevelId[] = [1, 2, 3, 4, 5, 6];
+export const LEVEL_IDS: LevelId[] = [1, 2, 3, 4, 5, 6, 7];
 /** Total levels planned (PRD section 15); levels beyond the built ones show as "coming soon". */
 export const PLANNED_LEVELS = 8;
 
